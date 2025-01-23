@@ -160,9 +160,91 @@ export const Agenda = () => {
 };
 
 export const Tarefas = () => {
+  const [tasks, setTasks] = useState<{ id: number; title: string; completed: boolean }[]>([]);
+  const { toast } = useToast();
+
+  const handleAddTask = (title: string) => {
+    if (title.trim()) {
+      setTasks([...tasks, { id: Date.now(), title, completed: false }]);
+      toast({
+        title: "Tarefa adicionada",
+        description: title,
+      });
+    }
+  };
+
+  const toggleTask = (id: number) => {
+    setTasks(tasks.map(task => 
+      task.id === id ? { ...task, completed: !task.completed } : task
+    ));
+  };
+
+  const deleteTask = (id: number) => {
+    setTasks(tasks.filter(task => task.id !== id));
+    toast({
+      title: "Tarefa removida",
+      variant: "destructive",
+    });
+  };
+
   return (
     <PageTemplate title="Tarefas">
-      <div>Em desenvolvimento</div>
+      <div className="space-y-4">
+        <div className="flex gap-2">
+          <Input
+            placeholder="Adicionar nova tarefa..."
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                handleAddTask((e.target as HTMLInputElement).value);
+                (e.target as HTMLInputElement).value = '';
+              }
+            }}
+          />
+          <Button
+            onClick={() => {
+              const input = document.querySelector('input') as HTMLInputElement;
+              handleAddTask(input.value);
+              input.value = '';
+            }}
+          >
+            Adicionar
+          </Button>
+        </div>
+
+        <div className="space-y-2">
+          {tasks.map(task => (
+            <div
+              key={task.id}
+              className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={task.completed}
+                  onChange={() => toggleTask(task.id)}
+                  className="w-4 h-4 rounded border-gray-300"
+                />
+                <span className={task.completed ? "line-through text-muted-foreground" : ""}>
+                  {task.title}
+                </span>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => deleteTask(task.id)}
+                className="text-destructive hover:text-destructive/90"
+              >
+                Remover
+              </Button>
+            </div>
+          ))}
+          {tasks.length === 0 && (
+            <p className="text-center text-muted-foreground py-4">
+              Nenhuma tarefa cadastrada
+            </p>
+          )}
+        </div>
+      </div>
     </PageTemplate>
   );
 };
