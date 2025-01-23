@@ -44,11 +44,12 @@
     @apply bg-background text-foreground antialiased;
   }
   .name-underline {
-    @apply relative;
+    @apply relative inline-block;
   }
   .name-underline::after {
     content: '';
-    @apply absolute bottom-0 left-0 w-full h-1 bg-[#00FF00];
+    @apply absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-[#00FF00] via-[#00FF00] to-[#FFD700];
+    border-radius: 4px;
   }
   .nav-button {
     @apply flex items-center gap-2 px-6 py-3 rounded-full bg-secondary hover:bg-secondary/80 transition-colors duration-200;

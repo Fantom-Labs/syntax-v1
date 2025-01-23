@@ -1,10 +1,12 @@
 import { List, Calendar, Activity, BookOpen, Target, ShoppingCart, DollarSign, Notebook, User, Utensils } from "lucide-react";
 import NavButton from "@/components/NavButton";
 import AddButton from "@/components/AddButton";
+import Header from "@/components/Header";
 
 const Index = () => {
   return (
     <div className="min-h-screen p-8 md:p-12">
+      <Header />
       <header className="mb-16">
         <h1 className="text-4xl font-medium">
           Hello, <span className="name-underline">Múcio</span>.
@@ -26,11 +28,6 @@ const Index = () => {
           <NavButton to="/alimentacao" icon={Utensils} label="Alimentação" />
           <AddButton />
         </div>
-
-        <section className="mt-16">
-          <h2 className="text-2xl font-medium">Planejamento</h2>
-          {/* Placeholder for future planning section */}
-        </section>
       </main>
     </div>
   );
