@@ -19,11 +19,11 @@ const Header = () => {
   }, []);
 
   const toggleTheme = () => {
-    const newTheme = theme === "dark" ? "light" : "dark";
-    console.log("Alternando de", theme, "para", newTheme);
-    setTheme(newTheme);
+    const currentTheme = theme === "dark" ? "light" : "dark";
+    console.log("Alternando tema de", theme, "para", currentTheme);
+    setTheme(currentTheme);
     toast({
-      title: `Tema alterado para ${newTheme === "dark" ? "escuro" : "claro"}`,
+      title: `Tema alterado para ${currentTheme === "dark" ? "escuro" : "claro"}`,
       duration: 2000,
     });
   };
