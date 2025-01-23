@@ -9,11 +9,19 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { format, addDays, subDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { CalendarIcon, Clock, Plus, ArrowLeft, ArrowRight, Trash2, Dog, Sun, Droplets, Plus as PlusIcon, CheckSquare, Square } from "lucide-react";
+import { CalendarIcon, Clock, Plus, ArrowLeft, ArrowRight, Trash2, Dog, Sun, Droplets } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
 import PageTemplate from "@/components/PageTemplate";
 import { Habit } from "@/types/habits";
+
+// Define the form schema
+const formSchema = z.object({
+  title: z.string().min(1, "O título é obrigatório"),
+  description: z.string().optional(),
+  date: z.date(),
+  time: z.string(),
+});
 
 export const Agenda = () => {
   const [date, setDate] = useState<Date>();
@@ -403,7 +411,7 @@ export const Habitos = () => {
             <Dialog open={isAddingHabit} onOpenChange={setIsAddingHabit}>
               <DialogTrigger asChild>
                 <Button variant="outline" size="icon" className="rounded-full">
-                  <PlusIcon className="h-4 w-4" />
+                  <Plus className="h-4 w-4" />
                 </Button>
               </DialogTrigger>
               <DialogContent>
