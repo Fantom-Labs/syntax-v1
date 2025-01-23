@@ -6,8 +6,8 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { format } from "date-fns";
-import { CalendarIcon, Clock, Plus } from "lucide-react";
+import { format, addDays, subDays } from "date-fns";
+import { CalendarIcon, Clock, Plus, ArrowLeft, ArrowRight } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import PageTemplate from "@/components/PageTemplate";
@@ -160,8 +160,12 @@ export const Agenda = () => {
 };
 
 export const Tarefas = () => {
-  const [date, setDate] = useState<Date>();
-  const [tasks, setTasks] = useState<{ id: number; title: string; completed: boolean }[]>([]);
+  const [date, setDate] = useState<Date>(new Date());
+  const [tasks, setTasks] = useState<{ id: number; title: string; completed: boolean }[]>([
+    { id: 1, title: "Fazer compras no supermercado", completed: false },
+    { id: 2, title: "Preparar apresentação", completed: true },
+    { id: 3, title: "Agendar consulta médica", completed: false },
+  ]);
   const { toast } = useToast();
 
   const handleAddTask = (title: string) => {
@@ -188,16 +192,14 @@ export const Tarefas = () => {
     });
   };
 
+  const navigateDay = (direction: 'next' | 'prev') => {
+    setDate(currentDate => direction === 'next' ? addDays(currentDate, 1) : subDays(currentDate, 1));
+  };
+
   return (
     <PageTemplate title="Tarefas">
       <div className="grid gap-6 md:grid-cols-[350px,1fr]">
         <div className="space-y-4">
-          <Calendar
-            mode="single"
-            selected={date}
-            onSelect={setDate}
-            className="rounded-lg border bg-card"
-          />
           <div className="flex gap-2">
             <Input
               placeholder="Adicionar nova tarefa..."
@@ -218,40 +220,60 @@ export const Tarefas = () => {
               Adicionar
             </Button>
           </div>
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={setDate}
+            className="rounded-lg border bg-card"
+          />
         </div>
 
-        <div className="space-y-2">
-          {tasks.map(task => (
-            <div
-              key={task.id}
-              className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
-            >
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={task.completed}
-                  onChange={() => toggleTask(task.id)}
-                  className="w-4 h-4 rounded border-gray-300"
-                />
-                <span className={task.completed ? "line-through text-muted-foreground" : ""}>
-                  {task.title}
-                </span>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => deleteTask(task.id)}
-                className="text-destructive hover:text-destructive/90"
+        <div className="space-y-4">
+          <div className="flex items-center justify-between mb-4">
+            <Button variant="outline" size="icon" onClick={() => navigateDay('prev')}>
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <span className="font-medium">
+              {format(date, "dd 'de' MMMM 'de' yyyy")}
+            </span>
+            <Button variant="outline" size="icon" onClick={() => navigateDay('next')}>
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </div>
+          
+          <div className="space-y-2">
+            {tasks.map(task => (
+              <div
+                key={task.id}
+                className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
               >
-                Remover
-              </Button>
-            </div>
-          ))}
-          {tasks.length === 0 && (
-            <p className="text-center text-muted-foreground py-4">
-              Nenhuma tarefa cadastrada
-            </p>
-          )}
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={task.completed}
+                    onChange={() => toggleTask(task.id)}
+                    className="w-4 h-4 rounded border-gray-300"
+                  />
+                  <span className={task.completed ? "line-through text-muted-foreground" : ""}>
+                    {task.title}
+                  </span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => deleteTask(task.id)}
+                  className="text-destructive hover:text-destructive/90"
+                >
+                  Remover
+                </Button>
+              </div>
+            ))}
+            {tasks.length === 0 && (
+              <p className="text-center text-muted-foreground py-4">
+                Nenhuma tarefa cadastrada
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </PageTemplate>
