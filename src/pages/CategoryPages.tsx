@@ -1,6 +1,6 @@
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,20 +9,11 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { format, addDays, subDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { CalendarIcon, Clock, Plus, ArrowLeft, ArrowRight, Trash2 } from "lucide-react";
+import { CalendarIcon, Clock, Plus, ArrowLeft, ArrowRight, Trash2, Dog, Sun, Droplets, Plus as PlusIcon, CheckSquare, Square } from "lucide-react";
 import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
-import PageTemplate from "@/components/PageTemplate";
-import { Check, Dog, Sun, Droplets, Plus as PlusIcon, CheckSquare, Square } from "lucide-react";
 import { toast } from "sonner";
+import PageTemplate from "@/components/PageTemplate";
 import { Habit } from "@/types/habits";
-
-const formSchema = z.object({
-  title: z.string().min(2, "O título deve ter pelo menos 2 caracteres"),
-  description: z.string().optional(),
-  date: z.date(),
-  time: z.string(),
-});
 
 export const Agenda = () => {
   const [date, setDate] = useState<Date>();
@@ -286,6 +277,7 @@ export const Tarefas = () => {
 };
 
 export const Habitos = () => {
+  const [date, setDate] = useState<Date>(new Date());
   const [habits, setHabits] = useState<Habit[]>([
     {
       id: "1",
@@ -310,11 +302,36 @@ export const Habitos = () => {
     }
   ]);
 
+  const [isAddingHabit, setIsAddingHabit] = useState(false);
+  const [newHabitTitle, setNewHabitTitle] = useState("");
+  const [checksPerDay, setChecksPerDay] = useState(1);
+
+  const addHabit = () => {
+    if (!newHabitTitle.trim()) {
+      toast.error("Por favor, insira um título para o hábito");
+      return;
+    }
+
+    const newHabit: Habit = {
+      id: Date.now().toString(),
+      title: newHabitTitle,
+      icon: <Sun className="w-5 h-5 text-[#F6FF71]" />,
+      checksPerDay,
+      checks: []
+    };
+
+    setHabits([...habits, newHabit]);
+    setNewHabitTitle("");
+    setChecksPerDay(1);
+    setIsAddingHabit(false);
+    toast.success("Hábito adicionado com sucesso!");
+  };
+
   const toggleHabitCheck = (habitId: string) => {
     setHabits(currentHabits =>
       currentHabits.map(habit => {
         if (habit.id === habitId) {
-          const today = new Date().toISOString().split('T')[0];
+          const today = format(date, 'yyyy-MM-dd');
           const todayChecks = habit.checks.filter(check => 
             check.timestamp.startsWith(today)
           );
@@ -339,11 +356,42 @@ export const Habitos = () => {
     );
   };
 
+  const removeHabitCheck = (habitId: string) => {
+    setHabits(currentHabits =>
+      currentHabits.map(habit => {
+        if (habit.id === habitId) {
+          const today = format(date, 'yyyy-MM-dd');
+          const updatedChecks = habit.checks.filter(check => 
+            !check.timestamp.startsWith(today)
+          );
+          return {
+            ...habit,
+            checks: updatedChecks
+          };
+        }
+        return habit;
+      })
+    );
+  };
+
+  const removeHabit = (habitId: string) => {
+    setHabits(currentHabits => currentHabits.filter(habit => habit.id !== habitId));
+    toast.success("Hábito removido com sucesso!");
+  };
+
   const getCompletedChecksToday = (habit: Habit) => {
-    const today = new Date().toISOString().split('T')[0];
+    const today = format(date, 'yyyy-MM-dd');
     return habit.checks.filter(check => 
       check.timestamp.startsWith(today)
     ).length;
+  };
+
+  const navigateDay = (direction: 'next' | 'prev') => {
+    setDate(currentDate => 
+      direction === 'next' 
+        ? addDays(currentDate, 1) 
+        : subDays(currentDate, 1)
+    );
   };
 
   return (
@@ -352,8 +400,54 @@ export const Habitos = () => {
         <div className="space-y-6">
           <div className="flex justify-between items-center">
             <h2 className="text-lg font-medium">Lista de Hábitos Diários</h2>
-            <Button variant="outline" size="icon" className="rounded-full">
-              <PlusIcon className="h-4 w-4" />
+            <Dialog open={isAddingHabit} onOpenChange={setIsAddingHabit}>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="icon" className="rounded-full">
+                  <PlusIcon className="h-4 w-4" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Adicionar Novo Hábito</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 mt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="title">Título do Hábito</Label>
+                    <Input
+                      id="title"
+                      value={newHabitTitle}
+                      onChange={(e) => setNewHabitTitle(e.target.value)}
+                      placeholder="Ex: Beber água"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="checks">Marcações por dia</Label>
+                    <Input
+                      id="checks"
+                      type="number"
+                      min="1"
+                      max="10"
+                      value={checksPerDay}
+                      onChange={(e) => setChecksPerDay(Number(e.target.value))}
+                    />
+                  </div>
+                  <Button onClick={addHabit} className="w-full">
+                    Adicionar Hábito
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          <div className="flex items-center justify-between mb-4">
+            <Button variant="outline" size="icon" onClick={() => navigateDay('prev')}>
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <span className="font-medium">
+              {format(date, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+            </span>
+            <Button variant="outline" size="icon" onClick={() => navigateDay('next')}>
+              <ArrowRight className="h-4 w-4" />
             </Button>
           </div>
           
@@ -373,7 +467,7 @@ export const Habitos = () => {
                     return (
                       <button
                         key={index}
-                        onClick={() => toggleHabitCheck(habit.id)}
+                        onClick={() => isCompleted ? removeHabitCheck(habit.id) : toggleHabitCheck(habit.id)}
                         className="p-1 hover:bg-accent/50 rounded transition-colors"
                       >
                         {isCompleted ? (
@@ -384,6 +478,14 @@ export const Habitos = () => {
                       </button>
                     );
                   })}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeHabit(habit.id)}
+                    className="ml-2 text-destructive hover:text-destructive/90"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
             ))}
