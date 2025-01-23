@@ -10,7 +10,7 @@ import { format } from "date-fns";
 import { CalendarIcon, Clock, Plus } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import PageTemplate from "./PageTemplate";
+import PageTemplate from "@/components/PageTemplate";
 
 const formSchema = z.object({
   title: z.string().min(2, "O título deve ter pelo menos 2 caracteres"),
@@ -159,13 +159,82 @@ export const Agenda = () => {
   );
 };
 
-export const Tarefas = () => { /* existing Tarefas component code */ };
-export const Habitos = () => { /* existing Habitos component code */ };
-export const Conteudo = () => { /* existing Conteudo component code */ };
-export const Livros = () => { /* existing Livros component code */ };
-export const Metas = () => { /* existing Metas component code */ };
-export const Compras = () => { /* existing Compras component code */ };
-export const Investimentos = () => { /* existing Investimentos component code */ };
-export const Notas = () => { /* existing Notas component code */ };
-export const Fisico = () => { /* existing Fisico component code */ };
-export const Alimentacao = () => { /* existing Alimentacao component code */ };
+export const Tarefas = () => {
+  return (
+    <PageTemplate title="Tarefas">
+      <div>Em desenvolvimento</div>
+    </PageTemplate>
+  );
+};
+
+export const Habitos = () => {
+  return (
+    <PageTemplate title="Hábitos">
+      <div>Em desenvolvimento</div>
+    </PageTemplate>
+  );
+};
+
+export const Conteudo = () => {
+  return (
+    <PageTemplate title="Conteúdo">
+      <div>Em desenvolvimento</div>
+    </PageTemplate>
+  );
+};
+
+export const Livros = () => {
+  return (
+    <PageTemplate title="Livros">
+      <div>Em desenvolvimento</div>
+    </PageTemplate>
+  );
+};
+
+export const Metas = () => {
+  return (
+    <PageTemplate title="Metas">
+      <div>Em desenvolvimento</div>
+    </PageTemplate>
+  );
+};
+
+export const Compras = () => {
+  return (
+    <PageTemplate title="Compras">
+      <div>Em desenvolvimento</div>
+    </PageTemplate>
+  );
+};
+
+export const Investimentos = () => {
+  return (
+    <PageTemplate title="Investimentos">
+      <div>Em desenvolvimento</div>
+    </PageTemplate>
+  );
+};
+
+export const Notas = () => {
+  return (
+    <PageTemplate title="Notas">
+      <div>Em desenvolvimento</div>
+    </PageTemplate>
+  );
+};
+
+export const Fisico = () => {
+  return (
+    <PageTemplate title="Físico">
+      <div>Em desenvolvimento</div>
+    </PageTemplate>
+  );
+};
+
+export const Alimentacao = () => {
+  return (
+    <PageTemplate title="Alimentação">
+      <div>Em desenvolvimento</div>
+    </PageTemplate>
+  );
+};
