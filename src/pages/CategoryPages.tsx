@@ -160,6 +160,7 @@ export const Agenda = () => {
 };
 
 export const Tarefas = () => {
+  const [date, setDate] = useState<Date>();
   const [tasks, setTasks] = useState<{ id: number; title: string; completed: boolean }[]>([]);
   const { toast } = useToast();
 
@@ -189,26 +190,34 @@ export const Tarefas = () => {
 
   return (
     <PageTemplate title="Tarefas">
-      <div className="space-y-4">
-        <div className="flex gap-2">
-          <Input
-            placeholder="Adicionar nova tarefa..."
-            onKeyPress={(e) => {
-              if (e.key === 'Enter') {
-                handleAddTask((e.target as HTMLInputElement).value);
-                (e.target as HTMLInputElement).value = '';
-              }
-            }}
+      <div className="grid gap-6 md:grid-cols-[350px,1fr]">
+        <div className="space-y-4">
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={setDate}
+            className="rounded-lg border bg-card"
           />
-          <Button
-            onClick={() => {
-              const input = document.querySelector('input') as HTMLInputElement;
-              handleAddTask(input.value);
-              input.value = '';
-            }}
-          >
-            Adicionar
-          </Button>
+          <div className="flex gap-2">
+            <Input
+              placeholder="Adicionar nova tarefa..."
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  handleAddTask((e.target as HTMLInputElement).value);
+                  (e.target as HTMLInputElement).value = '';
+                }
+              }}
+            />
+            <Button
+              onClick={() => {
+                const input = document.querySelector('input') as HTMLInputElement;
+                handleAddTask(input.value);
+                input.value = '';
+              }}
+            >
+              Adicionar
+            </Button>
+          </div>
         </div>
 
         <div className="space-y-2">
