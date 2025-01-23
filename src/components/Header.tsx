@@ -15,8 +15,15 @@ const Header = () => {
 
   const toggleTheme = () => {
     console.log("Alternando tema. Tema atual:", theme);
-    setTheme(theme === "dark" ? "light" : "dark");
+    // Forçar um valor inicial se theme for undefined
+    const currentTheme = theme || "light";
+    const newTheme = currentTheme === "dark" ? "light" : "dark";
+    console.log("Mudando para tema:", newTheme);
+    setTheme(newTheme);
   };
+
+  // Determinar qual ícone mostrar baseado no tema atual
+  const isDark = theme === "dark";
 
   return (
     <div className="fixed top-4 right-4 flex items-center gap-4">
@@ -26,9 +33,9 @@ const Header = () => {
       <button 
         className="p-2 rounded-full hover:bg-secondary transition-colors"
         onClick={toggleTheme}
-        aria-label={theme === "dark" ? "Mudar para tema claro" : "Mudar para tema escuro"}
+        aria-label={isDark ? "Mudar para tema claro" : "Mudar para tema escuro"}
       >
-        {theme === "dark" ? (
+        {isDark ? (
           <Sun className="w-5 h-5" />
         ) : (
           <Moon className="w-5 h-5" />
