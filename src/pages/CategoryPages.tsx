@@ -9,7 +9,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { format, addDays, subDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { CalendarIcon, Clock, Plus, ArrowLeft, ArrowRight } from "lucide-react";
+import { CalendarIcon, Clock, Plus, ArrowLeft, ArrowRight, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import PageTemplate from "@/components/PageTemplate";
