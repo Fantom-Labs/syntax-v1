@@ -1,5 +1,5 @@
 import { Moon, Sun, User } from "lucide-react";
-import { useTheme } from "next-themes";
+import { useTheme } from "./theme-provider";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -10,9 +10,6 @@ const Header = () => {
 
   useEffect(() => {
     setMounted(true);
-    if (!theme) {
-      setTheme("light");
-    }
   }, []);
 
   if (!mounted) {
@@ -20,19 +17,13 @@ const Header = () => {
   }
 
   const handleThemeChange = () => {
-    if (theme === "light") {
-      setTheme("dark");
-      toast({
-        title: "Tema alterado para escuro",
-        duration: 2000,
-      });
-    } else {
-      setTheme("light");
-      toast({
-        title: "Tema alterado para claro",
-        duration: 2000,
-      });
-    }
+    const newTheme = theme === "light" ? "dark" : "light";
+    setTheme(newTheme);
+    
+    toast({
+      title: `Tema alterado para ${newTheme === "dark" ? "escuro" : "claro"}`,
+      duration: 2000,
+    });
   };
 
   return (
