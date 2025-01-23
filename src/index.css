@@ -48,7 +48,8 @@
   }
   .name-underline::after {
     content: '';
-    @apply absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-[#00FF00] via-[#00FF00] to-[#FFD700];
+    @apply absolute -bottom-1 left-0 w-full h-1;
+    background: linear-gradient(90deg, #7BFF8B 25%, #F6FF71 47%, #DE7CFF 70%);
     border-radius: 4px;
   }
   .nav-button {

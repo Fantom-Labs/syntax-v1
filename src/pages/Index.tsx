@@ -2,8 +2,23 @@ import { List, Calendar, Activity, BookOpen, Target, ShoppingCart, DollarSign, N
 import NavButton from "@/components/NavButton";
 import AddButton from "@/components/AddButton";
 import Header from "@/components/Header";
+import { useEffect, useState } from "react";
+
+interface CustomNavButton {
+  label: string;
+  path: string;
+}
 
 const Index = () => {
+  const [customButtons, setCustomButtons] = useState<CustomNavButton[]>([]);
+
+  useEffect(() => {
+    const savedButtons = localStorage.getItem('customNavButtons');
+    if (savedButtons) {
+      setCustomButtons(JSON.parse(savedButtons));
+    }
+  }, []);
+
   return (
     <div className="min-h-screen p-8 md:p-12">
       <Header />
@@ -26,6 +41,14 @@ const Index = () => {
           <NavButton to="/notas" icon={Notebook} label="Notas" />
           <NavButton to="/fisico" icon={User} label="Físico" />
           <NavButton to="/alimentacao" icon={Utensils} label="Alimentação" />
+          {customButtons.map((button, index) => (
+            <NavButton
+              key={index}
+              to={button.path}
+              icon={List}
+              label={button.label}
+            />
+          ))}
           <AddButton />
         </div>
       </main>
