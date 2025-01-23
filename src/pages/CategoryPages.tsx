@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import PageTemplate from "@/components/PageTemplate";
 import { Check, Dog, Sun, Droplets, Plus as PlusIcon, CheckSquare, Square } from "lucide-react";
 import { toast } from "sonner";
+import { Habit } from "@/types/habits";
 
 const formSchema = z.object({
   title: z.string().min(2, "O título deve ter pelo menos 2 caracteres"),
