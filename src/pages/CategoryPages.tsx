@@ -26,7 +26,7 @@ export const Tarefas = () => (
       </div>
     </div>
   </PageTemplate>
-};
+);
 
 export const Agenda = () => <PageTemplate title="Agenda" />;
 export const Habitos = () => <PageTemplate title="Hábitos" />;
