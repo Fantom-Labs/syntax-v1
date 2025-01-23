@@ -5,6 +5,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { useState } from "react";
 import { format, addDays, subDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import AddButton from "@/components/AddButton";
 
 const TaskItem = ({ task }: { task: string }) => (
   <div className="flex items-center gap-4 p-4 border rounded-lg mb-4">
@@ -28,7 +29,7 @@ export const Tarefas = () => {
   return (
     <PageTemplate title="Tarefas">
       <div className="max-w-3xl mx-auto">
-        <div className="relative flex items-center justify-center mb-8 mt-4">
+        <div className="relative flex items-center justify-between mb-8 mt-4">
           <div className="flex items-center gap-4">
             <button 
               onClick={handlePreviousDay}
@@ -51,6 +52,8 @@ export const Tarefas = () => {
               <ChevronRight className="w-5 h-5" />
             </button>
           </div>
+
+          <AddButton />
 
           {calendarOpen && (
             <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-background border rounded-lg shadow-lg z-10">

@@ -12,10 +12,12 @@ const PageTemplate = ({ title, children }: PageTemplateProps) => {
     <div className="min-h-screen p-8 md:p-12">
       <Header />
       <header className="mb-8">
-        <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-4">
-          <ArrowLeft className="w-4 h-4" />
-          <span>Voltar</span>
-        </Link>
+        <div className="flex justify-between items-center mb-4">
+          <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground">
+            <ArrowLeft className="w-4 h-4" />
+            <span>Voltar</span>
+          </Link>
+        </div>
         <h1 className="text-3xl font-medium name-underline">{title}</h1>
       </header>
       <main>{children}</main>
