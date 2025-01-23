@@ -11,6 +11,8 @@ import { CalendarIcon, Clock, Plus, ArrowLeft, ArrowRight } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import PageTemplate from "@/components/PageTemplate";
+import { Check, Dog, Sun, Droplets, Plus as PlusIcon, CheckSquare, Square } from "lucide-react";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   title: z.string().min(2, "O título deve ter pelo menos 2 caracteres"),
@@ -281,9 +283,110 @@ export const Tarefas = () => {
 };
 
 export const Habitos = () => {
+  const [habits, setHabits] = useState<Habit[]>([
+    {
+      id: "1",
+      title: "Acordar cedo",
+      icon: <Sun className="w-5 h-5 text-[#F6FF71]" />,
+      checksPerDay: 1,
+      checks: []
+    },
+    {
+      id: "2",
+      title: "Passear com Katana",
+      icon: <Dog className="w-5 h-5 text-[#DE7CFF]" />,
+      checksPerDay: 2,
+      checks: []
+    },
+    {
+      id: "3",
+      title: "Beber 2L de água",
+      icon: <Droplets className="w-5 h-5 text-[#7BFF8B]" />,
+      checksPerDay: 1,
+      checks: []
+    }
+  ]);
+
+  const toggleHabitCheck = (habitId: string) => {
+    setHabits(currentHabits =>
+      currentHabits.map(habit => {
+        if (habit.id === habitId) {
+          const today = new Date().toISOString().split('T')[0];
+          const todayChecks = habit.checks.filter(check => 
+            check.timestamp.startsWith(today)
+          );
+
+          if (todayChecks.length >= habit.checksPerDay) {
+            toast.error("Você já completou todas as marcações para hoje!");
+            return habit;
+          }
+
+          const newCheck = {
+            timestamp: new Date().toISOString(),
+            completed: true
+          };
+
+          return {
+            ...habit,
+            checks: [...habit.checks, newCheck]
+          };
+        }
+        return habit;
+      })
+    );
+  };
+
+  const getCompletedChecksToday = (habit: Habit) => {
+    const today = new Date().toISOString().split('T')[0];
+    return habit.checks.filter(check => 
+      check.timestamp.startsWith(today)
+    ).length;
+  };
+
   return (
     <PageTemplate title="Hábitos">
-      <div>Em desenvolvimento</div>
+      <div className="grid gap-6 md:grid-cols-[1fr]">
+        <div className="space-y-6">
+          <div className="flex justify-between items-center">
+            <h2 className="text-lg font-medium">Lista de Hábitos Diários</h2>
+            <Button variant="outline" size="icon" className="rounded-full">
+              <PlusIcon className="h-4 w-4" />
+            </Button>
+          </div>
+          
+          <div className="space-y-4">
+            {habits.map(habit => (
+              <div
+                key={habit.id}
+                className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  {habit.icon}
+                  <span className="font-medium">{habit.title}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  {Array.from({ length: habit.checksPerDay }).map((_, index) => {
+                    const isCompleted = index < getCompletedChecksToday(habit);
+                    return (
+                      <button
+                        key={index}
+                        onClick={() => toggleHabitCheck(habit.id)}
+                        className="p-1 hover:bg-accent/50 rounded transition-colors"
+                      >
+                        {isCompleted ? (
+                          <CheckSquare className="w-6 h-6 text-primary" />
+                        ) : (
+                          <Square className="w-6 h-6" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </PageTemplate>
   );
 };
