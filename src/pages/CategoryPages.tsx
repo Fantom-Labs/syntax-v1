@@ -9,7 +9,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { format, addDays, subDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { CalendarIcon, Clock, Plus, ArrowLeft, ArrowRight, Trash2, Dog, Sun, Droplets } from "lucide-react";
+import { CalendarIcon, Clock, Plus, ArrowLeft, ArrowRight, Trash2, Dog, Sun, Droplets, CheckSquare, Square } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import PageTemplate from "@/components/PageTemplate";
@@ -313,10 +313,15 @@ export const Habitos = () => {
   const [isAddingHabit, setIsAddingHabit] = useState(false);
   const [newHabitTitle, setNewHabitTitle] = useState("");
   const [checksPerDay, setChecksPerDay] = useState(1);
+  const { toast } = useToast();
 
   const addHabit = () => {
     if (!newHabitTitle.trim()) {
-      toast.error("Por favor, insira um título para o hábito");
+      toast({
+        title: "Erro",
+        description: "Por favor, insira um título para o hábito",
+        variant: "destructive"
+      });
       return;
     }
 
@@ -332,7 +337,10 @@ export const Habitos = () => {
     setNewHabitTitle("");
     setChecksPerDay(1);
     setIsAddingHabit(false);
-    toast.success("Hábito adicionado com sucesso!");
+    toast({
+      title: "Sucesso",
+      description: "Hábito adicionado com sucesso!"
+    });
   };
 
   const toggleHabitCheck = (habitId: string) => {
@@ -345,7 +353,11 @@ export const Habitos = () => {
           );
 
           if (todayChecks.length >= habit.checksPerDay) {
-            toast.error("Você já completou todas as marcações para hoje!");
+            toast({
+              title: "Erro",
+              description: "Você já completou todas as marcações para hoje!",
+              variant: "destructive"
+            });
             return habit;
           }
 
@@ -384,7 +396,10 @@ export const Habitos = () => {
 
   const removeHabit = (habitId: string) => {
     setHabits(currentHabits => currentHabits.filter(habit => habit.id !== habitId));
-    toast.success("Hábito removido com sucesso!");
+    toast({
+      title: "Sucesso",
+      description: "Hábito removido com sucesso!"
+    });
   };
 
   const getCompletedChecksToday = (habit: Habit) => {
