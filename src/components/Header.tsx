@@ -1,29 +1,37 @@
 import { Moon, Sun, User } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
 
 const Header = () => {
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
+  const { toast } = useToast();
 
   // Prevenir hydration mismatch
   useEffect(() => {
     setMounted(true);
+    // Definir tema inicial se não houver nenhum
+    if (!theme) {
+      setTheme("light");
+    }
+    console.log("Tema inicial:", theme);
   }, []);
 
-  if (!mounted) return null;
-
   const toggleTheme = () => {
-    console.log("Alternando tema. Tema atual:", theme);
-    // Forçar um valor inicial se theme for undefined
-    const currentTheme = theme || "light";
-    const newTheme = currentTheme === "dark" ? "light" : "dark";
-    console.log("Mudando para tema:", newTheme);
+    const newTheme = theme === "dark" ? "light" : "dark";
+    console.log("Alternando de", theme, "para", newTheme);
     setTheme(newTheme);
+    toast({
+      title: `Tema alterado para ${newTheme === "dark" ? "escuro" : "claro"}`,
+      duration: 2000,
+    });
   };
 
-  // Determinar qual ícone mostrar baseado no tema atual
-  const isDark = theme === "dark";
+  // Não renderizar nada até o componente estar montado
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <div className="fixed top-4 right-4 flex items-center gap-4">
@@ -33,9 +41,9 @@ const Header = () => {
       <button 
         className="p-2 rounded-full hover:bg-secondary transition-colors"
         onClick={toggleTheme}
-        aria-label={isDark ? "Mudar para tema claro" : "Mudar para tema escuro"}
+        aria-label={theme === "dark" ? "Mudar para tema claro" : "Mudar para tema escuro"}
       >
-        {isDark ? (
+        {theme === "dark" ? (
           <Sun className="w-5 h-5" />
         ) : (
           <Moon className="w-5 h-5" />
