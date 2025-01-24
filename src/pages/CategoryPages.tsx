@@ -7,9 +7,9 @@ import { Label } from "@/components/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { format, addDays, subDays } from "date-fns";
+import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { CalendarIcon, Clock, Plus, Dog, Sun, Droplets, CheckSquare, Square, ArrowLeft, ArrowRight, Trash2 } from "lucide-react";
+import { CalendarIcon, Plus } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import PageTemplate from "@/components/PageTemplate";
@@ -56,12 +56,17 @@ export const Agenda = () => {
           <Calendar
             mode="single"
             selected={date}
-            onSelect={setDate}
+            onSelect={(newDate) => {
+              setDate(newDate);
+              if (newDate) {
+                form.setValue('date', newDate);
+              }
+            }}
             className="rounded-lg border bg-card"
           />
           <Dialog>
             <DialogTrigger asChild>
-              <Button className="w-full bg-gradient-to-r from-[#7BFF8B] via-[#F6FF71] to-[#DE7CFF] hover:opacity-90 text-foreground">
+              <Button className="w-full bg-gradient-to-r from-[#7BFF8B] via-[#F6FF71] to-[#B259FF] hover:opacity-90 text-foreground">
                 <Plus className="mr-2" />
                 Novo Evento
               </Button>
@@ -121,7 +126,6 @@ export const Agenda = () => {
                         <FormLabel>Horário</FormLabel>
                         <FormControl>
                           <div className="flex items-center gap-2">
-                            <Clock className="h-4 w-4 opacity-50" />
                             <Input type="time" {...field} />
                           </div>
                         </FormControl>
