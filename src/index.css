@@ -79,7 +79,7 @@
   .name-underline::after {
     content: '';
     @apply absolute -bottom-1 left-0 w-full h-1;
-    background: linear-gradient(90deg, #7BFF8B 25%, #F6FF71 47%, #DE7CFF 70%);
+    background: linear-gradient(90deg, #7BFF8B 25%, #F6FF71 47%, #B259FF 70%);
     border-radius: 4px;
   }
   .nav-button {
