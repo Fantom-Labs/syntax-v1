@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 
 type HabitListProps = {
   habits: Habit[];
-  setHabits: (habits: Habit[]) => void;
+  setHabits: React.Dispatch<React.SetStateAction<Habit[]>>;
   date: Date;
 };
 
@@ -14,7 +14,7 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
   const { toast } = useToast();
 
   const toggleHabitCheck = (habitId: string) => {
-    setHabits(currentHabits =>
+    setHabits((currentHabits: Habit[]) =>
       currentHabits.map(habit => {
         if (habit.id === habitId) {
           const today = format(date, 'yyyy-MM-dd');
@@ -47,7 +47,7 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
   };
 
   const removeHabitCheck = (habitId: string) => {
-    setHabits(currentHabits =>
+    setHabits((currentHabits: Habit[]) =>
       currentHabits.map(habit => {
         if (habit.id === habitId) {
           const today = format(date, 'yyyy-MM-dd');
@@ -65,7 +65,9 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
   };
 
   const removeHabit = (habitId: string) => {
-    setHabits(currentHabits => currentHabits.filter(habit => habit.id !== habitId));
+    setHabits((currentHabits: Habit[]) => 
+      currentHabits.filter(habit => habit.id !== habitId)
+    );
     toast({
       title: "Sucesso",
       description: "Hábito removido com sucesso!"
