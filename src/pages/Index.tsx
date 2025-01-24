@@ -20,8 +20,7 @@ interface DefaultButton {
 const Index = () => {
   const [customButtons, setCustomButtons] = useState<CustomNavButton[]>([]);
   const [isReordering, setIsReordering] = useState(false);
-
-  const defaultButtons: DefaultButton[] = [
+  const [buttons, setButtons] = useState<DefaultButton[]>([
     { label: "Tarefas", path: "/tarefas", icon: List },
     { label: "Agenda", path: "/agenda", icon: Calendar },
     { label: "Notas", path: "/notas", icon: Notebook },
@@ -33,7 +32,7 @@ const Index = () => {
     { label: "Investimentos", path: "/investimentos", icon: DollarSign },
     { label: "Físico", path: "/fisico", icon: User },
     { label: "Alimentação", path: "/alimentacao", icon: Utensils },
-  ];
+  ]);
 
   useEffect(() => {
     const savedButtons = localStorage.getItem('customNavButtons');
@@ -54,11 +53,14 @@ const Index = () => {
   const handleReorder = (index: number) => {
     if (!isReordering) return;
 
-    const newButtons = [...defaultButtons];
-    if (index > 0) {
-      [newButtons[index], newButtons[index - 1]] = [newButtons[index - 1], newButtons[index]];
-      toast.success("Botão movido para a esquerda");
-    }
+    setButtons(currentButtons => {
+      const newButtons = [...currentButtons];
+      if (index > 0) {
+        [newButtons[index], newButtons[index - 1]] = [newButtons[index - 1], newButtons[index]];
+        toast.success("Botão movido para a esquerda");
+      }
+      return newButtons;
+    });
   };
 
   return (
@@ -88,7 +90,7 @@ const Index = () => {
           >
             <ArrowUpDown className="w-6 h-6" />
           </Button>
-          {defaultButtons.map((button, index) => (
+          {buttons.map((button, index) => (
             <NavButton
               key={index}
               to={button.path}
