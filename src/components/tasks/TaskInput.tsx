@@ -23,6 +23,7 @@ export const TaskInput = ({ onAddTask }: TaskInputProps) => {
           onAddTask(input.value);
           input.value = '';
         }}
+        className="bg-[#7BFF8B] hover:bg-[#7BFF8B]/80 text-black"
       >
         Adicionar
       </Button>
