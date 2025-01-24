@@ -10,7 +10,7 @@ interface NavButtonProps {
 
 const NavButton = ({ to, icon: Icon, label, onClick }: NavButtonProps) => {
   return (
-    <Link to={to} className="nav-button w-full" onClick={(e) => {
+    <Link to={to} className="nav-button" onClick={(e) => {
       if (onClick) {
         e.preventDefault();
         onClick();

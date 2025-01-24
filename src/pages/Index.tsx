@@ -62,7 +62,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen p-4 md:p-12">
+    <div className="min-h-screen p-8 md:p-12">
       <svg width="0" height="0">
         <defs>
           <filter id="curve">
@@ -79,7 +79,7 @@ const Index = () => {
       </header>
 
       <main>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 md:gap-4">
+        <div className="flex flex-wrap gap-4">
           <Button
             variant="outline"
             size="icon"
