@@ -3,17 +3,17 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { format, addDays, subDays } from "date-fns";
+import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { CalendarIcon, Clock, Plus, ArrowLeft, ArrowRight, Trash2, Dog, Sun, Droplets, CheckSquare, Square } from "lucide-react";
+import { CalendarIcon, Clock, Plus, Dog, Sun, Droplets, CheckSquare, Square } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import PageTemplate from "@/components/PageTemplate";
 import { Habit } from "@/types/habits";
+import { TasksPage } from "./tasks/TasksPage";
 
 // Define the form schema
 const formSchema = z.object({
@@ -22,6 +22,8 @@ const formSchema = z.object({
   date: z.date(),
   time: z.string(),
 });
+
+export const Tarefas = TasksPage;
 
 export const Agenda = () => {
   const [date, setDate] = useState<Date>();
@@ -158,128 +160,6 @@ export const Agenda = () => {
             )}
           </div>
         </div>
-      </div>
-    </PageTemplate>
-  );
-};
-
-export const Tarefas = () => {
-  const [date, setDate] = useState<Date>(new Date());
-  const [tasks, setTasks] = useState<{ id: number; title: string; completed: boolean }[]>([
-    { id: 1, title: "Fazer compras no supermercado", completed: false },
-    { id: 2, title: "Preparar apresentação", completed: true },
-    { id: 3, title: "Agendar consulta médica", completed: false },
-  ]);
-  const { toast } = useToast();
-
-  const handleAddTask = (title: string) => {
-    if (title.trim()) {
-      setTasks([...tasks, { id: Date.now(), title, completed: false }]);
-      toast({
-        title: "Tarefa adicionada",
-        description: title,
-      });
-    }
-  };
-
-  const toggleTask = (id: number) => {
-    setTasks(tasks.map(task => 
-      task.id === id ? { ...task, completed: !task.completed } : task
-    ));
-  };
-
-  const deleteTask = (id: number) => {
-    setTasks(tasks.filter(task => task.id !== id));
-    toast({
-      title: "Tarefa removida",
-      variant: "destructive",
-    });
-  };
-
-  const navigateDay = (direction: 'next' | 'prev') => {
-    setDate(currentDate => direction === 'next' ? addDays(currentDate, 1) : subDays(currentDate, 1));
-  };
-
-  return (
-    <PageTemplate title="Tarefas">
-      <div className="grid gap-6">
-        <div className="space-y-4">
-          <div className="flex gap-2">
-            <Input
-              placeholder="Adicionar nova tarefa..."
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  handleAddTask((e.target as HTMLInputElement).value);
-                  (e.target as HTMLInputElement).value = '';
-                }
-              }}
-            />
-            <Button
-              onClick={() => {
-                const input = document.querySelector('input') as HTMLInputElement;
-                handleAddTask(input.value);
-                input.value = '';
-              }}
-            >
-              Adicionar
-            </Button>
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex items-center justify-between mb-4">
-              <Button variant="outline" size="icon" onClick={() => navigateDay('prev')}>
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-              <span className="font-medium">
-                {format(date, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
-              </span>
-              <Button variant="outline" size="icon" onClick={() => navigateDay('next')}>
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </div>
-            
-            <div className="space-y-2">
-              {tasks.map(task => (
-                <div
-                  key={task.id}
-                  className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
-                >
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={task.completed}
-                      onChange={() => toggleTask(task.id)}
-                      className="w-4 h-4 rounded border-gray-300"
-                    />
-                    <span className={task.completed ? "line-through text-muted-foreground" : ""}>
-                      {task.title}
-                    </span>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => deleteTask(task.id)}
-                    className="text-destructive hover:text-destructive/90"
-                  >
-                    Remover
-                  </Button>
-                </div>
-              ))}
-              {tasks.length === 0 && (
-                <p className="text-center text-muted-foreground py-4">
-                  Nenhuma tarefa cadastrada
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <Calendar
-          mode="single"
-          selected={date}
-          onSelect={setDate}
-          className="rounded-lg border bg-card w-full max-w-[350px] mx-auto"
-        />
       </div>
     </PageTemplate>
   );
