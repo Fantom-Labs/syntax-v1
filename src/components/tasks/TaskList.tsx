@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Task } from "@/types/tasks";
+import { Trash2 } from "lucide-react";
 
 interface TaskListProps {
   tasks: Task[];
@@ -28,11 +29,11 @@ export const TaskList = ({ tasks, onToggleTask, onDeleteTask }: TaskListProps) =
           </div>
           <Button
             variant="ghost"
-            size="sm"
+            size="icon"
             onClick={() => onDeleteTask(task.id)}
             className="text-destructive hover:text-destructive/90"
           >
-            Remover
+            <Trash2 className="h-4 w-4" />
           </Button>
         </div>
       ))}
