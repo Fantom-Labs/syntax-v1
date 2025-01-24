@@ -22,7 +22,7 @@
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 45%;
     
-    --accent: 142 72% 29%;
+    --accent: 142 100% 74%;
     --accent-foreground: 0 0% 100%;
     
     --destructive: 0 84% 60%;
@@ -30,7 +30,7 @@
 
     --border: 0 0% 92%;
     --input: 0 0% 92%;
-    --ring: 142 72% 29%;
+    --ring: 142 100% 74%;
 
     --radius: 1.5rem;
   }
@@ -54,7 +54,7 @@
     --muted: 240 3.7% 15.9%;
     --muted-foreground: 240 5% 64.9%;
     
-    --accent: 142 72% 29%;
+    --accent: 142 100% 74%;
     --accent-foreground: 0 0% 98%;
     
     --destructive: 0 62.8% 30.6%;
@@ -62,7 +62,7 @@
 
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
-    --ring: 142 72% 29%;
+    --ring: 142 100% 74%;
   }
 }
 
