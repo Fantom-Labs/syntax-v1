@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { CheckSquare, Plus } from "lucide-react";
+import { Activity, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import PageTemplate from "@/components/PageTemplate";
 import { Button } from "@/components/ui/button";
@@ -18,21 +18,21 @@ export const HabitsPage = () => {
     {
       id: "1",
       title: "Acordar cedo",
-      icon: <CheckSquare className="w-5 h-5 text-primary" />,
+      icon: <Activity className="w-5 h-5 text-primary" />,
       checksPerDay: 1,
       checks: []
     },
     {
       id: "2",
       title: "Passear com Katana",
-      icon: <CheckSquare className="w-5 h-5 text-primary" />,
+      icon: <Activity className="w-5 h-5 text-primary" />,
       checksPerDay: 2,
       checks: []
     },
     {
       id: "3",
       title: "Beber 2L de água",
-      icon: <CheckSquare className="w-5 h-5 text-primary" />,
+      icon: <Activity className="w-5 h-5 text-primary" />,
       checksPerDay: 1,
       checks: []
     }
@@ -56,7 +56,7 @@ export const HabitsPage = () => {
     const newHabit: Habit = {
       id: Date.now().toString(),
       title: newHabitTitle,
-      icon: <CheckSquare className="w-5 h-5 text-primary" />,
+      icon: <Activity className="w-5 h-5 text-primary" />,
       checksPerDay,
       checks: []
     };
@@ -76,7 +76,6 @@ export const HabitsPage = () => {
       <div className="grid gap-6 md:grid-cols-[1fr]">
         <div className="space-y-6">
           <div className="flex justify-between items-center">
-            <h2 className="text-lg font-medium">Lista de Hábitos Diários</h2>
             <Dialog open={isAddingHabit} onOpenChange={setIsAddingHabit}>
               <DialogTrigger asChild>
                 <Button variant="outline" size="icon" className="rounded-full">
