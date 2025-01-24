@@ -202,7 +202,14 @@ export const Tarefas = () => {
 
   return (
     <PageTemplate title="Tarefas">
-      <div className="grid gap-6 md:grid-cols-[350px,1fr]">
+      <div className="grid gap-6">
+        <Calendar
+          mode="single"
+          selected={date}
+          onSelect={setDate}
+          className="rounded-lg border bg-card w-full max-w-[350px] mx-auto"
+        />
+
         <div className="space-y-4">
           <div className="flex gap-2">
             <Input
@@ -224,59 +231,53 @@ export const Tarefas = () => {
               Adicionar
             </Button>
           </div>
-          <Calendar
-            mode="single"
-            selected={date}
-            onSelect={setDate}
-            className="rounded-lg border bg-card"
-          />
-        </div>
 
-        <div className="space-y-4">
-          <div className="flex items-center justify-between mb-4">
-            <Button variant="outline" size="icon" onClick={() => navigateDay('prev')}>
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <span className="font-medium">
-              {format(date, "dd 'de' MMMM 'de' yyyy")}
-            </span>
-            <Button variant="outline" size="icon" onClick={() => navigateDay('next')}>
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          </div>
-          
-          <div className="space-y-2">
-            {tasks.map(task => (
-              <div
-                key={task.id}
-                className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
-              >
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={task.completed}
-                    onChange={() => toggleTask(task.id)}
-                    className="w-4 h-4 rounded border-gray-300"
-                  />
-                  <span className={task.completed ? "line-through text-muted-foreground" : ""}>
-                    {task.title}
-                  </span>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => deleteTask(task.id)}
-                  className="text-destructive hover:text-destructive/90"
+          <div className="space-y-4">
+            <div className="flex items-center justify-between mb-4">
+              <Button variant="outline" size="icon" onClick={() => navigateDay('prev')}>
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+              <span className="font-medium">
+                {format(date, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+              </span>
+              <Button variant="outline" size="icon" onClick={() => navigateDay('next')}>
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            <div className="space-y-2">
+              {tasks.map(task => (
+                <div
+                  key={task.id}
+                  className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
                 >
-                  Remover
-                </Button>
-              </div>
-            ))}
-            {tasks.length === 0 && (
-              <p className="text-center text-muted-foreground py-4">
-                Nenhuma tarefa cadastrada
-              </p>
-            )}
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={task.completed}
+                      onChange={() => toggleTask(task.id)}
+                      className="w-4 h-4 rounded border-gray-300"
+                    />
+                    <span className={task.completed ? "line-through text-muted-foreground" : ""}>
+                      {task.title}
+                    </span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => deleteTask(task.id)}
+                    className="text-destructive hover:text-destructive/90"
+                  >
+                    Remover
+                  </Button>
+                </div>
+              ))}
+              {tasks.length === 0 && (
+                <p className="text-center text-muted-foreground py-4">
+                  Nenhuma tarefa cadastrada
+                </p>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -582,3 +583,4 @@ export const Alimentacao = () => {
     </PageTemplate>
   );
 };
+
