@@ -5,17 +5,33 @@ interface NavButtonProps {
   to: string;
   icon: LucideIcon;
   label: string;
-  onClick?: () => void;
+  index?: number;
+  onDragStart?: (e: React.DragEvent, index: number) => void;
+  onDragOver?: (e: React.DragEvent) => void;
+  onDrop?: (e: React.DragEvent, index: number) => void;
 }
 
-const NavButton = ({ to, icon: Icon, label, onClick }: NavButtonProps) => {
+const NavButton = ({ 
+  to, 
+  icon: Icon, 
+  label, 
+  index,
+  onDragStart,
+  onDragOver,
+  onDrop
+}: NavButtonProps) => {
   return (
-    <Link to={to} className="nav-button" onClick={(e) => {
-      if (onClick) {
+    <Link 
+      to={to} 
+      className="nav-button"
+      draggable
+      onDragStart={(e) => onDragStart?.(e, index!)}
+      onDragOver={(e) => {
         e.preventDefault();
-        onClick();
-      }
-    }}>
+        onDragOver?.(e);
+      }}
+      onDrop={(e) => onDrop?.(e, index!)}
+    >
       <Icon className="w-5 h-5" />
       <span>{label}</span>
     </Link>

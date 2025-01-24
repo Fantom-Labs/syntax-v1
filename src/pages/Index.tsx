@@ -1,9 +1,8 @@
-import { List, Calendar, Activity, BookOpen, Target, ShoppingCart, DollarSign, Notebook, User, Utensils, ArrowUpDown } from "lucide-react";
+import { List, Calendar, Activity, BookOpen, Target, ShoppingCart, DollarSign, Notebook, User, Utensils } from "lucide-react";
 import NavButton from "@/components/NavButton";
 import AddButton from "@/components/AddButton";
 import Header from "@/components/Header";
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 interface CustomNavButton {
@@ -19,7 +18,6 @@ interface DefaultButton {
 
 const Index = () => {
   const [customButtons, setCustomButtons] = useState<CustomNavButton[]>([]);
-  const [isReordering, setIsReordering] = useState(false);
   const [buttons, setButtons] = useState<DefaultButton[]>([
     { label: "Tarefas", path: "/tarefas", icon: List },
     { label: "Agenda", path: "/agenda", icon: Calendar },
@@ -41,26 +39,26 @@ const Index = () => {
     }
   }, []);
 
-  const toggleReordering = () => {
-    setIsReordering(!isReordering);
-    if (isReordering) {
-      toast.success("Modo de reordenação desativado");
-    } else {
-      toast.success("Clique nos botões para reordená-los");
-    }
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    setDraggedIndex(index);
   };
 
-  const handleReorder = (index: number) => {
-    if (!isReordering) return;
+  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    
+    if (draggedIndex === null) return;
 
     setButtons(currentButtons => {
       const newButtons = [...currentButtons];
-      if (index > 0) {
-        [newButtons[index], newButtons[index - 1]] = [newButtons[index - 1], newButtons[index]];
-        toast.success("Botão movido para a esquerda");
-      }
+      const [draggedButton] = newButtons.splice(draggedIndex, 1);
+      newButtons.splice(dropIndex, 0, draggedButton);
+      toast.success("Botão reordenado com sucesso");
       return newButtons;
     });
+
+    setDraggedIndex(null);
   };
 
   return (
@@ -82,21 +80,16 @@ const Index = () => {
 
       <main>
         <div className="flex flex-wrap gap-4">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={toggleReordering}
-            className={`w-12 h-12 rounded-full ${isReordering ? 'bg-primary text-primary-foreground' : ''}`}
-          >
-            <ArrowUpDown className="w-6 h-6" />
-          </Button>
           {buttons.map((button, index) => (
             <NavButton
               key={index}
               to={button.path}
               icon={button.icon}
               label={button.label}
-              onClick={() => handleReorder(index)}
+              index={index}
+              onDragStart={handleDragStart}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={handleDrop}
             />
           ))}
           {customButtons.map((button, index) => (
