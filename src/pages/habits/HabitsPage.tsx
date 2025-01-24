@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Dog, Sun, Droplets, CheckSquare, Square, ArrowLeft, ArrowRight, Trash2, Plus } from "lucide-react";
+import { CheckSquare, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import PageTemplate from "@/components/PageTemplate";
 import { Button } from "@/components/ui/button";
@@ -18,21 +18,21 @@ export const HabitsPage = () => {
     {
       id: "1",
       title: "Acordar cedo",
-      icon: <Sun className="w-5 h-5 text-[#F6FF71]" />,
+      icon: <CheckSquare className="w-5 h-5 text-primary" />,
       checksPerDay: 1,
       checks: []
     },
     {
       id: "2",
       title: "Passear com Katana",
-      icon: <Dog className="w-5 h-5 text-[#DE7CFF]" />,
+      icon: <CheckSquare className="w-5 h-5 text-primary" />,
       checksPerDay: 2,
       checks: []
     },
     {
       id: "3",
       title: "Beber 2L de água",
-      icon: <Droplets className="w-5 h-5 text-[#7BFF8B]" />,
+      icon: <CheckSquare className="w-5 h-5 text-primary" />,
       checksPerDay: 1,
       checks: []
     }
@@ -56,7 +56,7 @@ export const HabitsPage = () => {
     const newHabit: Habit = {
       id: Date.now().toString(),
       title: newHabitTitle,
-      icon: <Sun className="w-5 h-5 text-[#F6FF71]" />,
+      icon: <CheckSquare className="w-5 h-5 text-primary" />,
       checksPerDay,
       checks: []
     };
