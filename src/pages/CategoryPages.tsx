@@ -203,13 +203,6 @@ export const Tarefas = () => {
   return (
     <PageTemplate title="Tarefas">
       <div className="grid gap-6">
-        <Calendar
-          mode="single"
-          selected={date}
-          onSelect={setDate}
-          className="rounded-lg border bg-card w-full max-w-[350px] mx-auto"
-        />
-
         <div className="space-y-4">
           <div className="flex gap-2">
             <Input
@@ -280,6 +273,13 @@ export const Tarefas = () => {
             </div>
           </div>
         </div>
+
+        <Calendar
+          mode="single"
+          selected={date}
+          onSelect={setDate}
+          className="rounded-lg border bg-card w-full max-w-[350px] mx-auto"
+        />
       </div>
     </PageTemplate>
   );
@@ -583,4 +583,3 @@ export const Alimentacao = () => {
     </PageTemplate>
   );
 };
-
