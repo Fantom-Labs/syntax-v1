@@ -78,12 +78,9 @@
   }
   .name-underline::after {
     content: '';
-    @apply absolute -bottom-1 left-0 w-full;
-    height: 6px;
+    @apply absolute -bottom-1 left-0 w-full h-1;
     background: linear-gradient(90deg, #7BFF8B 25%, #F6FF71 47%, #B259FF 70%);
-    border-radius: 999px;
-    transform: translateY(2px);
-    filter: url('#curve');
+    border-radius: 4px;
   }
   .nav-button {
     @apply flex items-center gap-2 px-6 py-3 rounded-full bg-secondary hover:bg-secondary/80 transition-colors duration-200;
