@@ -21,6 +21,14 @@ const Index = () => {
 
   return (
     <div className="min-h-screen p-8 md:p-12">
+      <svg width="0" height="0">
+        <defs>
+          <filter id="curve">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="1" result="blur" />
+            <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="curve" />
+          </filter>
+        </defs>
+      </svg>
       <Header />
       <header className="mb-16">
         <h1 className="text-4xl font-medium">
