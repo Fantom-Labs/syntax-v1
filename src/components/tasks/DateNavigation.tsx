@@ -9,13 +9,16 @@ interface DateNavigationProps {
 }
 
 export const DateNavigation = ({ date, onNavigate }: DateNavigationProps) => {
+  // Ensure we have a valid date object
+  const safeDate = date instanceof Date && !isNaN(date.getTime()) ? date : new Date();
+
   return (
     <div className="flex items-center justify-between mb-4">
       <Button variant="outline" size="icon" onClick={() => onNavigate('prev')}>
         <ArrowLeft className="h-4 w-4" />
       </Button>
       <span className="font-medium">
-        {format(date, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+        {format(safeDate, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
       </span>
       <Button variant="outline" size="icon" onClick={() => onNavigate('next')}>
         <ArrowRight className="h-4 w-4" />
