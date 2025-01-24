@@ -63,8 +63,8 @@ const NotesPage = () => {
             onChange={(e) => setContent(e.target.value)}
             className="min-h-[120px]"
           />
-          <Button onClick={handleAddNote} className="w-full">
-            <Plus className="w-4 h-4 mr-2" />
+          <Button onClick={handleAddNote} className="w-full bg-[#7BFF8B] hover:bg-[#7BFF8B]/80 text-black">
+            <Plus className="w-4 h-4" />
             Adicionar nota
           </Button>
         </div>
@@ -81,7 +81,7 @@ const NotesPage = () => {
                   variant="ghost"
                   size="icon"
                   onClick={() => handleDeleteNote(note.id)}
-                  className="h-8 w-8"
+                  className="h-8 w-8 hover:bg-[#7BFF8B]/10"
                 >
                   <Trash2 className="w-4 h-4" />
                 </Button>
