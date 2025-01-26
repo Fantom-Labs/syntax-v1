@@ -59,7 +59,7 @@ export const AgendaPage = () => {
           />
           <Dialog>
             <DialogTrigger asChild>
-              <Button className="w-full bg-gradient-to-r from-[#7BFF8B] via-[#F6FF71] to-[#B259FF] hover:opacity-90 text-foreground">
+              <Button className="w-full bg-gradient-to-r from-[#7BFF8B] via-[#F6FF71] to-[#B259FF] hover:opacity-90 text-black">
                 <Plus className="mr-2" />
                 Novo Evento
               </Button>
