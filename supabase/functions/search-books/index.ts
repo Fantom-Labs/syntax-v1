@@ -11,11 +11,12 @@ serve(async (req) => {
   }
 
   try {
-    const { query, language, limit = 12 } = await req.json()
-    const langParam = language === 'pt' ? '&langRestrict=pt' : ''
+    const { query, language, limit = 40 } = await req.json()
+    const langParam = language ? `&langRestrict=${language}` : ''
     
+    // Add parameters to get more detailed results
     const response = await fetch(
-      `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}${langParam}&maxResults=${limit}`
+      `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}${langParam}&maxResults=${limit}&orderBy=relevance&printType=books`
     )
     
     const data = await response.json()
@@ -25,7 +26,12 @@ serve(async (req) => {
       title: item.volumeInfo.title,
       author: item.volumeInfo.authors?.[0] || 'Unknown',
       cover_url: item.volumeInfo.imageLinks?.thumbnail || null,
-      language: item.volumeInfo.language
+      language: item.volumeInfo.language,
+      // Add more details that might be useful
+      description: item.volumeInfo.description,
+      publishedDate: item.volumeInfo.publishedDate,
+      pageCount: item.volumeInfo.pageCount,
+      categories: item.volumeInfo.categories,
     })) || []
 
     return new Response(

@@ -24,6 +24,10 @@ interface Book {
   cover_url: string | null;
   language: string;
   google_books_id: string;
+  description?: string;
+  publishedDate?: string;
+  pageCount?: number;
+  categories?: string[];
 }
 
 export const BooksPage = () => {
@@ -71,7 +75,7 @@ export const BooksPage = () => {
       if (!searchQuery) return { books: [] };
       
       const { data, error } = await supabase.functions.invoke("search-books", {
-        body: { query: searchQuery, language },
+        body: { query: searchQuery, language: language || undefined },
       });
 
       if (error) throw error;
@@ -246,6 +250,16 @@ export const BooksPage = () => {
                       <div className="flex-1 space-y-2">
                         <h3 className="font-semibold line-clamp-2">{book.title}</h3>
                         <p className="text-sm text-muted-foreground">{book.author}</p>
+                        {book.publishedDate && (
+                          <p className="text-sm text-muted-foreground">
+                            {new Date(book.publishedDate).getFullYear()}
+                          </p>
+                        )}
+                        {book.description && (
+                          <p className="text-sm text-muted-foreground line-clamp-2">
+                            {book.description}
+                          </p>
+                        )}
                         <Button
                           size="sm"
                           onClick={() => addToReadingList(book)}
