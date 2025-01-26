@@ -23,6 +23,7 @@ interface Book {
   author: string;
   cover_url: string | null;
   language: string;
+  google_books_id: string;
 }
 
 export const BooksPage = () => {
@@ -42,7 +43,8 @@ export const BooksPage = () => {
             title,
             author,
             cover_url,
-            language
+            language,
+            google_books_id
           )
         `);
 
@@ -66,7 +68,6 @@ export const BooksPage = () => {
     enabled: false,
   });
 
-  // New query for suggestions as user types
   const { data: suggestions } = useQuery({
     queryKey: ["book-suggestions", searchQuery, language],
     queryFn: async () => {
@@ -84,24 +85,45 @@ export const BooksPage = () => {
 
   const addToReadingList = async (book: Book) => {
     try {
+      // First check if the book already exists using google_books_id
       const { data: existingBook } = await supabase
         .from("books")
         .select("id")
-        .eq("id", book.id)
-        .single();
+        .eq("google_books_id", book.google_books_id)
+        .maybeSingle();
+
+      let bookId;
 
       if (!existingBook) {
-        await supabase.from("books").insert([book]);
+        // If book doesn't exist, insert it
+        const { data: newBook, error: insertError } = await supabase
+          .from("books")
+          .insert([{
+            title: book.title,
+            author: book.author,
+            cover_url: book.cover_url,
+            language: book.language,
+            google_books_id: book.google_books_id
+          }])
+          .select("id")
+          .single();
+
+        if (insertError) throw insertError;
+        bookId = newBook.id;
+      } else {
+        bookId = existingBook.id;
       }
 
-      const { error } = await supabase.from("reading_list").insert([
-        {
-          book_id: book.id,
+      // Add to reading list using the Supabase-generated UUID
+      const { error: readingListError } = await supabase
+        .from("reading_list")
+        .insert([{
+          book_id: bookId,
           user_id: (await supabase.auth.getUser()).data.user?.id,
-        },
-      ]);
+        }]);
 
-      if (error) throw error;
+      if (readingListError) throw readingListError;
+      
       toast.success("Livro adicionado à lista de leitura!");
       setOpen(false);
     } catch (error) {
@@ -141,7 +163,7 @@ export const BooksPage = () => {
                     <CommandGroup heading="Sugestões">
                       {suggestions?.books?.map((book: Book) => (
                         <CommandItem
-                          key={book.id}
+                          key={book.google_books_id}
                           onSelect={() => {
                             setSearchQuery(book.title);
                             addToReadingList(book);
@@ -187,7 +209,7 @@ export const BooksPage = () => {
             <h2 className="text-2xl font-semibold mb-4">Resultados da Busca</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {searchResults.books.map((book: Book) => (
-                <Card key={book.id} className="overflow-hidden">
+                <Card key={book.google_books_id} className="overflow-hidden">
                   <CardContent className="p-4">
                     <div className="flex gap-4">
                       {book.cover_url ? (
@@ -208,10 +230,12 @@ export const BooksPage = () => {
                           size="sm"
                           onClick={() => addToReadingList(book)}
                           disabled={readingList?.some(
-                            (item) => item.book_id === book.id
+                            (item) => item.books.google_books_id === book.google_books_id
                           )}
                         >
-                          {readingList?.some((item) => item.book_id === book.id)
+                          {readingList?.some(
+                            (item) => item.books.google_books_id === book.google_books_id
+                          )
                             ? "Na lista"
                             : "Adicionar à lista"}
                         </Button>

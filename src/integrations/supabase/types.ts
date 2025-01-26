@@ -14,6 +14,7 @@ export type Database = {
           author: string | null
           cover_url: string | null
           created_at: string
+          google_books_id: string | null
           id: string
           language: string | null
           title: string
@@ -22,6 +23,7 @@ export type Database = {
           author?: string | null
           cover_url?: string | null
           created_at?: string
+          google_books_id?: string | null
           id?: string
           language?: string | null
           title: string
@@ -30,6 +32,7 @@ export type Database = {
           author?: string | null
           cover_url?: string | null
           created_at?: string
+          google_books_id?: string | null
           id?: string
           language?: string | null
           title?: string

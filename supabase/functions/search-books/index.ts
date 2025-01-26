@@ -11,17 +11,17 @@ serve(async (req) => {
   }
 
   try {
-    const { query, language } = await req.json()
+    const { query, language, limit = 12 } = await req.json()
     const langParam = language === 'pt' ? '&langRestrict=pt' : ''
     
     const response = await fetch(
-      `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}${langParam}&maxResults=12`
+      `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}${langParam}&maxResults=${limit}`
     )
     
     const data = await response.json()
     
     const books = data.items?.map((item: any) => ({
-      id: item.id,
+      google_books_id: item.id,
       title: item.volumeInfo.title,
       author: item.volumeInfo.authors?.[0] || 'Unknown',
       cover_url: item.volumeInfo.imageLinks?.thumbnail || null,
