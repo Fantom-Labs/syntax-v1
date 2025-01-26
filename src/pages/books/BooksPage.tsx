@@ -7,6 +7,15 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface Book {
   id: string;
@@ -19,6 +28,7 @@ interface Book {
 export const BooksPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [language, setLanguage] = useState<"en" | "pt">("pt");
+  const [open, setOpen] = useState(false);
 
   const { data: readingList } = useQuery({
     queryKey: ["reading-list"],
@@ -56,9 +66,24 @@ export const BooksPage = () => {
     enabled: false,
   });
 
+  // New query for suggestions as user types
+  const { data: suggestions } = useQuery({
+    queryKey: ["book-suggestions", searchQuery, language],
+    queryFn: async () => {
+      if (searchQuery.length < 2) return { books: [] };
+      
+      const { data, error } = await supabase.functions.invoke("search-books", {
+        body: { query: searchQuery, language, limit: 5 },
+      });
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: searchQuery.length >= 2,
+  });
+
   const addToReadingList = async (book: Book) => {
     try {
-      // First, ensure the book exists in our database
       const { data: existingBook } = await supabase
         .from("books")
         .select("id")
@@ -69,7 +94,6 @@ export const BooksPage = () => {
         await supabase.from("books").insert([book]);
       }
 
-      // Add to reading list
       const { error } = await supabase.from("reading_list").insert([
         {
           book_id: book.id,
@@ -79,6 +103,7 @@ export const BooksPage = () => {
 
       if (error) throw error;
       toast.success("Livro adicionado à lista de leitura!");
+      setOpen(false);
     } catch (error) {
       console.error("Error adding book:", error);
       toast.error("Erro ao adicionar livro à lista");
@@ -95,13 +120,55 @@ export const BooksPage = () => {
     <PageTemplate title="Livros">
       <div className="space-y-8">
         <form onSubmit={handleSearch} className="flex gap-4">
-          <Input
-            type="text"
-            placeholder="Buscar livros..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex-1"
-          />
+          <div className="flex-1">
+            <Popover open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
+                <Input
+                  type="text"
+                  placeholder="Buscar livros..."
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setOpen(e.target.value.length >= 2);
+                  }}
+                  className="w-full"
+                />
+              </PopoverTrigger>
+              <PopoverContent className="w-[400px] p-0" align="start">
+                <Command>
+                  <CommandList>
+                    <CommandEmpty>Nenhum livro encontrado.</CommandEmpty>
+                    <CommandGroup heading="Sugestões">
+                      {suggestions?.books?.map((book: Book) => (
+                        <CommandItem
+                          key={book.id}
+                          onSelect={() => {
+                            setSearchQuery(book.title);
+                            addToReadingList(book);
+                          }}
+                          className="flex items-center gap-2"
+                        >
+                          {book.cover_url && (
+                            <img
+                              src={book.cover_url}
+                              alt={book.title}
+                              className="w-8 h-12 object-cover"
+                            />
+                          )}
+                          <div>
+                            <p className="font-medium">{book.title}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {book.author}
+                            </p>
+                          </div>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+          </div>
           <Button type="submit" className="gap-2">
             <Search className="w-4 h-4" />
             Buscar
