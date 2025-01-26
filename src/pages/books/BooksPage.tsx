@@ -161,18 +161,20 @@ export const BooksPage = () => {
       <div className="space-y-8">
         <form onSubmit={handleSearch} className="flex gap-4">
           <div className="flex-1">
-            <Popover open={open} onOpenChange={setOpen}>
+            <Popover open={open}>
               <PopoverTrigger asChild>
-                <Input
-                  type="text"
-                  placeholder="Buscar livros..."
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    setOpen(e.target.value.length >= 2);
-                  }}
-                  className="w-full"
-                />
+                <div className="flex-1">
+                  <Input
+                    type="text"
+                    placeholder="Buscar livros..."
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      setOpen(e.target.value.length >= 2);
+                    }}
+                    className="w-full"
+                  />
+                </div>
               </PopoverTrigger>
               <PopoverContent className="w-[400px] p-0" align="start">
                 <Command>
