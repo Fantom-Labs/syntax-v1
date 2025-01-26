@@ -3,6 +3,7 @@ import { Habit } from "@/types/habits";
 import { Trash2 } from "lucide-react";
 import { format, startOfWeek, addDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface HabitListProps {
   habits: Habit[];
@@ -13,6 +14,7 @@ interface HabitListProps {
 type CheckStatus = "unchecked" | "completed" | "failed";
 
 export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
+  const isMobile = useIsMobile();
   const startOfCurrentWeek = startOfWeek(date, { weekStartsOn: 0 });
   
   const weekDays = Array.from({ length: 7 }).map((_, index) => {
@@ -64,22 +66,22 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
       {habits.map(habit => (
         <div
           key={habit.id}
-          className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/10 transition-colors"
+          className={`flex ${isMobile ? 'flex-col' : 'items-center'} justify-between p-4 rounded-lg border bg-card hover:bg-accent/10 transition-colors gap-4`}
         >
           <div className="flex items-center gap-3 min-w-[200px]">
             {habit.icon}
             <span className="font-medium">{habit.title}</span>
           </div>
           
-          <div className="flex items-center gap-2">
-            <div className="flex gap-1">
+          <div className={`flex ${isMobile ? 'flex-col' : 'items-center'} gap-4`}>
+            <div className="flex gap-1 overflow-x-auto pb-2">
               {weekDays.map((day) => {
                 const status = getCheckStatus(habit, day);
                 return (
                   <button
                     key={day}
                     onClick={() => toggleHabitCheck(habit.id, day)}
-                    className={`w-8 h-8 rounded transition-colors ${
+                    className={`w-8 h-8 rounded transition-colors flex-shrink-0 ${
                       status === "completed"
                         ? "bg-[#7BFF8B] hover:bg-[#6AEE7A]"
                         : status === "failed"
@@ -95,7 +97,7 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
               variant="ghost"
               size="icon"
               onClick={() => removeHabit(habit.id)}
-              className="ml-4 text-destructive hover:text-destructive/90"
+              className="text-destructive hover:text-destructive/90"
             >
               <Trash2 className="h-4 w-4" />
             </Button>
