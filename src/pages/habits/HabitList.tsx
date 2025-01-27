@@ -22,6 +22,8 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
     return format(day, "yyyy-MM-dd");
   });
 
+  const weekDayLabels = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+
   const getCheckStatus = (habit: Habit, date: string): CheckStatus => {
     const check = habit.checks.find(c => c.timestamp.startsWith(date));
     if (!check) return "unchecked";
@@ -74,23 +76,32 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
           </div>
           
           <div className={`flex ${isMobile ? 'flex-col' : 'items-center'} gap-4`}>
-            <div className="flex gap-1 overflow-x-auto pb-2">
-              {weekDays.map((day) => {
-                const status = getCheckStatus(habit, day);
-                return (
-                  <button
-                    key={day}
-                    onClick={() => toggleHabitCheck(habit.id, day)}
-                    className={`w-8 h-8 rounded transition-colors flex-shrink-0 ${
-                      status === "completed"
-                        ? "bg-[#7BFF8B] hover:bg-[#6AEE7A]"
-                        : status === "failed"
-                        ? "bg-[#ea384c] hover:bg-[#d9293d]"
-                        : "bg-secondary hover:bg-secondary/80"
-                    }`}
-                  />
-                );
-              })}
+            <div className="flex flex-col gap-1">
+              <div className="flex gap-1 overflow-x-auto pb-2">
+                {weekDays.map((day, index) => {
+                  const status = getCheckStatus(habit, day);
+                  return (
+                    <button
+                      key={day}
+                      onClick={() => toggleHabitCheck(habit.id, day)}
+                      className={`w-8 h-8 rounded transition-colors flex-shrink-0 ${
+                        status === "completed"
+                          ? "bg-[#7BFF8B] hover:bg-[#6AEE7A]"
+                          : status === "failed"
+                          ? "bg-[#ea384c] hover:bg-[#d9293d]"
+                          : "bg-secondary hover:bg-secondary/80"
+                      }`}
+                    />
+                  );
+                })}
+              </div>
+              <div className="flex gap-1 overflow-x-auto">
+                {weekDayLabels.map((label, index) => (
+                  <div key={index} className="w-8 text-center text-sm text-muted-foreground flex-shrink-0">
+                    {label}
+                  </div>
+                ))}
+              </div>
             </div>
             
             <Button
