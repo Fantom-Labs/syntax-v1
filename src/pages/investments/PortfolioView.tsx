@@ -90,16 +90,16 @@ export const PortfolioView = ({ portfolio, onUpdate }: PortfolioViewProps) => {
       </Card>
 
       <Card className="w-full">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle>Investimentos</CardTitle>
-            <CardDescription>
-              Gerencie seus investimentos nesta carteira
-            </CardDescription>
-          </div>
-          <AddInvestmentDialog onAdd={addInvestment} />
+        <CardHeader>
+          <CardTitle>Investimentos</CardTitle>
+          <CardDescription>
+            Gerencie seus investimentos nesta carteira
+          </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
+          <div className="flex justify-center">
+            <AddInvestmentDialog onAdd={addInvestment} />
+          </div>
           <InvestmentList
             investments={portfolio.investments}
             onRemove={removeInvestment}
