@@ -8,6 +8,7 @@ import { AgendaPage } from "@/pages/agenda/AgendaPage";
 import { HabitsPage } from "@/pages/habits/HabitsPage";
 import NotesPage from "@/pages/notes/NotesPage";
 import { BooksPage } from "@/pages/books/BooksPage";
+import { GoalsPage } from "@/pages/goals/GoalsPage";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ function App() {
             <Route path="/habitos" element={<HabitsPage />} />
             <Route path="/notas" element={<NotesPage />} />
             <Route path="/livros" element={<BooksPage />} />
+            <Route path="/metas" element={<GoalsPage />} />
           </Routes>
           <Toaster />
         </ThemeProvider>
