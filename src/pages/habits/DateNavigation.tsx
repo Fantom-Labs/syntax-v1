@@ -22,7 +22,7 @@ export const DateNavigation = ({ date, setDate }: DateNavigationProps) => {
         <ArrowLeft className="h-4 w-4" />
       </Button>
       
-      <span className="font-medium">
+      <span className="font-medium text-center flex-1">
         {format(weekStart, "dd 'de' MMMM", { locale: ptBR })} - {format(weekEnd, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
       </span>
       
