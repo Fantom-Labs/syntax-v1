@@ -10,6 +10,7 @@ import NotesPage from "@/pages/notes/NotesPage";
 import { BooksPage } from "@/pages/books/BooksPage";
 import { GoalsPage } from "@/pages/goals/GoalsPage";
 import { ShoppingPage } from "@/pages/shopping/ShoppingPage";
+import { InvestmentsPage } from "@/pages/investments/InvestmentsPage";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ function App() {
             <Route path="/livros" element={<BooksPage />} />
             <Route path="/metas" element={<GoalsPage />} />
             <Route path="/compras" element={<ShoppingPage />} />
+            <Route path="/investimentos" element={<InvestmentsPage />} />
           </Routes>
           <Toaster />
         </ThemeProvider>
