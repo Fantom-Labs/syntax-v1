@@ -9,6 +9,7 @@ import {
 import { AddInvestmentDialog } from "./AddInvestmentDialog";
 import { InvestmentList } from "./InvestmentList";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface PortfolioViewProps {
   portfolio: Portfolio;
@@ -18,6 +19,8 @@ interface PortfolioViewProps {
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
 export const PortfolioView = ({ portfolio, onUpdate }: PortfolioViewProps) => {
+  const isMobile = useIsMobile();
+
   const addInvestment = (investment: Investment) => {
     onUpdate({
       ...portfolio,
@@ -52,8 +55,8 @@ export const PortfolioView = ({ portfolio, onUpdate }: PortfolioViewProps) => {
   }));
 
   return (
-    <div className="grid gap-6 md:grid-cols-2">
-      <Card>
+    <div className="grid gap-6 grid-cols-1 md:grid-cols-2 w-full">
+      <Card className="w-full">
         <CardHeader>
           <CardTitle>Ativos da Carteira</CardTitle>
           <CardDescription>
@@ -65,7 +68,7 @@ export const PortfolioView = ({ portfolio, onUpdate }: PortfolioViewProps) => {
             <PieChart>
               <Pie
                 data={chartData}
-                cx="50%"
+                cx={isMobile ? "50%" : "50%"}
                 cy="50%"
                 innerRadius={60}
                 outerRadius={80}
@@ -86,7 +89,7 @@ export const PortfolioView = ({ portfolio, onUpdate }: PortfolioViewProps) => {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="w-full">
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle>Investimentos</CardTitle>
