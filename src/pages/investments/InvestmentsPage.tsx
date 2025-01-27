@@ -29,7 +29,7 @@ export const InvestmentsPage = () => {
               </Button>
             ))}
           </div>
-          <AddPortfolioDialog onAdd={addPortfolio} />
+          {portfolios.length > 0 && <AddPortfolioDialog onAdd={addPortfolio} />}
         </div>
 
         {selectedPortfolio && (
@@ -46,11 +46,18 @@ export const InvestmentsPage = () => {
         )}
 
         {!selectedPortfolio && (
-          <div className="text-center py-12">
-            <h3 className="text-lg font-medium">Nenhuma carteira selecionada</h3>
-            <p className="text-muted-foreground mt-2">
-              Selecione uma carteira existente ou crie uma nova para começar
-            </p>
+          <div className="text-center py-12 space-y-4">
+            <div>
+              <h3 className="text-lg font-medium">Nenhuma carteira selecionada</h3>
+              <p className="text-muted-foreground mt-2">
+                Selecione uma carteira existente ou crie uma nova para começar
+              </p>
+            </div>
+            {portfolios.length === 0 && (
+              <div className="flex justify-center">
+                <AddPortfolioDialog onAdd={addPortfolio} />
+              </div>
+            )}
           </div>
         )}
       </div>
