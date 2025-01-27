@@ -78,43 +78,45 @@ export const HabitsPage = () => {
           <DateNavigation date={date} setDate={setDate} />
           <HabitList habits={habits} setHabits={setHabits} date={date} />
           
-          <Dialog open={isAddingHabit} onOpenChange={setIsAddingHabit}>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="icon" className="rounded-full">
-                <Plus className="h-4 w-4" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Adicionar Novo Hábito</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4 mt-4">
-                <div className="space-y-2">
-                  <Label htmlFor="title">Título do Hábito</Label>
-                  <Input
-                    id="title"
-                    value={newHabitTitle}
-                    onChange={(e) => setNewHabitTitle(e.target.value)}
-                    placeholder="Ex: Beber água"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="checks">Marcações por dia</Label>
-                  <Input
-                    id="checks"
-                    type="number"
-                    min="1"
-                    max="10"
-                    value={checksPerDay}
-                    onChange={(e) => setChecksPerDay(Number(e.target.value))}
-                  />
-                </div>
-                <Button onClick={addHabit} className="w-full">
-                  Adicionar Hábito
+          <div className="flex justify-center">
+            <Dialog open={isAddingHabit} onOpenChange={setIsAddingHabit}>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="icon" className="rounded-full">
+                  <Plus className="h-4 w-4" />
                 </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Adicionar Novo Hábito</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 mt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="title">Título do Hábito</Label>
+                    <Input
+                      id="title"
+                      value={newHabitTitle}
+                      onChange={(e) => setNewHabitTitle(e.target.value)}
+                      placeholder="Ex: Beber água"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="checks">Marcações por dia</Label>
+                    <Input
+                      id="checks"
+                      type="number"
+                      min="1"
+                      max="10"
+                      value={checksPerDay}
+                      onChange={(e) => setChecksPerDay(Number(e.target.value))}
+                    />
+                  </div>
+                  <Button onClick={addHabit} className="w-full">
+                    Adicionar Hábito
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
       </div>
     </PageTemplate>
