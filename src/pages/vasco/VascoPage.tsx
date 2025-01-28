@@ -1,7 +1,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PageTemplate from "@/components/PageTemplate";
 import { MatchList } from "./components/MatchList";
-import { TeamRoster } from "./components/TeamRoster";
 
 export const VascoPage = () => {
   return (
@@ -11,10 +10,26 @@ export const VascoPage = () => {
           <TabsTrigger value="overview">Visão geral</TabsTrigger>
           <TabsTrigger value="matches">Partidas</TabsTrigger>
           <TabsTrigger value="standings">Classificação</TabsTrigger>
-          <TabsTrigger value="players">Jogadores</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
+          <div className="rounded-lg border bg-card p-6">
+            <h3 className="text-lg font-semibold mb-4">Últimas notícias</h3>
+            <div className="space-y-4">
+              <div className="border-b pb-2">
+                <p className="text-sm text-muted-foreground">23/03/2024</p>
+                <p className="font-medium">Vasco inicia preparação para próximo jogo do Campeonato Carioca</p>
+              </div>
+              <div className="border-b pb-2">
+                <p className="text-sm text-muted-foreground">22/03/2024</p>
+                <p className="font-medium">Ramón Díaz projeta duelo decisivo contra o Nova Iguaçu</p>
+              </div>
+              <div className="border-b pb-2">
+                <p className="text-sm text-muted-foreground">21/03/2024</p>
+                <p className="font-medium">Vegetti é eleito craque do mês pelos torcedores</p>
+              </div>
+            </div>
+          </div>
           <MatchList title="Partida recente" limit={1} />
           <MatchList title="Próximas partidas" limit={3} upcoming />
         </TabsContent>
@@ -55,10 +70,6 @@ export const VascoPage = () => {
               </table>
             </div>
           </div>
-        </TabsContent>
-
-        <TabsContent value="players">
-          <TeamRoster />
         </TabsContent>
       </Tabs>
     </PageTemplate>
