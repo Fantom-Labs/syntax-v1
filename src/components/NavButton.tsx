@@ -23,7 +23,7 @@ const NavButton = ({
   return (
     <Link 
       to={to} 
-      className="nav-button"
+      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-card hover:bg-accent transition-colors border text-sm font-medium"
       draggable
       onDragStart={(e) => onDragStart?.(e, index!)}
       onDragOver={(e) => {
