@@ -12,6 +12,7 @@ import { GoalsPage } from "@/pages/goals/GoalsPage";
 import { ShoppingPage } from "@/pages/shopping/ShoppingPage";
 import { InvestmentsPage } from "@/pages/investments/InvestmentsPage";
 import { VascoPage } from "@/pages/vasco/VascoPage";
+import { PhysicalPage } from "@/pages/physical/PhysicalPage";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ function App() {
             <Route path="/compras" element={<ShoppingPage />} />
             <Route path="/investimentos" element={<InvestmentsPage />} />
             <Route path="/vasco" element={<VascoPage />} />
+            <Route path="/fisico" element={<PhysicalPage />} />
           </Routes>
           <Toaster />
         </ThemeProvider>
