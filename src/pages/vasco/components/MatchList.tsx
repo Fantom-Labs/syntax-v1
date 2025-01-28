@@ -1,7 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useEffect, useState } from "react";
-import { Match, fetchVascoMatches } from "../api/footballApi";
-import { ApiKeyInput } from "./ApiKeyInput";
+
+interface Match {
+  date: string;
+  competition: string;
+  homeTeam: string;
+  awayTeam: string;
+  homeScore?: number;
+  awayScore?: number;
+  status: "scheduled" | "finished";
+}
 
 interface MatchListProps {
   title: string;
@@ -9,53 +16,29 @@ interface MatchListProps {
   upcoming?: boolean;
 }
 
+const matches: Match[] = [
+  {
+    date: "2024-02-10",
+    competition: "Copa do Brasil",
+    homeTeam: "Vasco da Gama",
+    awayTeam: "Atlético-MG",
+    homeScore: 1,
+    awayScore: 1,
+    status: "finished",
+  },
+  {
+    date: "2024-02-15",
+    competition: "Brasileirão",
+    homeTeam: "São Paulo",
+    awayTeam: "Vasco da Gama",
+    status: "scheduled",
+  },
+];
+
 export const MatchList = ({ title, limit = 5, upcoming = false }: MatchListProps) => {
-  const [matches, setMatches] = useState<Match[]>([]);
-  const [apiKey, setApiKey] = useState<string | null>(
-    localStorage.getItem('football_api_key')
-  );
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!apiKey) return;
-      
-      setLoading(true);
-      try {
-        const data = await fetchVascoMatches(apiKey);
-        setMatches(data);
-      } catch (error) {
-        console.error('Error fetching matches:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [apiKey]);
-
-  if (!apiKey) {
-    return <ApiKeyInput onApiKeySubmit={setApiKey} />;
-  }
-
   const filteredMatches = matches
     .filter((match) => upcoming ? match.status === "scheduled" : match.status === "finished")
     .slice(0, limit);
-
-  if (loading) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>{title}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-center p-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
 
   return (
     <Card>
@@ -88,11 +71,6 @@ export const MatchList = ({ title, limit = 5, upcoming = false }: MatchListProps
               </div>
             </div>
           ))}
-          {filteredMatches.length === 0 && (
-            <p className="text-center text-muted-foreground py-4">
-              Nenhuma partida encontrada
-            </p>
-          )}
         </div>
       </CardContent>
     </Card>
