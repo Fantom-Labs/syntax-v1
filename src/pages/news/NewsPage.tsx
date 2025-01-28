@@ -88,27 +88,27 @@ export const NewsPage = () => {
 
   return (
     <PageTemplate title="Notícias">
-      <div className="container mx-auto p-4">
+      <div className="w-full px-2 md:px-4">
         <Tabs defaultValue="tech" className="w-full">
-          <ScrollArea className="w-full">
-            <TabsList className="w-full justify-start mb-6">
-              <TabsTrigger value="tech" className="flex items-center gap-2">
+          <ScrollArea className="w-full max-w-[100vw] pb-2">
+            <TabsList className="w-full flex justify-start gap-2 mb-6">
+              <TabsTrigger value="tech" className="flex items-center gap-2 whitespace-nowrap">
                 <Database className="h-4 w-4" />
                 Tecnologia
               </TabsTrigger>
-              <TabsTrigger value="finance" className="flex items-center gap-2">
+              <TabsTrigger value="finance" className="flex items-center gap-2 whitespace-nowrap">
                 <ChartBar className="h-4 w-4" />
                 Economia
               </TabsTrigger>
-              <TabsTrigger value="geopolitics" className="flex items-center gap-2">
+              <TabsTrigger value="geopolitics" className="flex items-center gap-2 whitespace-nowrap">
                 <Globe className="h-4 w-4" />
                 Geopolítica
               </TabsTrigger>
-              <TabsTrigger value="local" className="flex items-center gap-2">
+              <TabsTrigger value="local" className="flex items-center gap-2 whitespace-nowrap">
                 <Newspaper className="h-4 w-4" />
                 João Pessoa
               </TabsTrigger>
-              <TabsTrigger value="brazil" className="flex items-center gap-2">
+              <TabsTrigger value="brazil" className="flex items-center gap-2 whitespace-nowrap">
                 <DollarSign className="h-4 w-4" />
                 Brasil
               </TabsTrigger>
