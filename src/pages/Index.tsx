@@ -3,10 +3,8 @@ import NavButton from "@/components/NavButton";
 import AddButton from "@/components/AddButton";
 import Header from "@/components/Header";
 import { useEffect, useState } from "react";
-import { EventsDashboard } from "@/components/dashboard/EventsDashboard";
-import { InvestmentsDashboard } from "@/components/dashboard/InvestmentsDashboard";
-import { VascoMatchDashboard } from "@/components/dashboard/VascoMatchDashboard";
-import { NewsDashboard } from "@/components/dashboard/NewsDashboard";
+import { toast } from "sonner";
+import { Card } from "@/components/ui/card";
 
 interface CustomNavButton {
   label: string;
@@ -17,6 +15,17 @@ interface DefaultButton {
   label: string;
   path: string;
   icon: any;
+}
+
+interface Event {
+  title: string;
+  date: Date;
+}
+
+interface Investment {
+  name: string;
+  value: number;
+  change: number;
 }
 
 const Index = () => {
@@ -36,11 +45,12 @@ const Index = () => {
   ]);
 
   const [nextEvent, setNextEvent] = useState<Event | null>(null);
-  const [investments, setInvestments] = useState([]);
+  const [investments, setInvestments] = useState<Investment[]>([]);
   const [nextMatch, setNextMatch] = useState<string | null>(null);
-  const [news, setNews] = useState([]);
+  const [news, setNews] = useState<{ category: string; title: string }[]>([]);
 
   useEffect(() => {
+    // Simulated data - in a real app, this would come from your backend
     setNextEvent({
       title: "Reunião de projeto",
       date: new Date("2024-03-25 14:00"),
@@ -70,13 +80,17 @@ const Index = () => {
 
   const handleDrop = (e: React.DragEvent, dropIndex: number) => {
     e.preventDefault();
+    
     if (draggedIndex === null) return;
+
     setButtons(currentButtons => {
       const newButtons = [...currentButtons];
       const [draggedButton] = newButtons.splice(draggedIndex, 1);
       newButtons.splice(dropIndex, 0, draggedButton);
+      toast.success("Botão reordenado com sucesso");
       return newButtons;
     });
+
     setDraggedIndex(null);
   };
 
@@ -98,7 +112,7 @@ const Index = () => {
       </header>
 
       <main className="space-y-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-w-[1000px]">
+        <div className="flex flex-wrap gap-4 max-w-[1000px]">
           {buttons.map((button, index) => (
             <NavButton
               key={index}
@@ -123,12 +137,62 @@ const Index = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <EventsDashboard nextEvent={nextEvent} />
-          <InvestmentsDashboard investments={investments} />
-          <VascoMatchDashboard nextMatch={nextMatch} />
+          {/* Próximo Evento */}
+          <Card className="p-4">
+            <h3 className="font-semibold mb-2 flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              Próximo Evento
+            </h3>
+            {nextEvent && (
+              <p className="text-sm">
+                {nextEvent.title} - {nextEvent.date.toLocaleString()}
+              </p>
+            )}
+          </Card>
+
+          {/* Investimentos */}
+          <Card className="p-4">
+            <h3 className="font-semibold mb-2 flex items-center gap-2">
+              <DollarSign className="w-4 h-4" />
+              Investimentos
+            </h3>
+            <div className="space-y-2">
+              {investments.map((inv, i) => (
+                <div key={i} className="flex justify-between text-sm">
+                  <span>{inv.name}</span>
+                  <span className={inv.change >= 0 ? "text-green-500" : "text-red-500"}>
+                    {inv.change}%
+                  </span>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* Próximo Jogo */}
+          <Card className="p-4">
+            <h3 className="font-semibold mb-2 flex items-center gap-2">
+              <Volleyball className="w-4 h-4" />
+              Próximo Jogo
+            </h3>
+            <p className="text-sm">{nextMatch}</p>
+          </Card>
         </div>
 
-        <NewsDashboard news={news} />
+        {/* Notícias */}
+        <Card className="p-4">
+          <h3 className="font-semibold mb-4 flex items-center gap-2">
+            <Newspaper className="w-4 h-4" />
+            Últimas Notícias
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {news.map((item, i) => (
+              <div key={i} className="space-y-1">
+                <span className="text-xs font-medium text-muted-foreground">{item.category}</span>
+                <p className="text-sm">{item.title}</p>
+              </div>
+            ))}
+          </div>
+        </Card>
       </main>
     </div>
   );
