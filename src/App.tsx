@@ -13,6 +13,7 @@ import { ShoppingPage } from "@/pages/shopping/ShoppingPage";
 import { InvestmentsPage } from "@/pages/investments/InvestmentsPage";
 import { VascoPage } from "@/pages/vasco/VascoPage";
 import { PhysicalPage } from "@/pages/physical/PhysicalPage";
+import { NewsPage } from "@/pages/news/NewsPage";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ function App() {
             <Route path="/investimentos" element={<InvestmentsPage />} />
             <Route path="/vasco" element={<VascoPage />} />
             <Route path="/fisico" element={<PhysicalPage />} />
+            <Route path="/noticias" element={<NewsPage />} />
           </Routes>
           <Toaster />
         </ThemeProvider>
