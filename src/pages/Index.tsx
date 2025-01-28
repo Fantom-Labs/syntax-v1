@@ -112,7 +112,7 @@ const Index = () => {
       </header>
 
       <main className="space-y-8">
-        <div className="flex flex-wrap gap-4">
+        <div className="flex flex-wrap gap-4 max-w-[1000px]">
           {buttons.map((button, index) => (
             <NavButton
               key={index}
