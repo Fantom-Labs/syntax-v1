@@ -24,9 +24,9 @@ export const NavButtons = ({ buttons, onDragStart, onDrop }: NavButtonsProps) =>
           icon={button.icon}
           label={button.label}
           index={index}
-          onDragStart={handleDragStart}
+          onDragStart={onDragStart}
           onDragOver={(e) => e.preventDefault()}
-          onDrop={handleDrop}
+          onDrop={onDrop}
         />
       ))}
       <AddButton />
