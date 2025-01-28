@@ -1,4 +1,4 @@
-import { List, Calendar, Activity, BookOpen, Target, ShoppingCart, DollarSign, Notebook, User, Utensils, Ball } from "lucide-react";
+import { List, Calendar, Activity, BookOpen, Target, ShoppingCart, DollarSign, Notebook, User, Utensils, Football } from "lucide-react";
 import NavButton from "@/components/NavButton";
 import AddButton from "@/components/AddButton";
 import Header from "@/components/Header";
@@ -23,7 +23,7 @@ const Index = () => {
     { label: "Agenda", path: "/agenda", icon: Calendar },
     { label: "Notas", path: "/notas", icon: Notebook },
     { label: "Hábitos", path: "/habitos", icon: Activity },
-    { label: "Vasco", path: "/vasco", icon: Ball },
+    { label: "Vasco", path: "/vasco", icon: Football },
     { label: "Livros", path: "/livros", icon: BookOpen },
     { label: "Metas", path: "/metas", icon: Target },
     { label: "Compras", path: "/compras", icon: ShoppingCart },
