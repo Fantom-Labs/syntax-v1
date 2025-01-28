@@ -87,10 +87,8 @@ export const NewsPage = () => {
   });
 
   return (
-    <PageTemplate>
+    <PageTemplate title="Notícias">
       <div className="container mx-auto p-4">
-        <h1 className="text-2xl font-bold mb-6">Notícias</h1>
-        
         <Tabs defaultValue="tech" className="w-full">
           <ScrollArea className="w-full">
             <TabsList className="w-full justify-start mb-6">
