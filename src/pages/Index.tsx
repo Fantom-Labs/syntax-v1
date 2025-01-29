@@ -44,17 +44,38 @@ const Index = () => {
 
   useEffect(() => {
     const fetchUserProfile = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('display_name')
-          .eq('id', user.id)
-          .single();
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
         
-        if (profile?.display_name) {
-          setDisplayName(profile.display_name);
+        if (user) {
+          // Primeiro, vamos tentar buscar o perfil
+          const { data: profile, error } = await supabase
+            .from('profiles')
+            .select('display_name')
+            .eq('id', user.id)
+            .maybeSingle();
+          
+          if (error) {
+            console.error('Erro ao buscar perfil:', error);
+            return;
+          }
+
+          // Se encontramos um perfil e ele tem um display_name, use-o
+          if (profile?.display_name) {
+            setDisplayName(profile.display_name);
+          } else {
+            // Se não encontramos um perfil, vamos criar um
+            const { error: insertError } = await supabase
+              .from('profiles')
+              .insert([{ id: user.id, display_name: 'Master' }]);
+
+            if (insertError) {
+              console.error('Erro ao criar perfil:', insertError);
+            }
+          }
         }
+      } catch (error) {
+        console.error('Erro ao buscar usuário:', error);
       }
     };
 
