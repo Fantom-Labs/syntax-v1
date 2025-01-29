@@ -39,6 +39,66 @@ export type Database = {
         }
         Relationships: []
       }
+      notes: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      physical_data: {
+        Row: {
+          age: number | null
+          allergies: string[] | null
+          blood_type: string | null
+          created_at: string
+          height: number | null
+          id: string
+          medications: string[] | null
+          user_id: string
+          weight: number | null
+        }
+        Insert: {
+          age?: number | null
+          allergies?: string[] | null
+          blood_type?: string | null
+          created_at?: string
+          height?: number | null
+          id?: string
+          medications?: string[] | null
+          user_id: string
+          weight?: number | null
+        }
+        Update: {
+          age?: number | null
+          allergies?: string[] | null
+          blood_type?: string | null
+          created_at?: string
+          height?: number | null
+          id?: string
+          medications?: string[] | null
+          user_id?: string
+          weight?: number | null
+        }
+        Relationships: []
+      }
       reading_list: {
         Row: {
           book_id: string
@@ -70,6 +130,57 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      shopping_items: {
+        Row: {
+          category_id: string
+          completed: boolean | null
+          created_at: string
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          category_id: string
+          completed?: boolean | null
+          created_at?: string
+          id?: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          category_id?: string
+          completed?: boolean | null
+          created_at?: string
+          id?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      tasks: {
+        Row: {
+          completed: boolean | null
+          created_at: string
+          id: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean | null
+          created_at?: string
+          id?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean | null
+          created_at?: string
+          id?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
       }
     }
     Views: {
