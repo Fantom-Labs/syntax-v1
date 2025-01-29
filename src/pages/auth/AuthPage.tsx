@@ -12,6 +12,7 @@ export function AuthPage() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [displayName, setDisplayName] = useState("");
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,6 +23,11 @@ export function AuthPage() {
         const { error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            data: {
+              display_name: displayName,
+            },
+          },
         });
         if (error) throw error;
         toast.success("Cadastro realizado com sucesso! Verifique seu e-mail.");
@@ -54,6 +60,16 @@ export function AuthPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleAuth} className="space-y-4">
+            {isSignUp && (
+              <div className="space-y-2">
+                <Input
+                  type="text"
+                  placeholder="Seu nome (opcional)"
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                />
+              </div>
+            )}
             <div className="space-y-2">
               <Input
                 type="email"

@@ -7,6 +7,7 @@ import { InvestmentCard } from "@/components/dashboard/InvestmentCard";
 import { MatchCard } from "@/components/dashboard/MatchCard";
 import { NewsCard } from "@/components/dashboard/NewsCard";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Event {
   title: string;
@@ -34,6 +35,7 @@ const Index = () => {
     { label: "Notícias", path: "/noticias", icon: Newspaper },
   ]);
 
+  const [displayName, setDisplayName] = useState("Master");
   const [nextEvent, setNextEvent] = useState<Event | null>(null);
   const [investments, setInvestments] = useState<Investment[]>([]);
   const [nextMatch, setNextMatch] = useState<string | null>(null);
@@ -41,6 +43,23 @@ const Index = () => {
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
   useEffect(() => {
+    const fetchUserProfile = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('display_name')
+          .eq('id', user.id)
+          .single();
+        
+        if (profile?.display_name) {
+          setDisplayName(profile.display_name);
+        }
+      }
+    };
+
+    fetchUserProfile();
+
     setNextEvent({
       title: "Reunião de projeto",
       date: new Date("2024-03-25 14:00"),
@@ -87,7 +106,7 @@ const Index = () => {
       <Header />
       <header className="mb-8 md:mb-16">
         <h1 className="text-4xl font-medium">
-          Hello, <span className="name-underline">Múcio</span>.
+          Hello, <span className="name-underline">{displayName}</span>.
         </h1>
       </header>
 
