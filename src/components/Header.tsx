@@ -2,11 +2,13 @@ import { Moon, Sun, User } from "lucide-react";
 import { useTheme } from "./theme-provider";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     setMounted(true);
@@ -26,9 +28,17 @@ const Header = () => {
     });
   };
 
+  const handleAuthClick = () => {
+    navigate("/auth");
+  };
+
   return (
     <div className="fixed top-4 right-4 flex items-center gap-4">
-      <button className="p-2 rounded-full hover:bg-secondary transition-colors">
+      <button 
+        className="p-2 rounded-full hover:bg-secondary transition-colors"
+        onClick={handleAuthClick}
+        aria-label="Entrar ou criar conta"
+      >
         <User className="w-5 h-5" />
       </button>
       <button 
