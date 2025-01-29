@@ -14,6 +14,7 @@ import { InvestmentsPage } from "@/pages/investments/InvestmentsPage";
 import { VascoPage } from "@/pages/vasco/VascoPage";
 import { PhysicalPage } from "@/pages/physical/PhysicalPage";
 import { NewsPage } from "@/pages/news/NewsPage";
+import { AuthPage } from "@/pages/auth/AuthPage";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ function App() {
         <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<AuthPage />} />
             <Route path="/tarefas" element={<TasksPage />} />
             <Route path="/agenda" element={<AgendaPage />} />
             <Route path="/habitos" element={<HabitsPage />} />
