@@ -4,8 +4,8 @@ import { Trash2 } from "lucide-react";
 
 interface TaskListProps {
   tasks: Task[];
-  onToggleTask: (id: number) => void;
-  onDeleteTask: (id: number) => void;
+  onToggleTask: (id: string) => void;
+  onDeleteTask: (id: string) => void;
 }
 
 export const TaskList = ({ tasks, onToggleTask, onDeleteTask }: TaskListProps) => {

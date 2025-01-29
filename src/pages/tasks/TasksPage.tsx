@@ -19,9 +19,13 @@ export const TasksPage = () => {
   const { data: tasks = [], isLoading } = useQuery({
     queryKey: ['tasks'],
     queryFn: async () => {
+      const { data: user } = await supabase.auth.getUser();
+      if (!user.user) throw new Error('User not authenticated');
+
       const { data, error } = await supabase
         .from('tasks')
         .select('*')
+        .eq('user_id', user.user.id)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -37,6 +41,7 @@ export const TasksPage = () => {
         id: task.id,
         title: task.title,
         completed: task.completed || false,
+        user_id: task.user_id
       }));
     },
   });
@@ -44,9 +49,15 @@ export const TasksPage = () => {
   // Add task mutation
   const addTaskMutation = useMutation({
     mutationFn: async (title: string) => {
+      const { data: user } = await supabase.auth.getUser();
+      if (!user.user) throw new Error('User not authenticated');
+
       const { data, error } = await supabase
         .from('tasks')
-        .insert([{ title }])
+        .insert([{ 
+          title,
+          user_id: user.user.id
+        }])
         .select()
         .single();
 
