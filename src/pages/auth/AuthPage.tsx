@@ -136,6 +136,7 @@ export function AuthPage() {
                       <InputOTPSlot
                         key={index}
                         {...slot}
+                        index={index}
                         className={cn(
                           "w-10 h-10 text-lg",
                           "border-2 border-border rounded-full",
