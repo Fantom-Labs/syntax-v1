@@ -267,3 +267,4 @@ export function AuthPage() {
       </Card>
     </div>
   );
+}
