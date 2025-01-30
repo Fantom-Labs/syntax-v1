@@ -51,44 +51,6 @@ export function AuthPage() {
     }
   };
 
-  const handlePinAuth = async () => {
-    if (pin.length !== 6) {
-      toast.error("PIN deve ter 6 dígitos");
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      // First, get the profile associated with this PIN
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('pin', pin)
-        .maybeSingle();
-
-      if (profileError || !profile) {
-        throw new Error('PIN inválido');
-      }
-
-      // Now try to sign in with the PIN as password
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: 'fantom.weblabs@gmail.com', // Using the known email since we can't query auth.users
-        password: pin,
-      });
-
-      if (signInError) throw signInError;
-      
-      toast.success("Login realizado com sucesso!");
-      navigate("/");
-    } catch (error: any) {
-      console.error('PIN auth error:', error);
-      toast.error("PIN inválido ou usuário não encontrado");
-      setPin("");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleResetPassword = async () => {
     if (!email) {
       toast.error("Digite seu e-mail para recuperar a senha");
@@ -104,6 +66,46 @@ export function AuthPage() {
       toast.success("Instruções de recuperação de senha enviadas para seu e-mail!");
     } catch (error: any) {
       toast.error(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handlePinAuth = async () => {
+    if (pin.length !== 6) {
+      toast.error("PIN deve ter 6 dígitos");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // First, get the profile associated with this PIN
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('pin', pin)
+        .single();
+
+      if (profileError || !profile) {
+        throw new Error('PIN inválido');
+      }
+
+      // Now try to sign in with the PIN as password
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        email: 'fantom.weblabs@gmail.com',
+        password: pin,
+      });
+
+      if (signInError || !signInData.user) {
+        throw signInError || new Error('Falha na autenticação');
+      }
+      
+      toast.success("Login realizado com sucesso!");
+      navigate("/");
+    } catch (error: any) {
+      console.error('PIN auth error:', error);
+      toast.error("PIN inválido ou usuário não encontrado");
+      setPin("");
     } finally {
       setIsLoading(false);
     }
@@ -132,6 +134,7 @@ export function AuthPage() {
                 value={pin}
                 onChange={handlePinInput}
                 maxLength={6}
+                containerClassName="group flex items-center gap-2"
                 render={({ slots }) => (
                   <InputOTPGroup className="gap-2">
                     {slots.map((slot, index) => (
@@ -151,20 +154,21 @@ export function AuthPage() {
               />
             </div>
             <div className="grid grid-cols-3 gap-4">
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9, "", 0].map((number, index) => (
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9, "", 0, ""].map((number, index) => (
                 <Button
                   key={index}
                   variant="ghost"
                   className={cn(
                     "h-16 w-16 rounded-full text-2xl font-light",
                     "hover:bg-muted/80 active:bg-muted",
-                    number === "" && "pointer-events-none"
+                    !number && "pointer-events-none opacity-0"
                   )}
                   onClick={() => {
-                    if (pin.length < 6) {
+                    if (typeof number === 'number' && pin.length < 6) {
                       setPin(prev => prev + number);
                     }
                   }}
+                  disabled={!number || isLoading}
                 >
                   {number}
                 </Button>
@@ -175,6 +179,7 @@ export function AuthPage() {
                 type="button"
                 onClick={() => setIsPinAuth(false)}
                 className="text-sm text-muted-foreground hover:underline"
+                disabled={isLoading}
               >
                 Voltar para login com e-mail
               </button>
