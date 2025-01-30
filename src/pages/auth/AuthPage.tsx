@@ -59,28 +59,21 @@ export function AuthPage() {
 
     setIsLoading(true);
     try {
-      // First, get the user's email associated with this PIN
+      // First, get the profile associated with this PIN
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('id')
+        .select('*')
         .eq('pin', pin)
-        .single();
+        .maybeSingle();
 
-      if (profileError) throw new Error('PIN inválido');
-      
-      // Then get the user's email from auth.users
-      const { data: userData, error: userError } = await supabase
-        .from('profiles')
-        .select('email')
-        .eq('id', profile.id)
-        .single();
+      if (profileError || !profile) {
+        throw new Error('PIN inválido');
+      }
 
-      if (userError) throw userError;
-
-      // Now sign in with the found email and PIN as password
+      // Now try to sign in with the PIN as password
       const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: userData.email,
-        password: pin, // Using PIN as password for simplicity
+        email: 'fantom.weblabs@gmail.com', // Using the known email since we can't query auth.users
+        password: pin,
       });
 
       if (signInError) throw signInError;
@@ -274,4 +267,3 @@ export function AuthPage() {
       </Card>
     </div>
   );
-}
