@@ -91,6 +91,36 @@ export const AgendaPage = () => {
     },
   });
 
+  const editEventMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: z.infer<typeof formSchema> }) => {
+      const { error } = await supabase
+        .from('events')
+        .update({
+          title: data.title,
+          description: data.description || '',
+          date: format(data.date, 'yyyy-MM-dd'),
+          time: data.time,
+        })
+        .eq('id', id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+      toast({
+        title: "Evento atualizado com sucesso!",
+        description: "As alterações foram salvas na sua agenda.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "Erro ao atualizar evento",
+        description: error.message,
+      });
+    },
+  });
+
   const deleteEventMutation = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
@@ -129,6 +159,10 @@ export const AgendaPage = () => {
     addEventMutation.mutate(data);
   };
 
+  const handleEditEvent = (id: string, data: z.infer<typeof formSchema>) => {
+    editEventMutation.mutate({ id, data });
+  };
+
   return (
     <PageTemplate title="Agenda">
       <div className="grid gap-6 md:grid-cols-[350px,1fr]">
@@ -159,7 +193,11 @@ export const AgendaPage = () => {
             </DialogContent>
           </Dialog>
         </div>
-        <EventList events={events} onDelete={(id) => deleteEventMutation.mutate(id)} />
+        <EventList 
+          events={events} 
+          onDelete={(id) => deleteEventMutation.mutate(id)} 
+          onEdit={handleEditEvent}
+        />
       </div>
     </PageTemplate>
   );
