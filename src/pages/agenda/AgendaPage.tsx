@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { format } from "date-fns";
 import { Plus } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import PageTemplate from "@/components/PageTemplate";
 import { EventList } from "./EventList";
@@ -29,6 +29,11 @@ export const AgendaPage = () => {
   const { data: events = [], isLoading } = useQuery({
     queryKey: ['events'],
     queryFn: async () => {
+      const { data: session } = await supabase.auth.getSession();
+      if (!session.session?.user) {
+        return [];
+      }
+
       const { data, error } = await supabase
         .from('events')
         .select('*')
@@ -52,6 +57,11 @@ export const AgendaPage = () => {
 
   const addEventMutation = useMutation({
     mutationFn: async (data: z.infer<typeof formSchema>) => {
+      const { data: session } = await supabase.auth.getSession();
+      if (!session.session?.user) {
+        throw new Error("Usuário não autenticado");
+      }
+
       const { error } = await supabase
         .from('events')
         .insert({
@@ -59,6 +69,7 @@ export const AgendaPage = () => {
           description: data.description || '',
           date: format(data.date, 'yyyy-MM-dd'),
           time: data.time,
+          user_id: session.session.user.id
         });
 
       if (error) throw error;
