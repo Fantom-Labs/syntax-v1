@@ -59,28 +59,37 @@ export function AuthPage() {
 
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
+      // First, get the user's email associated with this PIN
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('id')
         .eq('pin', pin)
         .single();
 
-      if (error) throw error;
-      if (!data) throw new Error('PIN inválido');
-
-      // Get user email from auth.users
+      if (profileError) throw new Error('PIN inválido');
+      
+      // Then get the user's email from auth.users
       const { data: userData, error: userError } = await supabase
         .from('profiles')
         .select('email')
-        .eq('id', data.id)
+        .eq('id', profile.id)
         .single();
 
       if (userError) throw userError;
+
+      // Now sign in with the found email and PIN as password
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: userData.email,
+        password: pin, // Using PIN as password for simplicity
+      });
+
+      if (signInError) throw signInError;
       
       toast.success("Login realizado com sucesso!");
       navigate("/");
     } catch (error: any) {
-      toast.error(error.message);
+      console.error('PIN auth error:', error);
+      toast.error("PIN inválido ou usuário não encontrado");
       setPin("");
     } finally {
       setIsLoading(false);
