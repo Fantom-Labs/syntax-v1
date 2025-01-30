@@ -47,6 +47,26 @@ export function AuthPage() {
     }
   };
 
+  const handleResetPassword = async () => {
+    if (!email) {
+      toast.error("Digite seu e-mail para recuperar a senha");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth`,
+      });
+      if (error) throw error;
+      toast.success("Instruções de recuperação de senha enviadas para seu e-mail!");
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
@@ -96,7 +116,7 @@ export function AuthPage() {
                 : "Entrar"}
             </Button>
           </form>
-          <div className="mt-4 text-center">
+          <div className="mt-4 text-center space-y-2">
             <button
               type="button"
               onClick={() => setIsSignUp(!isSignUp)}
@@ -106,6 +126,17 @@ export function AuthPage() {
                 ? "Já tem uma conta? Entre aqui"
                 : "Não tem uma conta? Cadastre-se"}
             </button>
+            {!isSignUp && (
+              <div>
+                <button
+                  type="button"
+                  onClick={handleResetPassword}
+                  className="text-sm text-muted-foreground hover:underline"
+                >
+                  Esqueceu a senha?
+                </button>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
