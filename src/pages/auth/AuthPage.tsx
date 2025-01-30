@@ -143,6 +143,7 @@ export function AuthPage() {
                     {slots.map((slot, index) => (
                       <InputOTPSlot
                         key={index}
+                        index={index}
                         {...slot}
                         className={cn(
                           "w-10 h-10 text-lg",
