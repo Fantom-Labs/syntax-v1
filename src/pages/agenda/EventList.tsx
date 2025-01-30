@@ -2,41 +2,31 @@ import { format } from "date-fns";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
+  id: z.string(),
   title: z.string().min(1, "O título é obrigatório"),
   description: z.string().optional(),
   date: z.date(),
   time: z.string(),
 });
 
+type Event = z.infer<typeof formSchema>;
+
 type EventListProps = {
-  events: z.infer<typeof formSchema>[];
-  setEvents?: React.Dispatch<React.SetStateAction<z.infer<typeof formSchema>[]>>;
+  events: Event[];
+  onDelete: (id: string) => void;
 };
 
-export const EventList = ({ events, setEvents }: EventListProps) => {
-  const { toast } = useToast();
-
-  const handleDelete = (index: number) => {
-    if (setEvents) {
-      setEvents(currentEvents => currentEvents.filter((_, i) => i !== index));
-      toast({
-        title: "Evento excluído",
-        description: "O evento foi removido com sucesso.",
-      });
-    }
-  };
-
+export const EventList = ({ events, onDelete }: EventListProps) => {
   return (
     <div className="rounded-lg border bg-card p-4">
       <h2 className="text-lg font-medium mb-4">Eventos</h2>
       <div className="space-y-4">
-        {events.map((event, index) => (
+        {events.map((event) => (
           <div
-            key={index}
-            className="p-4 rounded-lg border bg-gradient-to-r from-[#7BFF8B]/10 via-[#F6FF71]/10 to-[#DE7CFF]/10 hover:from-[#7BFF8B]/20 hover:via-[#F6FF71]/20 hover:to-[#DE7CFF]/20 transition-colors"
+            key={event.id}
+            className="p-4 rounded-lg border bg-card hover:bg-accent transition-colors"
           >
             <div className="flex items-center justify-between">
               <div>
@@ -48,7 +38,7 @@ export const EventList = ({ events, setEvents }: EventListProps) => {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => handleDelete(index)}
+                onClick={() => onDelete(event.id)}
                 className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
               >
                 <Trash2 className="h-4 w-4" />

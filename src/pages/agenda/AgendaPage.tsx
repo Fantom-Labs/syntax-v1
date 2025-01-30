@@ -6,11 +6,13 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { format } from "date-fns";
 import { Plus } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import PageTemplate from "@/components/PageTemplate";
 import { EventList } from "./EventList";
 import { EventForm } from "./EventForm";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 const formSchema = z.object({
   title: z.string().min(1, "O título é obrigatório"),
@@ -21,8 +23,87 @@ const formSchema = z.object({
 
 export const AgendaPage = () => {
   const [date, setDate] = useState<Date>();
-  const [events, setEvents] = useState<z.infer<typeof formSchema>[]>([]);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const { data: events = [], isLoading } = useQuery({
+    queryKey: ['events'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('events')
+        .select('*')
+        .order('date', { ascending: true });
+
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Erro ao carregar eventos",
+          description: error.message,
+        });
+        return [];
+      }
+
+      return data.map(event => ({
+        ...event,
+        date: new Date(event.date),
+      }));
+    },
+  });
+
+  const addEventMutation = useMutation({
+    mutationFn: async (data: z.infer<typeof formSchema>) => {
+      const { error } = await supabase
+        .from('events')
+        .insert({
+          title: data.title,
+          description: data.description || '',
+          date: format(data.date, 'yyyy-MM-dd'),
+          time: data.time,
+        });
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+      toast({
+        title: "Evento adicionado com sucesso!",
+        description: "O evento foi salvo na sua agenda.",
+      });
+      form.reset();
+    },
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "Erro ao adicionar evento",
+        description: error.message,
+      });
+    },
+  });
+
+  const deleteEventMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('events')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+      toast({
+        title: "Evento excluído",
+        description: "O evento foi removido da sua agenda.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "Erro ao excluir evento",
+        description: error.message,
+      });
+    },
+  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -34,12 +115,7 @@ export const AgendaPage = () => {
   });
 
   const onSubmit = (data: z.infer<typeof formSchema>) => {
-    setEvents((prev) => [...prev, data]);
-    toast({
-      title: "Evento adicionado com sucesso!",
-      description: `${data.title} - ${format(data.date, "dd/MM/yyyy")}`,
-    });
-    form.reset();
+    addEventMutation.mutate(data);
   };
 
   return (
@@ -59,7 +135,7 @@ export const AgendaPage = () => {
           />
           <Dialog>
             <DialogTrigger asChild>
-              <Button className="w-full bg-gradient-to-r from-[#7BFF8B] via-[#F6FF71] to-[#B259FF] hover:opacity-90 text-black">
+              <Button className="w-full">
                 <Plus className="mr-2" />
                 Novo Evento
               </Button>
@@ -72,7 +148,7 @@ export const AgendaPage = () => {
             </DialogContent>
           </Dialog>
         </div>
-        <EventList events={events} setEvents={setEvents} />
+        <EventList events={events} onDelete={(id) => deleteEventMutation.mutate(id)} />
       </div>
     </PageTemplate>
   );
