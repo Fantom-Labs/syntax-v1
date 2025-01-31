@@ -1,23 +1,24 @@
 import { Calendar } from "@/components/ui/calendar";
 import { NewEventDialog } from "./NewEventDialog";
 import { EventFormData } from "../hooks/useEvents";
+import { useState } from "react";
 
 type CalendarSectionProps = {
-  date?: Date;
-  onDateSelect: (date: Date | undefined) => void;
   onEventSubmit: (data: EventFormData) => void;
 };
 
-export const CalendarSection = ({ date, onDateSelect, onEventSubmit }: CalendarSectionProps) => {
+export const CalendarSection = ({ onEventSubmit }: CalendarSectionProps) => {
+  const [selectedDate, setSelectedDate] = useState<Date>();
+
   return (
     <div className="space-y-4">
       <Calendar
         mode="single"
-        selected={date}
-        onSelect={onDateSelect}
+        selected={selectedDate}
+        onSelect={setSelectedDate}
         className="rounded-lg border bg-card"
       />
-      <NewEventDialog onSubmit={onEventSubmit} selectedDate={date} />
+      <NewEventDialog onSubmit={onEventSubmit} selectedDate={selectedDate} />
     </div>
   );
 };

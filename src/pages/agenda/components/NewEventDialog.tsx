@@ -5,6 +5,7 @@ import { EventForm } from "../EventForm";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useEffect } from "react";
 
 const formSchema = z.object({
   title: z.string().min(1, "O título é obrigatório"),
@@ -25,9 +26,15 @@ export const NewEventDialog = ({ onSubmit, selectedDate }: NewEventDialogProps) 
       title: "",
       description: "",
       time: "12:00",
-      date: selectedDate,
+      date: selectedDate || new Date(),
     },
   });
+
+  useEffect(() => {
+    if (selectedDate) {
+      form.setValue('date', selectedDate);
+    }
+  }, [selectedDate, form]);
 
   return (
     <Dialog>
