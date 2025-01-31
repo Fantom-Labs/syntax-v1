@@ -17,9 +17,11 @@ const formSchema = z.object({
 type NewEventDialogProps = {
   onSubmit: (data: z.infer<typeof formSchema>) => void;
   selectedDate?: Date;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 };
 
-export const NewEventDialog = ({ onSubmit, selectedDate }: NewEventDialogProps) => {
+export const NewEventDialog = ({ onSubmit, selectedDate, open, onOpenChange }: NewEventDialogProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -36,8 +38,14 @@ export const NewEventDialog = ({ onSubmit, selectedDate }: NewEventDialogProps) 
     }
   }, [selectedDate, form]);
 
+  const handleSubmit = (data: z.infer<typeof formSchema>) => {
+    onSubmit(data);
+    onOpenChange(false);
+    form.reset();
+  };
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <Button className="w-full">
           <Plus className="mr-2" />
@@ -48,7 +56,7 @@ export const NewEventDialog = ({ onSubmit, selectedDate }: NewEventDialogProps) 
         <DialogHeader>
           <DialogTitle>Adicionar Novo Evento</DialogTitle>
         </DialogHeader>
-        <EventForm form={form} onSubmit={onSubmit} />
+        <EventForm form={form} onSubmit={handleSubmit} />
       </DialogContent>
     </Dialog>
   );
