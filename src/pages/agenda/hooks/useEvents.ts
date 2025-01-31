@@ -53,16 +53,18 @@ export const useEvents = () => {
         throw new Error("Usuário não autenticado");
       }
 
-      // Add UTC offset to prevent timezone issues
+      // Create a new date object with the selected date
       const date = new Date(data.date);
-      date.setMinutes(date.getMinutes() + date.getTimezoneOffset());
+      
+      // Format the date in ISO format and extract just the date part (YYYY-MM-DD)
+      const formattedDate = date.toISOString().split('T')[0];
 
       const { error } = await supabase
         .from('events')
         .insert({
           title: data.title,
           description: data.description || '',
-          date: format(date, 'yyyy-MM-dd'),
+          date: formattedDate,
           time: data.time,
           user_id: session.session.user.id
         });
@@ -87,16 +89,18 @@ export const useEvents = () => {
 
   const editEvent = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: EventFormData }) => {
-      // Add UTC offset to prevent timezone issues
+      // Create a new date object with the selected date
       const date = new Date(data.date);
-      date.setMinutes(date.getMinutes() + date.getTimezoneOffset());
+      
+      // Format the date in ISO format and extract just the date part (YYYY-MM-DD)
+      const formattedDate = date.toISOString().split('T')[0];
 
       const { error } = await supabase
         .from('events')
         .update({
           title: data.title,
           description: data.description || '',
-          date: format(date, 'yyyy-MM-dd'),
+          date: formattedDate,
           time: data.time,
         })
         .eq('id', id);
