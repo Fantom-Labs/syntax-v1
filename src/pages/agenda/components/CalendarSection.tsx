@@ -13,8 +13,11 @@ export const CalendarSection = ({ onEventSubmit }: CalendarSectionProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleDateSelect = (date: Date | undefined) => {
-    setSelectedDate(date);
     if (date) {
+      // Ensure the date is set to noon to avoid timezone issues
+      const adjustedDate = new Date(date);
+      adjustedDate.setHours(12, 0, 0, 0);
+      setSelectedDate(adjustedDate);
       setIsDialogOpen(true);
     }
   };

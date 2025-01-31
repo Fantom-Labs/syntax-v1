@@ -40,7 +40,7 @@ export const EventList = ({ events, onDelete, onEdit }: EventListProps) => {
     form.reset({
       title: event.title,
       description: event.description || "",
-      date: event.date,
+      date: new Date(event.date),
       time: event.time,
     });
   };
@@ -65,7 +65,7 @@ export const EventList = ({ events, onDelete, onEdit }: EventListProps) => {
               <div>
                 <h3 className="font-medium">{event.title}</h3>
                 <time className="text-sm text-muted-foreground">
-                  {format(event.date, "dd/MM/yyyy")} às {event.time}
+                  {format(new Date(event.date), "dd/MM/yyyy")} às {event.time}
                 </time>
               </div>
               <div className="flex gap-2">
