@@ -30,7 +30,13 @@ export function useNotes() {
 
   const { mutate: createNote } = useMutation({
     mutationFn: async (note: { title: string; content: string }) => {
-      const { data, error } = await supabase.from("notes").insert([note]).select();
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (userError) throw userError;
+
+      const { data, error } = await supabase
+        .from("notes")
+        .insert([{ ...note, user_id: userData.user.id }])
+        .select();
 
       if (error) throw error;
       return data;
