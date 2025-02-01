@@ -1,17 +1,21 @@
 import { useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { Edit2, Plus, Trash2 } from "lucide-react";
 import PageTemplate from "@/components/PageTemplate";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 import { Note } from "@/types/notes";
+import { EditNoteDialog } from "./components/EditNoteDialog";
+import { useNotes } from "./hooks/useNotes";
+import { format } from "date-fns";
 
 const NotesPage = () => {
-  const [notes, setNotes] = useState<Note[]>([]);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [editingNote, setEditingNote] = useState<Note | null>(null);
   const { toast } = useToast();
+  const { notes, createNote, updateNote, deleteNote } = useNotes();
 
   const handleAddNote = () => {
     if (!title.trim() || !content.trim()) {
@@ -23,29 +27,13 @@ const NotesPage = () => {
       return;
     }
 
-    const newNote: Note = {
-      id: Date.now(),
+    createNote({
       title: title.trim(),
       content: content.trim(),
-      createdAt: new Date(),
-    };
+    });
 
-    setNotes([newNote, ...notes]);
     setTitle("");
     setContent("");
-    
-    toast({
-      title: "Nota criada com sucesso",
-      description: "Sua nota foi adicionada à lista",
-    });
-  };
-
-  const handleDeleteNote = (id: number) => {
-    setNotes(notes.filter((note) => note.id !== id));
-    toast({
-      title: "Nota excluída",
-      description: "Sua nota foi removida da lista",
-    });
   };
 
   return (
@@ -63,8 +51,11 @@ const NotesPage = () => {
             onChange={(e) => setContent(e.target.value)}
             className="min-h-[120px]"
           />
-          <Button onClick={handleAddNote} className="w-full bg-[#7BFF8B] hover:bg-[#7BFF8B]/80 text-black">
-            <Plus className="w-4 h-4" />
+          <Button
+            onClick={handleAddNote}
+            className="w-full bg-[#7BFF8B] hover:bg-[#7BFF8B]/80 text-black"
+          >
+            <Plus className="w-4 h-4 mr-2" />
             Adicionar nota
           </Button>
         </div>
@@ -77,28 +68,41 @@ const NotesPage = () => {
             >
               <div className="flex items-start justify-between">
                 <h3 className="font-medium">{note.title}</h3>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleDeleteNote(note.id)}
-                  className="h-8 w-8 hover:bg-[#7BFF8B]/10"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setEditingNote(note)}
+                    className="h-8 w-8 hover:bg-[#7BFF8B]/10"
+                  >
+                    <Edit2 className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => deleteNote(note.id)}
+                    className="h-8 w-8 hover:bg-[#7BFF8B]/10"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
               </div>
               <p className="text-sm text-muted-foreground">{note.content}</p>
               <p className="text-xs text-muted-foreground">
-                {new Date(note.createdAt).toLocaleDateString("pt-BR", {
-                  day: "2-digit",
-                  month: "2-digit",
-                  year: "2-digit",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
+                {format(new Date(note.created_at), "dd/MM/yyyy 'às' HH:mm")}
               </p>
             </div>
           ))}
         </div>
+
+        {editingNote && (
+          <EditNoteDialog
+            note={editingNote}
+            open={!!editingNote}
+            onOpenChange={(open) => !open && setEditingNote(null)}
+            onSave={updateNote}
+          />
+        )}
       </div>
     </PageTemplate>
   );
