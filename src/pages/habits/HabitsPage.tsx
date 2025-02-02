@@ -1,6 +1,4 @@
-import { useState } from "react";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { useState, useEffect } from "react";
 import { Activity, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import PageTemplate from "@/components/PageTemplate";
@@ -11,39 +9,57 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Habit } from "@/types/habits";
 import { HabitList } from "./HabitList";
 import { DateNavigation } from "./DateNavigation";
+import { HabitsDashboard } from "./HabitsDashboard";
+import { supabase } from "@/integrations/supabase/client";
 
 export const HabitsPage = () => {
   const [date, setDate] = useState<Date>(new Date());
-  const [habits, setHabits] = useState<Habit[]>([
-    {
-      id: "1",
-      title: "Acordar cedo",
-      icon: <Activity className="w-5 h-5 text-primary" />,
-      checksPerDay: 1,
-      checks: []
-    },
-    {
-      id: "2",
-      title: "Passear com Katana",
-      icon: <Activity className="w-5 h-5 text-primary" />,
-      checksPerDay: 2,
-      checks: []
-    },
-    {
-      id: "3",
-      title: "Beber 2L de água",
-      icon: <Activity className="w-5 h-5 text-primary" />,
-      checksPerDay: 1,
-      checks: []
-    }
-  ]);
-
+  const [habits, setHabits] = useState<Habit[]>([]);
   const [isAddingHabit, setIsAddingHabit] = useState(false);
   const [newHabitTitle, setNewHabitTitle] = useState("");
   const [checksPerDay, setChecksPerDay] = useState(1);
+  const [userId, setUserId] = useState<string | undefined>();
   const { toast } = useToast();
 
-  const addHabit = () => {
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUserId(user?.id);
+
+      if (user?.id) {
+        const { data: userHabits, error } = await supabase
+          .from("habits")
+          .select("*")
+          .eq("user_id", user.id);
+
+        if (error) {
+          console.error("Error fetching habits:", error);
+          return;
+        }
+
+        setHabits(userHabits.map(habit => ({
+          id: habit.id,
+          title: habit.title,
+          icon: <Activity className="w-5 h-5 text-primary" />,
+          checksPerDay: habit.checks_per_day,
+          checks: []
+        })));
+      }
+    };
+
+    checkAuth();
+  }, []);
+
+  const addHabit = async () => {
+    if (!userId) {
+      toast({
+        title: "Erro",
+        description: "Você precisa estar logado para adicionar hábitos",
+        variant: "destructive"
+      });
+      return;
+    }
+
     if (!newHabitTitle.trim()) {
       toast({
         title: "Erro",
@@ -53,11 +69,30 @@ export const HabitsPage = () => {
       return;
     }
 
+    const { data: habit, error } = await supabase
+      .from("habits")
+      .insert({
+        title: newHabitTitle,
+        checks_per_day: checksPerDay,
+        user_id: userId
+      })
+      .select()
+      .single();
+
+    if (error) {
+      toast({
+        title: "Erro",
+        description: "Erro ao adicionar hábito",
+        variant: "destructive"
+      });
+      return;
+    }
+
     const newHabit: Habit = {
-      id: Date.now().toString(),
-      title: newHabitTitle,
+      id: habit.id,
+      title: habit.title,
       icon: <Activity className="w-5 h-5 text-primary" />,
-      checksPerDay,
+      checksPerDay: habit.checks_per_day,
       checks: []
     };
 
@@ -70,6 +105,21 @@ export const HabitsPage = () => {
       description: "Hábito adicionado com sucesso!"
     });
   };
+
+  if (!userId) {
+    return (
+      <PageTemplate title="Hábitos">
+        <div className="flex flex-col items-center justify-center h-[60vh] space-y-4">
+          <h2 className="text-2xl font-semibold text-center">
+            Crie sua conta e configure seus hábitos diários!
+          </h2>
+          <p className="text-muted-foreground text-center">
+            Acompanhe seu progresso e desenvolva hábitos positivos.
+          </p>
+        </div>
+      </PageTemplate>
+    );
+  }
 
   return (
     <PageTemplate title="Hábitos">
@@ -117,6 +167,8 @@ export const HabitsPage = () => {
               </DialogContent>
             </Dialog>
           </div>
+
+          <HabitsDashboard userId={userId} />
         </div>
       </div>
     </PageTemplate>

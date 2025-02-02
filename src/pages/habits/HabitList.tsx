@@ -4,6 +4,8 @@ import { Trash2 } from "lucide-react";
 import { format, startOfWeek, addDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface HabitListProps {
   habits: Habit[];
@@ -15,6 +17,7 @@ type CheckStatus = "unchecked" | "completed" | "failed";
 
 export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
   const isMobile = useIsMobile();
+  const { toast } = useToast();
   const startOfCurrentWeek = startOfWeek(date, { weekStartsOn: 0 });
   
   const weekDays = Array.from({ length: 7 }).map((_, index) => {
@@ -30,24 +33,43 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
     return check.completed ? "completed" : "failed";
   };
 
-  const toggleHabitCheck = (habitId: string, date: string) => {
+  const toggleHabitCheck = async (habitId: string, date: string) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const currentStatus = getCheckStatus(
+      habits.find(h => h.id === habitId)!,
+      date
+    );
+
+    const completed = currentStatus === "unchecked";
+
+    const { error } = await supabase
+      .from("habit_history")
+      .upsert({
+        habit_id: habitId,
+        user_id: user.id,
+        date,
+        completed
+      });
+
+    if (error) {
+      toast({
+        title: "Erro",
+        description: "Erro ao atualizar hábito",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setHabits(currentHabits => 
       currentHabits.map(habit => {
         if (habit.id === habitId) {
-          const currentStatus = getCheckStatus(habit, date);
           let newChecks = habit.checks.filter(check => !check.timestamp.startsWith(date));
-          
-          if (currentStatus === "unchecked") {
-            newChecks.push({
-              timestamp: `${date}T00:00:00.000Z`,
-              completed: true
-            });
-          } else if (currentStatus === "completed") {
-            newChecks.push({
-              timestamp: `${date}T00:00:00.000Z`,
-              completed: false
-            });
-          }
+          newChecks.push({
+            timestamp: `${date}T00:00:00.000Z`,
+            completed
+          });
           
           return {
             ...habit,
@@ -59,8 +81,26 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
     );
   };
 
-  const removeHabit = (habitId: string) => {
+  const removeHabit = async (habitId: string) => {
+    const { error } = await supabase
+      .from("habits")
+      .delete()
+      .eq("id", habitId);
+
+    if (error) {
+      toast({
+        title: "Erro",
+        description: "Erro ao remover hábito",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setHabits(currentHabits => currentHabits.filter(habit => habit.id !== habitId));
+    toast({
+      title: "Sucesso",
+      description: "Hábito removido com sucesso!"
+    });
   };
 
   return (

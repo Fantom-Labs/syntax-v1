@@ -10,3 +10,17 @@ export interface Habit {
   checksPerDay: number;
   checks: HabitCheck[];
 }
+
+export interface HabitHistory {
+  id: string;
+  habitId: string;
+  date: string;
+  completed: boolean;
+}
+
+export interface HabitProgress {
+  habitId: string;
+  title: string;
+  completionRate: number;
+  history: HabitHistory[];
+}
