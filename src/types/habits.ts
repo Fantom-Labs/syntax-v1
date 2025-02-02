@@ -13,9 +13,11 @@ export interface Habit {
 
 export interface HabitHistory {
   id: string;
-  habitId: string;
+  habit_id: string;
   date: string;
   completed: boolean;
+  created_at: string;
+  user_id: string;
 }
 
 export interface HabitProgress {
