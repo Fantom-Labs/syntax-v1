@@ -11,7 +11,6 @@ import { BooksPage } from "@/pages/books/BooksPage";
 import { GoalsPage } from "@/pages/goals/GoalsPage";
 import { ShoppingPage } from "@/pages/shopping/ShoppingPage";
 import { InvestmentsPage } from "@/pages/investments/InvestmentsPage";
-import { VascoPage } from "@/pages/vasco/VascoPage";
 import { PhysicalPage } from "@/pages/physical/PhysicalPage";
 import { NewsPage } from "@/pages/news/NewsPage";
 import { AuthPage } from "@/pages/auth/AuthPage";
@@ -34,7 +33,6 @@ function App() {
             <Route path="/metas" element={<GoalsPage />} />
             <Route path="/compras" element={<ShoppingPage />} />
             <Route path="/investimentos" element={<InvestmentsPage />} />
-            <Route path="/vasco" element={<VascoPage />} />
             <Route path="/fisico" element={<PhysicalPage />} />
             <Route path="/noticias" element={<NewsPage />} />
           </Routes>

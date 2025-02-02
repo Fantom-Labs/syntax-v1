@@ -1,4 +1,4 @@
-import { List, Calendar, Activity, BookOpen, Target, ShoppingCart, DollarSign, Notebook, User, Volleyball, Newspaper } from "lucide-react";
+import { List, Calendar, Activity, BookOpen, Target, ShoppingCart, DollarSign, Notebook, User, Newspaper } from "lucide-react";
 import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import { NavButtons } from "@/components/dashboard/NavButtons";
@@ -26,7 +26,6 @@ const Index = () => {
     { label: "Agenda", path: "/agenda", icon: Calendar },
     { label: "Notas", path: "/notas", icon: Notebook },
     { label: "Hábitos", path: "/habitos", icon: Activity },
-    { label: "Vasco", path: "/vasco", icon: Volleyball },
     { label: "Livros", path: "/livros", icon: BookOpen },
     { label: "Metas", path: "/metas", icon: Target },
     { label: "Compras", path: "/compras", icon: ShoppingCart },
@@ -48,7 +47,6 @@ const Index = () => {
         const { data: { user } } = await supabase.auth.getUser();
         
         if (user) {
-          // Primeiro, vamos tentar buscar o perfil
           const { data: profile, error } = await supabase
             .from('profiles')
             .select('display_name')
@@ -60,11 +58,9 @@ const Index = () => {
             return;
           }
 
-          // Se encontramos um perfil e ele tem um display_name, use-o
           if (profile?.display_name) {
             setDisplayName(profile.display_name);
           } else {
-            // Se não encontramos um perfil, vamos criar um
             const { error: insertError } = await supabase
               .from('profiles')
               .insert([{ id: user.id, display_name: 'Master' }]);
@@ -91,7 +87,8 @@ const Index = () => {
       { name: "PETR4", value: 38.42, change: -1.2 },
     ]);
 
-    setNextMatch("Vasco x Fluminense - 24/03 16:00");
+    // Atualizado para mostrar o próximo jogo do Vasco em 2025
+    setNextMatch("Vasco x Flamengo - Campeonato Brasileiro 2025 - 19/01 16:00");
 
     setNews([
       { category: "Tecnologia", title: "Nova IA da OpenAI supera benchmarks" },
