@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { EventForm } from "./EventForm";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
+import { startOfDay } from "date-fns";
 
 const formSchema = z.object({
   id: z.string(),
@@ -30,7 +31,7 @@ export const EventList = ({ events, onDelete, onEdit }: EventListProps) => {
     defaultValues: {
       title: editingEvent?.title || "",
       description: editingEvent?.description || "",
-      date: editingEvent?.date || new Date(),
+      date: editingEvent?.date || startOfDay(new Date()),
       time: editingEvent?.time || "12:00",
     },
   });
@@ -40,14 +41,17 @@ export const EventList = ({ events, onDelete, onEdit }: EventListProps) => {
     form.reset({
       title: event.title,
       description: event.description || "",
-      date: new Date(event.date),
+      date: startOfDay(new Date(event.date)),
       time: event.time,
     });
   };
 
   const handleEditSubmit = (data: z.infer<typeof formSchema>) => {
     if (editingEvent) {
-      onEdit(editingEvent.id, data);
+      onEdit(editingEvent.id, {
+        ...data,
+        date: startOfDay(data.date),
+      });
       setEditingEvent(null);
     }
   };
@@ -65,7 +69,7 @@ export const EventList = ({ events, onDelete, onEdit }: EventListProps) => {
               <div>
                 <h3 className="font-medium">{event.title}</h3>
                 <time className="text-sm text-muted-foreground">
-                  {format(new Date(event.date), "dd/MM/yyyy")} às {event.time}
+                  {format(event.date, "dd/MM/yyyy")} às {event.time}
                 </time>
               </div>
               <div className="flex gap-2">

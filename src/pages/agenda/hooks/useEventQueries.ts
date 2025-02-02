@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { parseISO } from "date-fns";
 
 export const useEventQueries = () => {
   const { toast } = useToast();
@@ -29,7 +30,7 @@ export const useEventQueries = () => {
 
       return data.map(event => ({
         ...event,
-        date: new Date(event.date),
+        date: parseISO(event.date),
       }));
     },
   });

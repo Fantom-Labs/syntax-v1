@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useEffect } from "react";
+import { startOfDay } from "date-fns";
 
 const formSchema = z.object({
   title: z.string().min(1, "O título é obrigatório"),
@@ -28,18 +29,21 @@ export const NewEventDialog = ({ onSubmit, selectedDate, open, onOpenChange }: N
       title: "",
       description: "",
       time: "12:00",
-      date: selectedDate || new Date(),
+      date: selectedDate || startOfDay(new Date()),
     },
   });
 
   useEffect(() => {
     if (selectedDate) {
-      form.setValue('date', selectedDate);
+      form.setValue('date', startOfDay(selectedDate));
     }
   }, [selectedDate, form]);
 
   const handleSubmit = (data: z.infer<typeof formSchema>) => {
-    onSubmit(data);
+    onSubmit({
+      ...data,
+      date: startOfDay(data.date),
+    });
     onOpenChange(false);
     form.reset();
   };

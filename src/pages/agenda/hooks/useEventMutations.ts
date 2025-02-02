@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { EventFormData } from "./useEvents";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 
 export const useEventMutations = () => {
   const { toast } = useToast();
@@ -15,7 +15,7 @@ export const useEventMutations = () => {
         throw new Error("Usuário não autenticado");
       }
 
-      // Format the date in YYYY-MM-DD format without timezone conversion
+      // Format the date in YYYY-MM-DD format
       const formattedDate = format(data.date, 'yyyy-MM-dd');
 
       const { error } = await supabase
@@ -48,7 +48,6 @@ export const useEventMutations = () => {
 
   const editEvent = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: EventFormData }) => {
-      // Format the date in YYYY-MM-DD format without timezone conversion
       const formattedDate = format(data.date, 'yyyy-MM-dd');
 
       const { error } = await supabase
