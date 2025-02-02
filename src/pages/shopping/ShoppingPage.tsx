@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Home, Computer, Dog, Apple, Plus } from "lucide-react";
+import { Home, Computer, Dog, Apple, Plus, Loader2 } from "lucide-react";
 import PageTemplate from "@/components/PageTemplate";
-import { ShoppingCategory, ShoppingItem } from "@/types/shopping";
+import { ShoppingCategory } from "@/types/shopping";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { useShoppingItems } from "./hooks/useShoppingItems";
 
 const DEFAULT_CATEGORIES: ShoppingCategory[] = [
   { id: "1", name: "Feira", icon: "food" },
@@ -22,8 +23,8 @@ const SUGGESTIONS = {
 
 export const ShoppingPage = () => {
   const [categories, setCategories] = useState<ShoppingCategory[]>(DEFAULT_CATEGORIES);
-  const [items, setItems] = useState<ShoppingItem[]>([]);
   const [newCategory, setNewCategory] = useState("");
+  const { items, isLoading, addItem, toggleItem, removeItem } = useShoppingItems();
 
   const getIconComponent = (iconName: string) => {
     switch (iconName) {
@@ -53,29 +54,15 @@ export const ShoppingPage = () => {
     }
   };
 
-  const toggleItem = (itemId: string) => {
-    setItems(
-      items.map((item) =>
-        item.id === itemId ? { ...item, completed: !item.completed } : item
-      )
+  if (isLoading) {
+    return (
+      <PageTemplate title="Lista de Compras">
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="w-8 h-8 animate-spin" />
+        </div>
+      </PageTemplate>
     );
-  };
-
-  const addItem = (categoryId: string, name: string) => {
-    if (name.trim()) {
-      const newItem: ShoppingItem = {
-        id: Date.now().toString(),
-        name: name.trim(),
-        completed: false,
-        categoryId,
-      };
-      setItems([...items, newItem]);
-    }
-  };
-
-  const removeItem = (itemId: string) => {
-    setItems(items.filter((item) => item.id !== itemId));
-  };
+  }
 
   return (
     <PageTemplate title="Lista de Compras">
@@ -107,7 +94,7 @@ export const ShoppingPage = () => {
 
               <div className="space-y-2">
                 {items
-                  .filter((item) => item.categoryId === category.id)
+                  ?.filter((item) => item.category_id === category.id)
                   .map((item) => (
                     <div
                       key={item.id}
@@ -116,34 +103,30 @@ export const ShoppingPage = () => {
                       <input
                         type="checkbox"
                         checked={item.completed}
-                        onChange={() => toggleItem(item.id)}
+                        onChange={() => toggleItem.mutate(item.id)}
                         className="w-4 h-4 rounded border-gray-300"
                       />
-                      <input
-                        type="text"
-                        value={item.name}
-                        onChange={(e) => {
-                          const newName = e.target.value;
-                          if (newName.trim()) {
-                            setItems(
-                              items.map((i) =>
-                                i.id === item.id ? { ...i, name: newName } : i
-                              )
-                            );
-                          } else {
-                            removeItem(item.id);
-                          }
-                        }}
-                        className={`flex-1 bg-transparent border-none focus:outline-none ${
+                      <span
+                        className={`flex-1 ${
                           item.completed ? "line-through text-muted-foreground" : ""
                         }`}
-                      />
+                      >
+                        {item.name}
+                      </span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="opacity-0 group-hover:opacity-100"
+                        onClick={() => removeItem.mutate(item.id)}
+                      >
+                        Remover
+                      </Button>
                     </div>
                   ))}
 
                 {/* Empty state with suggestions */}
-                {items.filter((item) => item.categoryId === category.id)
-                  .length === 0 && (
+                {!items?.filter((item) => item.category_id === category.id)
+                  .length && (
                   <div className="space-y-2">
                     {(SUGGESTIONS[category.id as keyof typeof SUGGESTIONS] || []).map(
                       (suggestion, index) => (
@@ -153,14 +136,17 @@ export const ShoppingPage = () => {
                             className="w-4 h-4 rounded border-gray-300"
                             disabled
                           />
-                          <input
-                            type="text"
-                            placeholder={suggestion}
-                            className="flex-1 bg-transparent border-none focus:outline-none text-muted-foreground"
-                            onFocus={(e) => {
-                              addItem(category.id, e.target.value);
+                          <span
+                            className="flex-1 text-muted-foreground cursor-pointer"
+                            onClick={() => {
+                              addItem.mutate({
+                                name: suggestion,
+                                categoryId: category.id,
+                              });
                             }}
-                          />
+                          >
+                            {suggestion}
+                          </span>
                         </div>
                       )
                     )}
@@ -179,8 +165,11 @@ export const ShoppingPage = () => {
                     placeholder="Adicionar item..."
                     className="flex-1 bg-transparent border-none focus:outline-none"
                     onKeyPress={(e) => {
-                      if (e.key === "Enter") {
-                        addItem(category.id, e.currentTarget.value);
+                      if (e.key === "Enter" && e.currentTarget.value.trim()) {
+                        addItem.mutate({
+                          name: e.currentTarget.value.trim(),
+                          categoryId: category.id,
+                        });
                         e.currentTarget.value = "";
                       }
                     }}
