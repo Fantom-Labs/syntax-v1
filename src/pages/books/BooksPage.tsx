@@ -6,6 +6,7 @@ import PageTemplate from "@/components/PageTemplate";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Command,
@@ -51,7 +52,9 @@ export const BooksPage = () => {
       const { data, error } = await supabase
         .from("reading_list")
         .select(`
+          id,
           book_id,
+          status,
           books (
             id,
             title,
@@ -278,12 +281,11 @@ export const BooksPage = () => {
                             (item) => item.books.google_books_id === book.google_books_id
                           ) && (
                             <div className="flex items-center gap-2">
-                              <input
-                                type="checkbox"
+                              <Checkbox
                                 checked={readingList.find(
                                   (item) => item.books.google_books_id === book.google_books_id
                                 )?.status === "read"}
-                                onChange={async () => {
+                                onCheckedChange={async () => {
                                   const item = readingList.find(
                                     (item) => item.books.google_books_id === book.google_books_id
                                   );
@@ -304,7 +306,6 @@ export const BooksPage = () => {
                                     refetchReadingList();
                                   }
                                 }}
-                                className="w-4 h-4 rounded border-gray-300"
                               />
                               <span className="text-sm text-muted-foreground">Lido</span>
                             </div>
@@ -343,6 +344,28 @@ export const BooksPage = () => {
                         <div className="flex-1 space-y-2">
                           <h3 className="font-semibold line-clamp-2">{book.title}</h3>
                           <p className="text-sm text-muted-foreground">{book.author}</p>
+                          <div className="flex items-center gap-2">
+                            <Checkbox
+                              checked={item.status === "read"}
+                              onCheckedChange={async () => {
+                                const { error } = await supabase
+                                  .from("reading_list")
+                                  .update({
+                                    status: item.status === "read" ? "to_read" : "read"
+                                  })
+                                  .eq("id", item.id);
+                                
+                                if (error) {
+                                  toast.error("Erro ao atualizar status do livro");
+                                  return;
+                                }
+                                
+                                toast.success("Status do livro atualizado");
+                                refetchReadingList();
+                              }}
+                            />
+                            <span className="text-sm text-muted-foreground">Lido</span>
+                          </div>
                         </div>
                       </div>
                     </CardContent>
