@@ -260,19 +260,56 @@ export const BooksPage = () => {
                             {book.description}
                           </p>
                         )}
-                        <Button
-                          size="sm"
-                          onClick={() => addToReadingList(book)}
-                          disabled={readingList?.some(
-                            (item) => item.books.google_books_id === book.google_books_id
-                          )}
-                        >
+                        <div className="flex items-center gap-4">
+                          <Button
+                            size="sm"
+                            onClick={() => addToReadingList(book)}
+                            disabled={readingList?.some(
+                              (item) => item.books.google_books_id === book.google_books_id
+                            )}
+                          >
+                            {readingList?.some(
+                              (item) => item.books.google_books_id === book.google_books_id
+                            )
+                              ? "Na lista"
+                              : "Adicionar à lista"}
+                          </Button>
                           {readingList?.some(
                             (item) => item.books.google_books_id === book.google_books_id
-                          )
-                            ? "Na lista"
-                            : "Adicionar à lista"}
-                        </Button>
+                          ) && (
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="checkbox"
+                                checked={readingList.find(
+                                  (item) => item.books.google_books_id === book.google_books_id
+                                )?.status === "read"}
+                                onChange={async () => {
+                                  const item = readingList.find(
+                                    (item) => item.books.google_books_id === book.google_books_id
+                                  );
+                                  if (item) {
+                                    const { error } = await supabase
+                                      .from("reading_list")
+                                      .update({
+                                        status: item.status === "read" ? "to_read" : "read"
+                                      })
+                                      .eq("id", item.id);
+                                    
+                                    if (error) {
+                                      toast.error("Erro ao atualizar status do livro");
+                                      return;
+                                    }
+                                    
+                                    toast.success("Status do livro atualizado");
+                                    refetchReadingList();
+                                  }
+                                }}
+                                className="w-4 h-4 rounded border-gray-300"
+                              />
+                              <span className="text-sm text-muted-foreground">Lido</span>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </CardContent>
