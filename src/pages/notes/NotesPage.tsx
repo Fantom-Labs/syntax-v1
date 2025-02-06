@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Edit2, Plus, Trash2 } from "lucide-react";
 import PageTemplate from "@/components/PageTemplate";
@@ -38,8 +39,8 @@ const NotesPage = () => {
 
   return (
     <PageTemplate title="Notas">
-      <div className="space-y-6">
-        <div className="space-y-4">
+      <div className="space-y-8">
+        <div className="space-y-4 max-w-2xl mx-auto">
           <Input
             placeholder="Título da nota"
             value={title}
@@ -60,15 +61,15 @@ const NotesPage = () => {
           </Button>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {notes.map((note) => (
             <div
               key={note.id}
-              className="p-4 space-y-2 rounded-lg border bg-card text-card-foreground"
+              className="p-6 space-y-3 rounded-lg border bg-card text-card-foreground hover:shadow-md transition-shadow"
             >
-              <div className="flex items-start justify-between">
-                <h3 className="font-medium">{note.title}</h3>
-                <div className="flex gap-2">
+              <div className="flex items-start justify-between gap-4">
+                <h3 className="font-medium text-lg break-words">{note.title}</h3>
+                <div className="flex gap-2 flex-shrink-0">
                   <Button
                     variant="ghost"
                     size="icon"
@@ -87,7 +88,7 @@ const NotesPage = () => {
                   </Button>
                 </div>
               </div>
-              <p className="text-sm text-muted-foreground">{note.content}</p>
+              <p className="text-sm text-muted-foreground whitespace-pre-wrap break-words">{note.content}</p>
               <p className="text-xs text-muted-foreground">
                 {format(new Date(note.created_at), "dd/MM/yyyy 'às' HH:mm")}
               </p>
