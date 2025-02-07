@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,7 +21,7 @@ import {
 } from "@/components/ui/select";
 
 interface AddInvestmentDialogProps {
-  onAdd: (investment: Investment) => void;
+  onAdd: (investment: Omit<Investment, 'id'>) => void;
 }
 
 export const AddInvestmentDialog = ({ onAdd }: AddInvestmentDialogProps) => {
@@ -41,10 +42,13 @@ export const AddInvestmentDialog = ({ onAdd }: AddInvestmentDialogProps) => {
       return;
 
     onAdd({
-      ...investment,
-      id: crypto.randomUUID(),
-      totalInvested: investment.quantity * investment.purchasePrice * 5, // Simple BRL conversion
-    } as Investment);
+      name: investment.name,
+      symbol: investment.symbol,
+      quantity: investment.quantity,
+      purchasePrice: investment.purchasePrice,
+      type: investment.type,
+      totalInvested: investment.quantity * investment.purchasePrice * 5 // Simple BRL conversion
+    });
     setOpen(false);
     setInvestment({ type: "stocks" });
   };

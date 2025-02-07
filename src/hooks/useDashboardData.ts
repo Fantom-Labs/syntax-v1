@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -38,14 +39,6 @@ export const useDashboardData = () => {
 
           if (profile?.display_name) {
             setDisplayName(profile.display_name);
-          } else {
-            const { error: insertError } = await supabase
-              .from('profiles')
-              .insert([{ id: user.id, display_name: 'Master' }]);
-
-            if (insertError) {
-              console.error('Erro ao criar perfil:', insertError);
-            }
           }
         }
       } catch (error) {
@@ -53,17 +46,51 @@ export const useDashboardData = () => {
       }
     };
 
+    const fetchInvestments = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          const { data: portfolios, error } = await supabase
+            .from('portfolios')
+            .select(`
+              investments (
+                name,
+                quantity,
+                purchase_price
+              )
+            `)
+            .eq('user_id', user.id);
+
+          if (error) {
+            console.error('Error fetching investments:', error);
+            return;
+          }
+
+          // Combine investments from all portfolios
+          const allInvestments = portfolios.flatMap(p => p.investments);
+          
+          // Transform to the format expected by the dashboard
+          const dashboardInvestments = allInvestments.map(inv => ({
+            name: inv.name,
+            value: inv.quantity * inv.purchase_price * 5, // Simple BRL conversion
+            change: Math.random() * 10 - 5, // Mock change value for now
+          }));
+
+          setInvestments(dashboardInvestments);
+        }
+      } catch (error) {
+        console.error('Error fetching investments:', error);
+      }
+    };
+
     fetchUserProfile();
+    fetchInvestments();
 
     setNextEvent({
       title: "Reunião de projeto",
       date: new Date("2024-03-25 14:00"),
     });
-
-    setInvestments([
-      { name: "Bitcoin", value: 62000, change: 2.5 },
-      { name: "PETR4", value: 38.42, change: -1.2 },
-    ]);
 
     setNextMatch("Vasco x Flamengo - Campeonato Brasileiro 2025 - 19/01 16:00");
 

@@ -1,3 +1,4 @@
+
 import { Investment, Portfolio } from "@/types/investments";
 import {
   Card,
@@ -10,10 +11,12 @@ import { AddInvestmentDialog } from "./AddInvestmentDialog";
 import { InvestmentList } from "./InvestmentList";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface PortfolioViewProps {
   portfolio: Portfolio;
-  onUpdate: (portfolio: Portfolio) => void;
+  onUpdate: () => void;
 }
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
@@ -21,37 +24,43 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'
 export const PortfolioView = ({ portfolio, onUpdate }: PortfolioViewProps) => {
   const isMobile = useIsMobile();
 
-  const addInvestment = (investment: Investment) => {
-    onUpdate({
-      ...portfolio,
-      investments: [...portfolio.investments, investment],
-      totalValue: portfolio.totalValue + investment.totalInvested,
-    });
+  const addInvestment = async (investment: Omit<Investment, 'id'>) => {
+    const { data, error } = await supabase
+      .from('investments')
+      .insert([{
+        ...investment,
+        portfolio_id: portfolio.id
+      }])
+      .select()
+      .single();
+
+    if (error) {
+      toast.error("Error adding investment");
+      return;
+    }
+
+    onUpdate();
+    toast.success("Investment added successfully");
   };
 
-  const removeInvestment = (investmentId: string) => {
-    const investment = portfolio.investments.find((i) => i.id === investmentId);
-    if (!investment) return;
+  const removeInvestment = async (investmentId: string) => {
+    const { error } = await supabase
+      .from('investments')
+      .delete()
+      .eq('id', investmentId);
 
-    onUpdate({
-      ...portfolio,
-      investments: portfolio.investments.filter((i) => i.id !== investmentId),
-      totalValue: portfolio.totalValue - investment.totalInvested,
-    });
-  };
+    if (error) {
+      toast.error("Error removing investment");
+      return;
+    }
 
-  const updateInvestment = (investment: Investment) => {
-    onUpdate({
-      ...portfolio,
-      investments: portfolio.investments.map((i) =>
-        i.id === investment.id ? investment : i
-      ),
-    });
+    onUpdate();
+    toast.success("Investment removed successfully");
   };
 
   const chartData = portfolio.investments.map((investment) => ({
     name: investment.symbol,
-    value: investment.totalInvested,
+    value: investment.quantity * investment.purchasePrice * 5, // Simple BRL conversion
   }));
 
   return (
@@ -103,7 +112,6 @@ export const PortfolioView = ({ portfolio, onUpdate }: PortfolioViewProps) => {
           <InvestmentList
             investments={portfolio.investments}
             onRemove={removeInvestment}
-            onUpdate={updateInvestment}
           />
         </CardContent>
       </Card>

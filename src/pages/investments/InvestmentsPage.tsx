@@ -1,17 +1,73 @@
-import { useState } from "react";
+
+import { useEffect, useState } from "react";
 import PageTemplate from "@/components/PageTemplate";
 import { Portfolio } from "@/types/investments";
 import { PortfolioView } from "./PortfolioView";
 import { AddPortfolioDialog } from "./AddPortfolioDialog";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
 
 export const InvestmentsPage = () => {
-  const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
   const [selectedPortfolio, setSelectedPortfolio] = useState<string | null>(null);
 
-  const addPortfolio = (portfolio: Portfolio) => {
-    setPortfolios([...portfolios, portfolio]);
+  const { data: portfolios = [], refetch: refetchPortfolios } = useQuery({
+    queryKey: ['portfolios'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('portfolios')
+        .select(`
+          id,
+          name,
+          investments (
+            id,
+            name,
+            symbol,
+            quantity,
+            purchase_price,
+            type
+          )
+        `);
+
+      if (error) {
+        toast.error("Error loading portfolios");
+        throw error;
+      }
+
+      return data.map(portfolio => ({
+        ...portfolio,
+        totalValue: portfolio.investments.reduce(
+          (sum, inv) => sum + (inv.quantity * inv.purchase_price * 5), // Simple BRL conversion
+          0
+        )
+      }));
+    }
+  });
+
+  const addPortfolio = async (portfolio: Omit<Portfolio, 'id' | 'investments' | 'totalValue'>) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast.error("You must be logged in to create a portfolio");
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from('portfolios')
+      .insert([{
+        name: portfolio.name,
+        user_id: user.id
+      }])
+      .select()
+      .single();
+
+    if (error) {
+      toast.error("Error creating portfolio");
+      return;
+    }
+
+    refetchPortfolios();
+    toast.success("Portfolio created successfully");
   };
 
   return (
@@ -35,13 +91,7 @@ export const InvestmentsPage = () => {
         {selectedPortfolio && (
           <PortfolioView
             portfolio={portfolios.find((p) => p.id === selectedPortfolio)!}
-            onUpdate={(updated) => {
-              setPortfolios(
-                portfolios.map((p) =>
-                  p.id === selectedPortfolio ? updated : p
-                )
-              );
-            }}
+            onUpdate={() => refetchPortfolios()}
           />
         )}
 
