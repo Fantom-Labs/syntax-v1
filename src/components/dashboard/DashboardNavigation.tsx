@@ -1,5 +1,6 @@
+
 import { useState } from "react";
-import { List, Calendar, Activity, BookOpen, Target, ShoppingCart, DollarSign, Notebook, User, Newspaper } from "lucide-react";
+import { List, Calendar, Activity, BookOpen, Target, ShoppingCart, DollarSign, Notebook, User } from "lucide-react";
 import { NavButtons } from "./NavButtons";
 import { toast } from "sonner";
 
@@ -14,7 +15,6 @@ export const DashboardNavigation = () => {
     { label: "Compras", path: "/compras", icon: ShoppingCart },
     { label: "Investimentos", path: "/investimentos", icon: DollarSign },
     { label: "Físico", path: "/fisico", icon: User },
-    { label: "Notícias", path: "/noticias", icon: Newspaper },
   ]);
 
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);

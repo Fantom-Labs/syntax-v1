@@ -1,3 +1,4 @@
+
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
@@ -12,7 +13,6 @@ import { GoalsPage } from "@/pages/goals/GoalsPage";
 import { ShoppingPage } from "@/pages/shopping/ShoppingPage";
 import { InvestmentsPage } from "@/pages/investments/InvestmentsPage";
 import { PhysicalPage } from "@/pages/physical/PhysicalPage";
-import { NewsPage } from "@/pages/news/NewsPage";
 import { AuthPage } from "@/pages/auth/AuthPage";
 
 const queryClient = new QueryClient();
@@ -34,7 +34,6 @@ function App() {
             <Route path="/compras" element={<ShoppingPage />} />
             <Route path="/investimentos" element={<InvestmentsPage />} />
             <Route path="/fisico" element={<PhysicalPage />} />
-            <Route path="/noticias" element={<NewsPage />} />
           </Routes>
           <Toaster />
         </ThemeProvider>
