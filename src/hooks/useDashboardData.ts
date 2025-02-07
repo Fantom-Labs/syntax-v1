@@ -11,6 +11,7 @@ export interface Investment {
 export const useDashboardData = () => {
   const [displayName, setDisplayName] = useState("Master");
   const [investments, setInvestments] = useState<Investment[]>([]);
+  const [news, setNews] = useState<{ category: string; title: string }[]>([]);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -78,10 +79,19 @@ export const useDashboardData = () => {
 
     fetchUserProfile();
     fetchInvestments();
+
+    setNews([
+      { category: "Tecnologia", title: "Nova IA da OpenAI supera benchmarks" },
+      { category: "Economia", title: "Bitcoin atinge nova máxima histórica" },
+      { category: "Geopolítica", title: "Tensões aumentam no Oriente Médio" },
+      { category: "João Pessoa", title: "Obras do BRT avançam na capital" },
+      { category: "Brasil", title: "Nova política econômica é anunciada" },
+    ]);
   }, []);
 
   return {
     displayName,
     investments,
+    news
   };
 };

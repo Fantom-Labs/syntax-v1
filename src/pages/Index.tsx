@@ -3,10 +3,11 @@ import Header from "@/components/Header";
 import { DashboardNavigation } from "@/components/dashboard/DashboardNavigation";
 import { EventCard } from "@/components/dashboard/EventCard";
 import { InvestmentCard } from "@/components/dashboard/InvestmentCard";
+import { NewsCard } from "@/components/dashboard/NewsCard";
 import { useDashboardData } from "@/hooks/useDashboardData";
 
 const Index = () => {
-  const { displayName, investments } = useDashboardData();
+  const { displayName, investments, news } = useDashboardData();
 
   return (
     <div className="min-h-screen p-4 md:p-8 lg:p-12">
@@ -20,10 +21,12 @@ const Index = () => {
       <main className="space-y-8">
         <DashboardNavigation />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <EventCard />
           <InvestmentCard investments={investments} />
         </div>
+
+        <NewsCard news={news} />
       </main>
     </div>
   );
