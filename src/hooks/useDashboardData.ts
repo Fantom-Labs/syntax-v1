@@ -11,7 +11,6 @@ export interface Investment {
 export const useDashboardData = () => {
   const [displayName, setDisplayName] = useState("Master");
   const [investments, setInvestments] = useState<Investment[]>([]);
-  const [nextMatch, setNextMatch] = useState<string | null>(null);
   const [news, setNews] = useState<{ category: string; title: string }[]>([]);
 
   useEffect(() => {
@@ -81,8 +80,6 @@ export const useDashboardData = () => {
     fetchUserProfile();
     fetchInvestments();
 
-    setNextMatch("Vasco x Flamengo - Campeonato Brasileiro 2025 - 19/01 16:00");
-
     setNews([
       { category: "Tecnologia", title: "Nova IA da OpenAI supera benchmarks" },
       { category: "Economia", title: "Bitcoin atinge nova máxima histórica" },
@@ -95,7 +92,6 @@ export const useDashboardData = () => {
   return {
     displayName,
     investments,
-    nextMatch,
     news
   };
 };
