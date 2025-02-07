@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 import PageTemplate from "@/components/PageTemplate";
-import { Portfolio } from "@/types/investments";
+import { Portfolio, Investment } from "@/types/investments";
 import { PortfolioView } from "./PortfolioView";
 import { AddPortfolioDialog } from "./AddPortfolioDialog";
 import { Button } from "@/components/ui/button";
@@ -41,6 +41,7 @@ export const InvestmentsPage = () => {
           ...inv,
           purchasePrice: inv.purchase_price,
           totalInvested: inv.quantity * inv.purchase_price * 5, // Simple BRL conversion
+          type: inv.type as Investment['type'] // Explicitly cast the type to our union type
         })),
         totalValue: portfolio.investments.reduce(
           (sum, inv) => sum + (inv.quantity * inv.purchase_price * 5), // Simple BRL conversion
