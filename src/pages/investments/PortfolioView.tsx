@@ -24,11 +24,15 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'
 export const PortfolioView = ({ portfolio, onUpdate }: PortfolioViewProps) => {
   const isMobile = useIsMobile();
 
-  const addInvestment = async (investment: Omit<Investment, 'id'>) => {
+  const addInvestment = async (investment: Omit<Investment, 'id' | 'totalInvested'>) => {
     const { data, error } = await supabase
       .from('investments')
       .insert([{
-        ...investment,
+        name: investment.name,
+        symbol: investment.symbol,
+        quantity: investment.quantity,
+        purchase_price: investment.purchasePrice,
+        type: investment.type,
         portfolio_id: portfolio.id
       }])
       .select()
@@ -112,6 +116,7 @@ export const PortfolioView = ({ portfolio, onUpdate }: PortfolioViewProps) => {
           <InvestmentList
             investments={portfolio.investments}
             onRemove={removeInvestment}
+            onUpdate={onUpdate}
           />
         </CardContent>
       </Card>

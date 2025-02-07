@@ -1,3 +1,4 @@
+
 import { Investment } from "@/types/investments";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
@@ -5,7 +6,7 @@ import { Trash2 } from "lucide-react";
 interface InvestmentListProps {
   investments: Investment[];
   onRemove: (id: string) => void;
-  onUpdate: (investment: Investment) => void;
+  onUpdate: () => void;
 }
 
 export const InvestmentList = ({

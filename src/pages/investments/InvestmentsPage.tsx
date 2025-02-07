@@ -37,6 +37,11 @@ export const InvestmentsPage = () => {
 
       return data.map(portfolio => ({
         ...portfolio,
+        investments: portfolio.investments.map(inv => ({
+          ...inv,
+          purchasePrice: inv.purchase_price,
+          totalInvested: inv.quantity * inv.purchase_price * 5, // Simple BRL conversion
+        })),
         totalValue: portfolio.investments.reduce(
           (sum, inv) => sum + (inv.quantity * inv.purchase_price * 5), // Simple BRL conversion
           0

@@ -1,10 +1,12 @@
+
 export interface Investment {
   id: string;
   name: string;
   symbol: string;
   quantity: number;
-  purchasePrice: number; // USD
-  totalInvested: number; // BRL
+  purchasePrice: number; // Frontend property
+  purchase_price?: number; // Database property
+  totalInvested: number;
   type: 'stocks' | 'crypto' | 'funds' | 'fixed_income' | 'real_estate' | 'others';
 }
 
