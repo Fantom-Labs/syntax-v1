@@ -2,11 +2,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-export interface Event {
-  title: string;
-  date: Date;
-}
-
 export interface Investment {
   name: string;
   value: number;
@@ -15,7 +10,6 @@ export interface Investment {
 
 export const useDashboardData = () => {
   const [displayName, setDisplayName] = useState("Master");
-  const [nextEvent, setNextEvent] = useState<Event | null>(null);
   const [investments, setInvestments] = useState<Investment[]>([]);
   const [nextMatch, setNextMatch] = useState<string | null>(null);
   const [news, setNews] = useState<{ category: string; title: string }[]>([]);
@@ -87,11 +81,6 @@ export const useDashboardData = () => {
     fetchUserProfile();
     fetchInvestments();
 
-    setNextEvent({
-      title: "Reunião de projeto",
-      date: new Date("2024-03-25 14:00"),
-    });
-
     setNextMatch("Vasco x Flamengo - Campeonato Brasileiro 2025 - 19/01 16:00");
 
     setNews([
@@ -105,7 +94,6 @@ export const useDashboardData = () => {
 
   return {
     displayName,
-    nextEvent,
     investments,
     nextMatch,
     news
