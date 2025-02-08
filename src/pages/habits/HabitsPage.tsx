@@ -48,8 +48,8 @@ export const HabitsPage = () => {
         setHabits(userHabits.map(habit => ({
           id: habit.id,
           title: habit.title,
-          type: habit.type,
-          tracking_type: habit.tracking_type,
+          type: habit.type as HabitType, // Cast to HabitType
+          tracking_type: habit.tracking_type as TrackingType, // Cast to TrackingType
           emoji: habit.emoji,
           color: habit.color,
           amount_target: habit.amount_target,
@@ -85,8 +85,8 @@ export const HabitsPage = () => {
 
     const habitData = {
       title: newHabitTitle,
-      type: habitType,
-      tracking_type: trackingType,
+      type: habitType as HabitType,
+      tracking_type: trackingType as TrackingType,
       emoji: emoji || undefined,
       color: color || undefined,
       amount_target: trackingType === 'amount' ? amountTarget : undefined,
@@ -113,8 +113,8 @@ export const HabitsPage = () => {
     const newHabit: Habit = {
       id: habit.id,
       title: habit.title,
-      type: habit.type,
-      tracking_type: habit.tracking_type,
+      type: habit.type as HabitType,
+      tracking_type: habit.tracking_type as TrackingType,
       emoji: habit.emoji,
       color: habit.color,
       amount_target: habit.amount_target,
