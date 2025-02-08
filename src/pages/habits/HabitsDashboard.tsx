@@ -66,7 +66,7 @@ export const HabitsDashboard = ({ userId }: HabitsDashboardProps) => {
   }, [userId]);
 
   const chartConfig = {
-    habit: {
+    value: {
       theme: {
         light: "#0ea5e9",
         dark: "#38bdf8"
@@ -79,7 +79,7 @@ export const HabitsDashboard = ({ userId }: HabitsDashboardProps) => {
       <h2 className="text-2xl font-semibold">Progresso dos Hábitos</h2>
       <div className="grid gap-6">
         {progressData.map((habit) => (
-          <Card key={habit.habitId} className="p-4">
+          <Card key={habit.habitId} className="p-6">
             <div className="flex flex-col space-y-4">
               <div className="flex justify-between items-center">
                 <h3 className="text-lg font-medium">{habit.title}</h3>
@@ -90,13 +90,22 @@ export const HabitsDashboard = ({ userId }: HabitsDashboardProps) => {
               <div className="h-[200px] w-full">
                 <ChartContainer config={chartConfig}>
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={habit.history.map(h => ({
-                      date: format(new Date(h.date), "dd/MM", { locale: ptBR }),
-                      value: h.completed ? 100 : 0
-                    }))}>
+                    <LineChart 
+                      data={habit.history.map(h => ({
+                        date: format(new Date(h.date), "dd/MM", { locale: ptBR }),
+                        value: h.completed ? 100 : 0
+                      }))}
+                      margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                    >
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="date" />
-                      <YAxis />
+                      <XAxis 
+                        dataKey="date"
+                        tickMargin={10}
+                      />
+                      <YAxis 
+                        domain={[0, 100]}
+                        tickFormatter={(value) => `${value}%`}
+                      />
                       <ChartTooltip
                         content={({ active, payload }) => (
                           <ChartTooltipContent
@@ -109,7 +118,6 @@ export const HabitsDashboard = ({ userId }: HabitsDashboardProps) => {
                       <Line
                         type="monotone"
                         dataKey="value"
-                        stroke="var(--primary)"
                         strokeWidth={2}
                       />
                     </LineChart>
