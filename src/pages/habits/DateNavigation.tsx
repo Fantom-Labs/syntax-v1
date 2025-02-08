@@ -36,7 +36,7 @@ export const DateNavigation = ({ date, setDate }: DateNavigationProps) => {
         )}
       </div>
       
-      <ScrollArea className="w-full" orientation="horizontal">
+      <ScrollArea className="w-full">
         <div 
           ref={scrollRef}
           className="flex items-center gap-2 pb-4 px-2 min-w-full"
@@ -64,3 +64,4 @@ export const DateNavigation = ({ date, setDate }: DateNavigationProps) => {
     </div>
   );
 };
+
