@@ -1,9 +1,8 @@
 
 import { Button } from "@/components/ui/button";
-import { format, addDays, startOfDay, isToday } from "date-fns";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import { format, addDays, subDays, startOfWeek, isToday } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { useRef } from "react";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 type DateNavigationProps = {
   date: Date;
@@ -11,12 +10,26 @@ type DateNavigationProps = {
 };
 
 export const DateNavigation = ({ date, setDate }: DateNavigationProps) => {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const today = startOfDay(new Date());
+  const weekStart = startOfWeek(date, { weekStartsOn: 0 });
   
-  // Generate dates for 30 days in the past and 30 days in the future
-  const dates = Array.from({ length: 61 }).map((_, index) => {
-    return addDays(today, index - 30);
+  const weekDays = Array.from({ length: 7 }).map((_, index) => {
+    const currentDate = addDays(weekStart, index);
+    const isSelected = format(currentDate, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd');
+    const dayName = format(currentDate, 'EEE', { locale: ptBR });
+    const dayNumber = format(currentDate, 'd');
+    
+    return (
+      <button
+        key={index}
+        onClick={() => setDate(currentDate)}
+        className={`flex flex-col items-center p-2 rounded-full transition-colors
+          ${isSelected ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'}
+        `}
+      >
+        <span className="text-sm font-medium">{dayName}</span>
+        <span className="text-lg font-bold">{dayNumber}</span>
+      </button>
+    );
   });
 
   return (
@@ -36,32 +49,27 @@ export const DateNavigation = ({ date, setDate }: DateNavigationProps) => {
         )}
       </div>
       
-      <ScrollArea className="w-full">
-        <div 
-          ref={scrollRef}
-          className="flex items-center gap-2 pb-4 px-2 min-w-full"
+      <div className="flex items-center justify-between gap-2">
+        <Button 
+          variant="outline" 
+          size="icon"
+          onClick={() => setDate(subDays(date, 1))}
         >
-          {dates.map((currentDate, index) => {
-            const isSelected = format(currentDate, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd');
-            const dayName = format(currentDate, 'EEE', { locale: ptBR });
-            const dayNumber = format(currentDate, 'd');
-            
-            return (
-              <button
-                key={index}
-                onClick={() => setDate(currentDate)}
-                className={`flex-none flex flex-col items-center p-2 rounded-full transition-colors
-                  ${isSelected ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'}
-                `}
-              >
-                <span className="text-sm font-medium">{dayName}</span>
-                <span className="text-lg font-bold">{dayNumber}</span>
-              </button>
-            );
-          })}
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+        
+        <div className="flex items-center justify-between gap-2 flex-1">
+          {weekDays}
         </div>
-      </ScrollArea>
+        
+        <Button 
+          variant="outline" 
+          size="icon"
+          onClick={() => setDate(addDays(date, 1))}
+        >
+          <ArrowRight className="h-4 w-4" />
+        </Button>
+      </div>
     </div>
   );
 };
-
