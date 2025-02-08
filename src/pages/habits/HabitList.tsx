@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Habit } from "@/types/habits";
-import { Trash2 } from "lucide-react";
+import { Trash2, Play, Plus } from "lucide-react";
 import { format, startOfWeek, addDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -25,8 +25,6 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
     const day = addDays(startOfCurrentWeek, index);
     return format(day, "yyyy-MM-dd");
   });
-
-  const weekDayLabels = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 
   const getCheckStatus = (habit: Habit, date: string): CheckStatus => {
     const check = habit.checks.find(c => c.timestamp.startsWith(date));
@@ -121,56 +119,84 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
     return habit.color || (habit.type === 'build' ? '#7BFF8B' : '#ea384c');
   };
 
+  const getProgressText = (habit: Habit) => {
+    const todayCheck = habit.checks.find(c => c.timestamp.startsWith(format(date, "yyyy-MM-dd")));
+    
+    if (habit.tracking_type === 'task') {
+      return todayCheck?.completed ? 'Completed' : 'Not completed';
+    } else if (habit.tracking_type === 'amount') {
+      const current = todayCheck?.amount || 0;
+      return `${current}/${habit.amount_target} ${habit.title.toLowerCase()}`;
+    } else if (habit.tracking_type === 'time') {
+      const current = todayCheck?.time || 0;
+      return `${current}:00/${habit.time_target}:00`;
+    }
+  };
+
+  const renderHabitAction = (habit: Habit) => {
+    const check = habit.checks.find(c => c.timestamp.startsWith(format(date, "yyyy-MM-dd")));
+    const isCompleted = check?.completed;
+
+    switch (habit.tracking_type) {
+      case 'task':
+        return (
+          <Button
+            variant="ghost"
+            size="icon"
+            className={`rounded-full ${isCompleted ? 'bg-primary' : 'bg-secondary'}`}
+            onClick={() => toggleHabitCheck(habit.id, format(date, "yyyy-MM-dd"))}
+          >
+            {isCompleted ? '✓' : ''}
+          </Button>
+        );
+      case 'time':
+        return (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full bg-secondary hover:bg-secondary/80"
+          >
+            <Play className="h-4 w-4" />
+          </Button>
+        );
+      case 'amount':
+        return (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full bg-secondary hover:bg-secondary/80"
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
+        );
+    }
+  };
+
   return (
     <div className="space-y-4">
       {habits.map(habit => (
         <div
           key={habit.id}
-          className={`flex ${isMobile ? 'flex-col' : 'items-center'} justify-between p-4 rounded-lg border bg-card hover:bg-accent/10 transition-colors gap-4`}
-          style={{ borderColor: getHabitColor(habit) }}
+          className={`flex items-center justify-between p-4 rounded-lg bg-background hover:bg-accent/5 transition-colors`}
+          style={{ backgroundColor: `${getHabitColor(habit)}15` }}
         >
-          <div className="flex items-center gap-3 min-w-[200px]">
-            <span className="text-xl">{habit.emoji || (habit.type === 'build' ? '🎯' : '🚫')}</span>
+          <div className="flex items-center gap-3">
+            <div 
+              className="w-10 h-10 rounded-full flex items-center justify-center text-xl"
+              style={{ backgroundColor: getHabitColor(habit) }}
+            >
+              {habit.emoji || habit.title[0].toUpperCase()}
+            </div>
             <div className="flex flex-col">
               <span className="font-medium">{habit.title}</span>
-              {habit.tracking_type !== 'task' && (
-                <span className="text-sm text-muted-foreground">
-                  Meta: {habit.tracking_type === 'amount' ? `${habit.amount_target}x` : `${habit.time_target}min`}
-                </span>
-              )}
+              <span className="text-sm text-muted-foreground">
+                {getProgressText(habit)}
+              </span>
             </div>
           </div>
           
-          <div className={`flex ${isMobile ? 'flex-col' : 'items-center'} gap-4`}>
-            <div className="flex flex-col gap-1">
-              <div className="flex gap-1 overflow-x-auto pb-2">
-                {weekDays.map((day, index) => {
-                  const status = getCheckStatus(habit, day);
-                  const bgColor = status === "completed" 
-                    ? getHabitColor(habit)
-                    : status === "failed"
-                    ? "#ea384c"
-                    : "bg-secondary";
-                  
-                  return (
-                    <button
-                      key={day}
-                      onClick={() => toggleHabitCheck(habit.id, day)}
-                      className={`w-8 h-8 rounded transition-colors flex-shrink-0`}
-                      style={{ backgroundColor: bgColor }}
-                    />
-                  );
-                })}
-              </div>
-              <div className="flex gap-1 overflow-x-auto">
-                {weekDayLabels.map((label, index) => (
-                  <div key={index} className="w-8 text-center text-sm text-muted-foreground flex-shrink-0">
-                    {label}
-                  </div>
-                ))}
-              </div>
-            </div>
-            
+          <div className="flex items-center gap-2">
+            {renderHabitAction(habit)}
             <Button
               variant="ghost"
               size="icon"
