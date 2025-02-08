@@ -18,8 +18,8 @@ export const DateNavigation = ({ date, setDate }: DateNavigationProps) => {
   const dates = Array.from({ length: 61 }, (_, i) => addDays(today, i - 30));
   
   return (
-    <div className="mb-6">
-      <div className="flex items-center justify-between mb-4">
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
         <span className="text-xl font-medium">
           {format(date, "MMMM yyyy", { locale: ptBR })}
         </span>
@@ -34,22 +34,21 @@ export const DateNavigation = ({ date, setDate }: DateNavigationProps) => {
         )}
       </div>
       
-      <div className="w-full overflow-hidden">
+      <div className="relative w-full">
         <Carousel 
           opts={{
             align: "start",
             dragFree: true,
           }}
-          className="w-full"
         >
-          <CarouselContent className="-ml-4">
+          <CarouselContent>
             {dates.map((currentDate, index) => {
               const isSelected = format(currentDate, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd');
               const dayName = format(currentDate, 'EEE', { locale: ptBR });
               const dayNumber = format(currentDate, 'd');
               
               return (
-                <CarouselItem key={index} className="pl-4 basis-[70px]">
+                <CarouselItem key={index} className="basis-[70px]">
                   <button
                     onClick={() => setDate(currentDate)}
                     className={`flex flex-col items-center p-2 rounded-full transition-colors w-full
