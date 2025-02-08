@@ -1,12 +1,15 @@
+
 import { useState, useEffect } from "react";
-import { Activity, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import PageTemplate from "@/components/PageTemplate";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Habit } from "@/types/habits";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Habit, HabitType, TrackingType } from "@/types/habits";
 import { HabitList } from "./HabitList";
 import { DateNavigation } from "./DateNavigation";
 import { HabitsDashboard } from "./HabitsDashboard";
@@ -17,7 +20,12 @@ export const HabitsPage = () => {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [isAddingHabit, setIsAddingHabit] = useState(false);
   const [newHabitTitle, setNewHabitTitle] = useState("");
-  const [checksPerDay, setChecksPerDay] = useState(1);
+  const [habitType, setHabitType] = useState<HabitType>("build");
+  const [trackingType, setTrackingType] = useState<TrackingType>("task");
+  const [emoji, setEmoji] = useState("");
+  const [color, setColor] = useState("#7BFF8B");
+  const [amountTarget, setAmountTarget] = useState(1);
+  const [timeTarget, setTimeTarget] = useState(30);
   const [userId, setUserId] = useState<string | undefined>();
   const { toast } = useToast();
 
@@ -27,7 +35,7 @@ export const HabitsPage = () => {
       setUserId(user?.id);
 
       if (user?.id) {
-        const { data: userHabits, error } = await supabase
+        const { data: habits, error } = await supabase
           .from("habits")
           .select("*")
           .eq("user_id", user.id);
@@ -37,12 +45,35 @@ export const HabitsPage = () => {
           return;
         }
 
-        setHabits(userHabits.map(habit => ({
+        const { data: history, error: historyError } = await supabase
+          .from("habit_history")
+          .select("*")
+          .eq("user_id", user.id);
+
+        if (historyError) {
+          console.error("Error fetching habit history:", historyError);
+          return;
+        }
+
+        setHabits(habits.map(habit => ({
           id: habit.id,
           title: habit.title,
-          icon: <Activity className="w-5 h-5 text-primary" />,
-          checksPerDay: habit.checks_per_day,
-          checks: []
+          type: habit.type as HabitType,
+          tracking_type: habit.tracking_type as TrackingType,
+          emoji: habit.emoji,
+          color: habit.color,
+          amount_target: habit.amount_target,
+          time_target: habit.time_target,
+          repeat_days: habit.repeat_days,
+          checksPerDay: habit.checks_per_day || 1,
+          checks: history
+            ?.filter(h => h.habit_id === habit.id)
+            .map(h => ({
+              timestamp: h.date,
+              completed: h.completed,
+              amount: h.amount,
+              time: h.time
+            })) || []
         })));
       }
     };
@@ -69,13 +100,20 @@ export const HabitsPage = () => {
       return;
     }
 
+    const habitData = {
+      title: newHabitTitle,
+      type: habitType,
+      tracking_type: trackingType,
+      emoji: emoji || undefined,
+      color: color || undefined,
+      amount_target: trackingType === 'amount' ? amountTarget : undefined,
+      time_target: trackingType === 'time' ? timeTarget : undefined,
+      user_id: userId
+    };
+
     const { data: habit, error } = await supabase
       .from("habits")
-      .insert({
-        title: newHabitTitle,
-        checks_per_day: checksPerDay,
-        user_id: userId
-      })
+      .insert(habitData)
       .select()
       .single();
 
@@ -91,19 +129,34 @@ export const HabitsPage = () => {
     const newHabit: Habit = {
       id: habit.id,
       title: habit.title,
-      icon: <Activity className="w-5 h-5 text-primary" />,
-      checksPerDay: habit.checks_per_day,
+      type: habit.type as HabitType,
+      tracking_type: habit.tracking_type as TrackingType,
+      emoji: habit.emoji,
+      color: habit.color,
+      amount_target: habit.amount_target,
+      time_target: habit.time_target,
+      repeat_days: habit.repeat_days,
+      checksPerDay: habit.checks_per_day || 1,
       checks: []
     };
 
     setHabits([...habits, newHabit]);
-    setNewHabitTitle("");
-    setChecksPerDay(1);
+    resetForm();
     setIsAddingHabit(false);
     toast({
       title: "Sucesso",
       description: "Hábito adicionado com sucesso!"
     });
+  };
+
+  const resetForm = () => {
+    setNewHabitTitle("");
+    setHabitType("build");
+    setTrackingType("task");
+    setEmoji("");
+    setColor("#7BFF8B");
+    setAmountTarget(1);
+    setTimeTarget(30);
   };
 
   if (!userId) {
@@ -141,6 +194,24 @@ export const HabitsPage = () => {
                 </DialogHeader>
                 <div className="space-y-4 mt-4">
                   <div className="space-y-2">
+                    <Label>Tipo de Hábito</Label>
+                    <RadioGroup
+                      value={habitType}
+                      onValueChange={(value) => setHabitType(value as HabitType)}
+                      className="flex gap-4"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="build" id="build" />
+                        <Label htmlFor="build">Construir</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="quit" id="quit" />
+                        <Label htmlFor="quit">Abandonar</Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+
+                  <div className="space-y-2">
                     <Label htmlFor="title">Título do Hábito</Label>
                     <Input
                       id="title"
@@ -149,17 +220,68 @@ export const HabitsPage = () => {
                       placeholder="Ex: Beber água"
                     />
                   </div>
+
                   <div className="space-y-2">
-                    <Label htmlFor="checks">Marcações por dia</Label>
+                    <Label>Tipo de Acompanhamento</Label>
+                    <Select value={trackingType} onValueChange={(value) => setTrackingType(value as TrackingType)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="task">Tarefa (Sim/Não)</SelectItem>
+                        <SelectItem value="amount">Quantidade (repetições)</SelectItem>
+                        <SelectItem value="time">Tempo (minutos)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {trackingType === 'amount' && (
+                    <div className="space-y-2">
+                      <Label htmlFor="amount">Meta de Repetições</Label>
+                      <Input
+                        id="amount"
+                        type="number"
+                        min="1"
+                        value={amountTarget}
+                        onChange={(e) => setAmountTarget(Number(e.target.value))}
+                      />
+                    </div>
+                  )}
+
+                  {trackingType === 'time' && (
+                    <div className="space-y-2">
+                      <Label htmlFor="time">Meta de Tempo (minutos)</Label>
+                      <Input
+                        id="time"
+                        type="number"
+                        min="1"
+                        value={timeTarget}
+                        onChange={(e) => setTimeTarget(Number(e.target.value))}
+                      />
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
+                    <Label htmlFor="emoji">Emoji (opcional)</Label>
                     <Input
-                      id="checks"
-                      type="number"
-                      min="1"
-                      max="10"
-                      value={checksPerDay}
-                      onChange={(e) => setChecksPerDay(Number(e.target.value))}
+                      id="emoji"
+                      value={emoji}
+                      onChange={(e) => setEmoji(e.target.value)}
+                      placeholder="Ex: 💧"
                     />
                   </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="color">Cor</Label>
+                    <Input
+                      id="color"
+                      type="color"
+                      value={color}
+                      onChange={(e) => setColor(e.target.value)}
+                      className="h-10 w-full"
+                    />
+                  </div>
+
                   <Button onClick={addHabit} className="w-full">
                     Adicionar Hábito
                   </Button>

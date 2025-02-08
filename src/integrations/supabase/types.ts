@@ -98,27 +98,33 @@ export type Database = {
       }
       habit_history: {
         Row: {
+          amount: number | null
           completed: boolean | null
           created_at: string
           date: string
           habit_id: string
           id: string
+          time: number | null
           user_id: string
         }
         Insert: {
+          amount?: number | null
           completed?: boolean | null
           created_at?: string
           date: string
           habit_id: string
           id?: string
+          time?: number | null
           user_id: string
         }
         Update: {
+          amount?: number | null
           completed?: boolean | null
           created_at?: string
           date?: string
           habit_id?: string
           id?: string
+          time?: number | null
           user_id?: string
         }
         Relationships: []
