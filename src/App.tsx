@@ -15,7 +15,15 @@ import { InvestmentsPage } from "@/pages/investments/InvestmentsPage";
 import { PhysicalPage } from "@/pages/physical/PhysicalPage";
 import { AuthPage } from "@/pages/auth/AuthPage";
 
-const queryClient = new QueryClient();
+// Create a new QueryClient instance outside of the component
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      retry: 1,
+    },
+  },
+});
 
 function App() {
   return (
