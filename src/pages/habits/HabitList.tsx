@@ -190,3 +190,4 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
       )}
     </div>
   );
+};
