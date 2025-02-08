@@ -1,12 +1,24 @@
+
 export interface HabitCheck {
   timestamp: string;
   completed: boolean;
+  amount?: number;
+  time?: number;
 }
+
+export type HabitType = 'build' | 'quit';
+export type TrackingType = 'task' | 'amount' | 'time';
 
 export interface Habit {
   id: string;
   title: string;
-  icon: JSX.Element;
+  type: HabitType;
+  color?: string;
+  emoji?: string;
+  tracking_type: TrackingType;
+  amount_target?: number;
+  time_target?: number;
+  repeat_days?: string[];
   checksPerDay: number;
   checks: HabitCheck[];
 }
@@ -16,6 +28,8 @@ export interface HabitHistory {
   habit_id: string;
   date: string;
   completed: boolean;
+  amount?: number;
+  time?: number;
   created_at: string;
   user_id: string;
 }
