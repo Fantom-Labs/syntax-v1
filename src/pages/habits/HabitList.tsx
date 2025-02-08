@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Habit } from "@/types/habits";
 import { Trash2, Play, Plus } from "lucide-react";
-import { format, startOfWeek, addDays } from "date-fns";
+import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,12 +19,6 @@ type CheckStatus = "unchecked" | "completed" | "failed";
 export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
   const isMobile = useIsMobile();
   const { toast } = useToast();
-  const startOfCurrentWeek = startOfWeek(date, { weekStartsOn: 0 });
-  
-  const weekDays = Array.from({ length: 7 }).map((_, index) => {
-    const day = addDays(startOfCurrentWeek, index);
-    return format(day, "yyyy-MM-dd");
-  });
 
   const getCheckStatus = (habit: Habit, date: string): CheckStatus => {
     const check = habit.checks.find(c => c.timestamp.startsWith(date));
@@ -115,10 +109,6 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
     });
   };
 
-  const getHabitColor = (habit: Habit) => {
-    return habit.color || (habit.type === 'build' ? '#7BFF8B' : '#ea384c');
-  };
-
   const getProgressText = (habit: Habit) => {
     const todayCheck = habit.checks.find(c => c.timestamp.startsWith(format(date, "yyyy-MM-dd")));
     
@@ -143,7 +133,7 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
           <Button
             variant="ghost"
             size="icon"
-            className={`rounded-full ${isCompleted ? 'bg-primary' : 'bg-secondary'}`}
+            className={`rounded-full w-8 h-8 border ${isCompleted ? 'bg-primary border-primary text-primary-foreground' : 'border-muted-foreground'}`}
             onClick={() => toggleHabitCheck(habit.id, format(date, "yyyy-MM-dd"))}
           >
             {isCompleted ? '✓' : ''}
@@ -154,7 +144,8 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
           <Button
             variant="ghost"
             size="icon"
-            className="rounded-full bg-secondary hover:bg-secondary/80"
+            onClick={() => toggleHabitCheck(habit.id, format(date, "yyyy-MM-dd"))}
+            className="rounded-full w-8 h-8 border border-muted-foreground hover:bg-accent"
           >
             <Play className="h-4 w-4" />
           </Button>
@@ -164,7 +155,8 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
           <Button
             variant="ghost"
             size="icon"
-            className="rounded-full bg-secondary hover:bg-secondary/80"
+            onClick={() => toggleHabitCheck(habit.id, format(date, "yyyy-MM-dd"))}
+            className="rounded-full w-8 h-8 border border-muted-foreground hover:bg-accent"
           >
             <Plus className="h-4 w-4" />
           </Button>
@@ -173,17 +165,17 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2 max-h-[calc(100vh-300px)] overflow-y-auto px-1">
       {habits.map(habit => (
         <div
           key={habit.id}
-          className={`flex items-center justify-between p-4 rounded-lg bg-background hover:bg-accent/5 transition-colors`}
-          style={{ backgroundColor: `${getHabitColor(habit)}15` }}
+          className="flex items-center justify-between p-4 rounded-2xl bg-background transition-colors"
+          style={{ backgroundColor: `${habit.color}15` }}
         >
           <div className="flex items-center gap-3">
             <div 
-              className="w-10 h-10 rounded-full flex items-center justify-center text-xl"
-              style={{ backgroundColor: getHabitColor(habit) }}
+              className="w-10 h-10 rounded-full flex items-center justify-center text-xl font-medium"
+              style={{ backgroundColor: habit.color }}
             >
               {habit.emoji || habit.title[0].toUpperCase()}
             </div>
@@ -201,7 +193,7 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
               variant="ghost"
               size="icon"
               onClick={() => removeHabit(habit.id)}
-              className="text-destructive hover:text-destructive/90"
+              className="text-destructive hover:text-destructive/90 rounded-full w-8 h-8"
             >
               <Trash2 className="h-4 w-4" />
             </Button>

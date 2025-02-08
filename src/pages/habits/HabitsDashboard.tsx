@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
@@ -19,7 +20,7 @@ export const HabitsDashboard = ({ userId }: HabitsDashboardProps) => {
 
     const fetchHabitProgress = async () => {
       const today = new Date();
-      const startDate = subDays(today, 30); // Last 30 days
+      const startDate = subDays(today, 30);
 
       const { data: habits, error: habitsError } = await supabase
         .from("habits")
@@ -78,7 +79,7 @@ export const HabitsDashboard = ({ userId }: HabitsDashboardProps) => {
       <h2 className="text-2xl font-semibold">Progresso dos Hábitos</h2>
       <div className="grid gap-6">
         {progressData.map((habit) => (
-          <Card key={habit.habitId} className="p-6">
+          <Card key={habit.habitId} className="p-4">
             <div className="flex flex-col space-y-4">
               <div className="flex justify-between items-center">
                 <h3 className="text-lg font-medium">{habit.title}</h3>
@@ -86,8 +87,8 @@ export const HabitsDashboard = ({ userId }: HabitsDashboardProps) => {
                   Taxa de conclusão: {habit.completionRate.toFixed(1)}%
                 </span>
               </div>
-              <div className="h-[200px]">
-                <ChartContainer config={chartConfig}>
+              <div className="h-[200px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={habit.history.map(h => ({
                     date: format(new Date(h.date), "dd/MM", { locale: ptBR }),
                     value: h.completed ? 100 : 0
@@ -107,11 +108,11 @@ export const HabitsDashboard = ({ userId }: HabitsDashboardProps) => {
                     <Line
                       type="monotone"
                       dataKey="value"
-                      stroke="var(--color-habit)"
+                      stroke="var(--primary)"
                       strokeWidth={2}
                     />
                   </LineChart>
-                </ChartContainer>
+                </ResponsiveContainer>
               </div>
             </div>
           </Card>
