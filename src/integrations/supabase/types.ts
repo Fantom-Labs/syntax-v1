@@ -125,24 +125,45 @@ export type Database = {
       }
       habits: {
         Row: {
+          amount_target: number | null
           checks_per_day: number | null
+          color: string | null
           created_at: string
+          emoji: string | null
           id: string
+          repeat_days: string[] | null
+          time_target: number | null
           title: string
+          tracking_type: string
+          type: string
           user_id: string
         }
         Insert: {
+          amount_target?: number | null
           checks_per_day?: number | null
+          color?: string | null
           created_at?: string
+          emoji?: string | null
           id?: string
+          repeat_days?: string[] | null
+          time_target?: number | null
           title: string
+          tracking_type?: string
+          type?: string
           user_id: string
         }
         Update: {
+          amount_target?: number | null
           checks_per_day?: number | null
+          color?: string | null
           created_at?: string
+          emoji?: string | null
           id?: string
+          repeat_days?: string[] | null
+          time_target?: number | null
           title?: string
+          tracking_type?: string
+          type?: string
           user_id?: string
         }
         Relationships: []
