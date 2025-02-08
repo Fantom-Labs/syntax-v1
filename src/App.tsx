@@ -1,4 +1,5 @@
 
+import { StrictMode } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
@@ -27,26 +28,28 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<AuthPage />} />
-            <Route path="/tarefas" element={<TasksPage />} />
-            <Route path="/agenda" element={<AgendaPage />} />
-            <Route path="/habitos" element={<HabitsPage />} />
-            <Route path="/notas" element={<NotesPage />} />
-            <Route path="/livros" element={<BooksPage />} />
-            <Route path="/metas" element={<GoalsPage />} />
-            <Route path="/compras" element={<ShoppingPage />} />
-            <Route path="/investimentos" element={<InvestmentsPage />} />
-            <Route path="/fisico" element={<PhysicalPage />} />
-          </Routes>
-          <Toaster />
-        </ThemeProvider>
-      </BrowserRouter>
-    </QueryClientProvider>
+    <StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/auth" element={<AuthPage />} />
+              <Route path="/tarefas" element={<TasksPage />} />
+              <Route path="/agenda" element={<AgendaPage />} />
+              <Route path="/habitos" element={<HabitsPage />} />
+              <Route path="/notas" element={<NotesPage />} />
+              <Route path="/livros" element={<BooksPage />} />
+              <Route path="/metas" element={<GoalsPage />} />
+              <Route path="/compras" element={<ShoppingPage />} />
+              <Route path="/investimentos" element={<InvestmentsPage />} />
+              <Route path="/fisico" element={<PhysicalPage />} />
+            </Routes>
+            <Toaster />
+          </ThemeProvider>
+        </BrowserRouter>
+      </QueryClientProvider>
+    </StrictMode>
   );
 }
 
