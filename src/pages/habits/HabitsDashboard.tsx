@@ -81,12 +81,7 @@ export const HabitsDashboard = ({ userId }: HabitsDashboardProps) => {
         {progressData.map((habit) => (
           <Card key={habit.habitId} className="p-6">
             <div className="flex flex-col space-y-4">
-              <div className="flex justify-between items-center">
-                <h3 className="text-lg font-medium">{habit.title}</h3>
-                <span className="text-sm text-muted-foreground">
-                  Taxa de conclusão: {habit.completionRate.toFixed(1)}%
-                </span>
-              </div>
+              <h3 className="text-lg font-medium">{habit.title}</h3>
               <div className="h-[200px] w-full">
                 <ChartContainer config={chartConfig}>
                   <ResponsiveContainer width="100%" height="100%">
@@ -95,16 +90,30 @@ export const HabitsDashboard = ({ userId }: HabitsDashboardProps) => {
                         date: format(new Date(h.date), "dd/MM", { locale: ptBR }),
                         value: h.completed ? 100 : 0
                       }))}
-                      margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                      margin={{ top: 20, right: 20, left: 0, bottom: 20 }}
                     >
-                      <CartesianGrid strokeDasharray="3 3" />
+                      <CartesianGrid 
+                        strokeDasharray="3 3" 
+                        vertical={false}
+                        stroke="#e5e7eb"
+                      />
                       <XAxis 
                         dataKey="date"
+                        axisLine={false}
+                        tickLine={false}
                         tickMargin={10}
+                        stroke="#6b7280"
+                        fontSize={12}
                       />
                       <YAxis 
                         domain={[0, 100]}
                         tickFormatter={(value) => `${value}%`}
+                        axisLine={false}
+                        tickLine={false}
+                        tickMargin={10}
+                        stroke="#6b7280"
+                        fontSize={12}
+                        ticks={[0, 25, 50, 75, 100]}
                       />
                       <ChartTooltip
                         content={({ active, payload }) => (
@@ -119,6 +128,8 @@ export const HabitsDashboard = ({ userId }: HabitsDashboardProps) => {
                         type="monotone"
                         dataKey="value"
                         strokeWidth={2}
+                        dot={{ strokeWidth: 2, r: 4 }}
+                        activeDot={{ r: 6, strokeWidth: 2 }}
                       />
                     </LineChart>
                   </ResponsiveContainer>
