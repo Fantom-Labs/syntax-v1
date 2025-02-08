@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Habit } from "@/types/habits";
 import { Trash2 } from "lucide-react";
@@ -38,21 +37,12 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    const habit = habits.find(h => h.id === habitId);
-    if (!habit) return;
+    const currentStatus = getCheckStatus(
+      habits.find(h => h.id === habitId)!,
+      date
+    );
 
-    const currentStatus = getCheckStatus(habit, date);
     const completed = currentStatus === "unchecked";
-
-    let amount = undefined;
-    let time = undefined;
-
-    if (completed && habit.tracking_type === 'amount' && habit.amount_target) {
-      amount = habit.amount_target;
-    }
-    if (completed && habit.tracking_type === 'time' && habit.time_target) {
-      time = habit.time_target;
-    }
 
     const { error } = await supabase
       .from("habit_history")
@@ -60,9 +50,7 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
         habit_id: habitId,
         user_id: user.id,
         date,
-        completed,
-        amount,
-        time
+        completed
       });
 
     if (error) {
@@ -75,22 +63,20 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
     }
 
     setHabits(currentHabits => 
-      currentHabits.map(h => {
-        if (h.id === habitId) {
-          let newChecks = h.checks.filter(check => !check.timestamp.startsWith(date));
+      currentHabits.map(habit => {
+        if (habit.id === habitId) {
+          let newChecks = habit.checks.filter(check => !check.timestamp.startsWith(date));
           newChecks.push({
             timestamp: `${date}T00:00:00.000Z`,
-            completed,
-            amount,
-            time
+            completed
           });
           
           return {
-            ...h,
+            ...habit,
             checks: newChecks
           };
         }
-        return h;
+        return habit;
       })
     );
   };
@@ -117,28 +103,16 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
     });
   };
 
-  const getHabitColor = (habit: Habit) => {
-    return habit.color || (habit.type === 'build' ? '#7BFF8B' : '#ea384c');
-  };
-
   return (
     <div className="space-y-4">
       {habits.map(habit => (
         <div
           key={habit.id}
           className={`flex ${isMobile ? 'flex-col' : 'items-center'} justify-between p-4 rounded-lg border bg-card hover:bg-accent/10 transition-colors gap-4`}
-          style={{ borderColor: getHabitColor(habit) }}
         >
           <div className="flex items-center gap-3 min-w-[200px]">
-            <span className="text-xl">{habit.emoji || (habit.type === 'build' ? '🎯' : '🚫')}</span>
-            <div className="flex flex-col">
-              <span className="font-medium">{habit.title}</span>
-              {habit.tracking_type !== 'task' && (
-                <span className="text-sm text-muted-foreground">
-                  Meta: {habit.tracking_type === 'amount' ? `${habit.amount_target}x` : `${habit.time_target}min`}
-                </span>
-              )}
-            </div>
+            {habit.icon}
+            <span className="font-medium">{habit.title}</span>
           </div>
           
           <div className={`flex ${isMobile ? 'flex-col' : 'items-center'} gap-4`}>
@@ -146,18 +120,17 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
               <div className="flex gap-1 overflow-x-auto pb-2">
                 {weekDays.map((day, index) => {
                   const status = getCheckStatus(habit, day);
-                  const bgColor = status === "completed" 
-                    ? getHabitColor(habit)
-                    : status === "failed"
-                    ? "#ea384c"
-                    : "bg-secondary";
-                  
                   return (
                     <button
                       key={day}
                       onClick={() => toggleHabitCheck(habit.id, day)}
-                      className={`w-8 h-8 rounded transition-colors flex-shrink-0`}
-                      style={{ backgroundColor: bgColor }}
+                      className={`w-8 h-8 rounded transition-colors flex-shrink-0 ${
+                        status === "completed"
+                          ? "bg-[#7BFF8B] hover:bg-[#6AEE7A]"
+                          : status === "failed"
+                          ? "bg-[#ea384c] hover:bg-[#d9293d]"
+                          : "bg-secondary hover:bg-secondary/80"
+                      }`}
                     />
                   );
                 })}
