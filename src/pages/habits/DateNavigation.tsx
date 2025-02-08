@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { format, addDays, subDays, startOfWeek, isToday } from "date-fns";
+import { format, addDays, isToday } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
   Carousel,
@@ -34,36 +34,36 @@ export const DateNavigation = ({ date, setDate }: DateNavigationProps) => {
         )}
       </div>
       
-      <Carousel
-        opts={{
-          align: "start",
-          loop: false,
-          dragFree: true,
-        }}
-        className="w-full"
-      >
-        <CarouselContent className="-ml-2">
-          {dates.map((currentDate, index) => {
-            const isSelected = format(currentDate, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd');
-            const dayName = format(currentDate, 'EEE', { locale: ptBR });
-            const dayNumber = format(currentDate, 'd');
-            
-            return (
-              <CarouselItem key={index} className="pl-2 basis-[70px]">
-                <button
-                  onClick={() => setDate(currentDate)}
-                  className={`flex flex-col items-center p-2 rounded-full transition-colors w-full
-                    ${isSelected ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'}
-                  `}
-                >
-                  <span className="text-sm font-medium">{dayName}</span>
-                  <span className="text-lg font-bold">{dayNumber}</span>
-                </button>
-              </CarouselItem>
-            );
-          })}
-        </CarouselContent>
-      </Carousel>
+      <div className="relative w-full">
+        <Carousel 
+          opts={{
+            align: "start",
+            dragFree: true,
+          }}
+        >
+          <CarouselContent>
+            {dates.map((currentDate, index) => {
+              const isSelected = format(currentDate, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd');
+              const dayName = format(currentDate, 'EEE', { locale: ptBR });
+              const dayNumber = format(currentDate, 'd');
+              
+              return (
+                <CarouselItem key={index} className="basis-[70px]">
+                  <button
+                    onClick={() => setDate(currentDate)}
+                    className={`flex flex-col items-center p-2 rounded-full transition-colors w-full
+                      ${isSelected ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'}
+                    `}
+                  >
+                    <span className="text-sm font-medium">{dayName}</span>
+                    <span className="text-lg font-bold">{dayNumber}</span>
+                  </button>
+                </CarouselItem>
+              );
+            })}
+          </CarouselContent>
+        </Carousel>
+      </div>
     </div>
   );
 };
