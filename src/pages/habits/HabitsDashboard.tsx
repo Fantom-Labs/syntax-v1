@@ -88,31 +88,33 @@ export const HabitsDashboard = ({ userId }: HabitsDashboardProps) => {
                 </span>
               </div>
               <div className="h-[200px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={habit.history.map(h => ({
-                    date: format(new Date(h.date), "dd/MM", { locale: ptBR }),
-                    value: h.completed ? 100 : 0
-                  }))}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis />
-                    <ChartTooltip
-                      content={({ active, payload }) => (
-                        <ChartTooltipContent
-                          active={active}
-                          payload={payload}
-                          formatter={(value) => `${value}% concluído`}
-                        />
-                      )}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="value"
-                      stroke="var(--primary)"
-                      strokeWidth={2}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
+                <ChartContainer config={chartConfig}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={habit.history.map(h => ({
+                      date: format(new Date(h.date), "dd/MM", { locale: ptBR }),
+                      value: h.completed ? 100 : 0
+                    }))}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="date" />
+                      <YAxis />
+                      <ChartTooltip
+                        content={({ active, payload }) => (
+                          <ChartTooltipContent
+                            active={active}
+                            payload={payload}
+                            formatter={(value) => `${value}% concluído`}
+                          />
+                        )}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="value"
+                        stroke="var(--primary)"
+                        strokeWidth={2}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </ChartContainer>
               </div>
             </div>
           </Card>
