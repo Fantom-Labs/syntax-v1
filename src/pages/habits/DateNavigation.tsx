@@ -1,6 +1,7 @@
+
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import { format, addWeeks, subWeeks, startOfWeek, endOfWeek } from "date-fns";
+import { format, addDays, subDays, startOfWeek, isToday } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 type DateNavigationProps = {
@@ -10,29 +11,65 @@ type DateNavigationProps = {
 
 export const DateNavigation = ({ date, setDate }: DateNavigationProps) => {
   const weekStart = startOfWeek(date, { weekStartsOn: 0 });
-  const weekEnd = endOfWeek(date, { weekStartsOn: 0 });
+  
+  const weekDays = Array.from({ length: 7 }).map((_, index) => {
+    const currentDate = addDays(weekStart, index);
+    const isSelected = format(currentDate, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd');
+    const dayName = format(currentDate, 'EEE', { locale: ptBR });
+    const dayNumber = format(currentDate, 'd');
+    
+    return (
+      <button
+        key={index}
+        onClick={() => setDate(currentDate)}
+        className={`flex flex-col items-center p-2 rounded-full transition-colors
+          ${isSelected ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'}
+        `}
+      >
+        <span className="text-sm font-medium">{dayName}</span>
+        <span className="text-lg font-bold">{dayNumber}</span>
+      </button>
+    );
+  });
 
   return (
-    <div className="flex items-center justify-between mb-4">
-      <Button 
-        variant="outline" 
-        size="icon" 
-        onClick={() => setDate(subWeeks(date, 1))}
-      >
-        <ArrowLeft className="h-4 w-4" />
-      </Button>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <span className="text-xl font-medium">
+          {format(date, "MMMM yyyy", { locale: ptBR })}
+        </span>
+        {isToday(date) ? null : (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setDate(new Date())}
+          >
+            Hoje
+          </Button>
+        )}
+      </div>
       
-      <span className="font-medium text-center flex-1">
-        {format(weekStart, "dd 'de' MMMM", { locale: ptBR })} - {format(weekEnd, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
-      </span>
-      
-      <Button 
-        variant="outline" 
-        size="icon" 
-        onClick={() => setDate(addWeeks(date, 1))}
-      >
-        <ArrowRight className="h-4 w-4" />
-      </Button>
+      <div className="flex items-center justify-between gap-2">
+        <Button 
+          variant="outline" 
+          size="icon"
+          onClick={() => setDate(subDays(date, 1))}
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+        
+        <div className="flex items-center justify-between gap-2 flex-1">
+          {weekDays}
+        </div>
+        
+        <Button 
+          variant="outline" 
+          size="icon"
+          onClick={() => setDate(addDays(date, 1))}
+        >
+          <ArrowRight className="h-4 w-4" />
+        </Button>
+      </div>
     </div>
   );
 };
