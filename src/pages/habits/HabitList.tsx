@@ -165,7 +165,7 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
   };
 
   return (
-    <div className="space-y-2 max-h-[calc(100vh-300px)] overflow-y-auto px-1">
+    <div className="space-y-2 max-h-[calc(100vh-300px)] overflow-y-auto">
       {habits.map(habit => (
         <div
           key={habit.id}

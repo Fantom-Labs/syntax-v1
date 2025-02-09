@@ -181,7 +181,7 @@ export const HabitsPage = () => {
           <DateNavigation date={date} setDate={setDate} />
           <HabitList habits={habits} setHabits={setHabits} date={date} />
           
-          <div className="flex justify-center">
+          <div className="flex justify-center mt-4">
             <Dialog open={isAddingHabit} onOpenChange={setIsAddingHabit}>
               <DialogTrigger asChild>
                 <Button variant="outline" size="icon" className="rounded-full">
