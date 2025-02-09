@@ -1,4 +1,3 @@
-
 import { Habit } from "@/types/habits";
 import { format } from "date-fns";
 import { useEffect, useState } from "react";
@@ -34,7 +33,7 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
     };
   }, [runningTimers]);
 
-  const toggleHabitCheck = async (habitId: string, date: string, tracking_type: string) => {
+  const toggleHabitCheck = async (habitId: string, date: string, tracking_type: string, increment: boolean = true) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
@@ -48,13 +47,15 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
     let time = undefined;
 
     if (tracking_type === 'amount') {
-      amount = (todayCheck?.amount || 0) + 1;
+      amount = (todayCheck?.amount || 0) + (increment ? 1 : -1);
+      if (amount < 0) {
+        amount = 0;
+      }
       completed = amount >= (habit.amount_target || 0);
     }
 
     if (tracking_type === 'time') {
       if (runningTimers[habitId]) {
-        // Stop timer
         time = (todayCheck?.time || 0) + elapsedTimes[habitId];
         completed = time >= (habit.time_target || 0);
         setRunningTimers(prev => {
@@ -68,7 +69,6 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
           return newTimes;
         });
       } else {
-        // Start timer
         time = todayCheck?.time || 0;
         setRunningTimers(prev => ({
           ...prev,
@@ -78,7 +78,7 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
           ...prev,
           [habitId]: 0
         }));
-        return; // Don't update the database when starting the timer
+        return;
       }
     }
 

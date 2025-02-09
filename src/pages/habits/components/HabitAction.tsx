@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Habit } from "@/types/habits";
-import { Check, Play, Plus, Pause, X } from "lucide-react";
+import { Check, Play, Plus, Pause, X, Minus } from "lucide-react";
 import { format } from "date-fns";
 import { getCheckStatus } from "../utils/habitUtils";
 
@@ -9,11 +9,11 @@ interface HabitActionProps {
   habit: Habit;
   date: Date;
   runningTimers: { [key: string]: number };
-  onToggleHabit: (habitId: string, date: string, tracking_type: string) => void;
+  onToggleHabit: (habitId: string, date: string, tracking_type: string, increment?: boolean) => void;
 }
 
 export const HabitAction = ({ habit, date, runningTimers, onToggleHabit }: HabitActionProps) => {
-  const check = habit.checks.find(c => c.timestamp.startsWith(format(date, "yyyy-MM-dd")));
+  const check = habit.checks.find(c => c.timestamp === `${format(date, "yyyy-MM-dd")}T00:00:00.000Z`);
   const isCompleted = check?.completed;
   const habitId = habit.id;
   const isRunning = !!runningTimers[habitId];
@@ -55,14 +55,24 @@ export const HabitAction = ({ habit, date, runningTimers, onToggleHabit }: Habit
       );
     case 'amount':
       return (
-        <Button
-          variant={isCompleted ? "default" : "ghost"}
-          size="icon"
-          onClick={() => onToggleHabit(habit.id, format(date, "yyyy-MM-dd"), 'amount')}
-          className={`rounded-full w-8 h-8 border ${isCompleted ? 'bg-primary border-primary text-primary-foreground' : 'border-muted-foreground hover:bg-accent'}`}
-        >
-          <Plus className="h-4 w-4" />
-        </Button>
+        <div className="flex gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onToggleHabit(habit.id, format(date, "yyyy-MM-dd"), 'amount', false)}
+            className={`rounded-full w-8 h-8 border border-muted-foreground hover:bg-accent`}
+          >
+            <Minus className="h-4 w-4" />
+          </Button>
+          <Button
+            variant={isCompleted ? "default" : "ghost"}
+            size="icon"
+            onClick={() => onToggleHabit(habit.id, format(date, "yyyy-MM-dd"), 'amount', true)}
+            className={`rounded-full w-8 h-8 border ${isCompleted ? 'bg-primary border-primary text-primary-foreground' : 'border-muted-foreground hover:bg-accent'}`}
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
+        </div>
       );
   }
 };
