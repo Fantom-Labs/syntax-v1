@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Habit } from "@/types/habits";
-import { Trash2, Play, Plus } from "lucide-react";
+import { Trash2, Play, Plus, Check } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -26,7 +26,7 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
     return check.completed ? "completed" : "failed";
   };
 
-  const toggleHabitCheck = async (habitId: string, date: string) => {
+  const toggleHabitCheck = async (habitId: string, date: string, tracking_type: string) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
@@ -39,11 +39,13 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
     let amount = undefined;
     let time = undefined;
 
-    if (completed && habit.tracking_type === 'amount' && habit.amount_target) {
-      amount = habit.amount_target;
-    }
-    if (completed && habit.tracking_type === 'time' && habit.time_target) {
-      time = habit.time_target;
+    if (completed) {
+      if (tracking_type === 'amount' && habit.amount_target) {
+        amount = habit.amount_target;
+      }
+      if (tracking_type === 'time' && habit.time_target) {
+        time = habit.time_target;
+      }
     }
 
     const { error } = await supabase
@@ -85,6 +87,11 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
         return h;
       })
     );
+
+    toast({
+      title: completed ? "Hábito concluído!" : "Hábito desmarcado",
+      description: completed ? "Continue assim!" : "Tente novamente amanhã!",
+    });
   };
 
   const removeHabit = async (habitId: string) => {
@@ -113,13 +120,13 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
     const todayCheck = habit.checks.find(c => c.timestamp.startsWith(format(date, "yyyy-MM-dd")));
     
     if (habit.tracking_type === 'task') {
-      return todayCheck?.completed ? 'Completed' : 'Not completed';
+      return todayCheck?.completed ? 'Concluído' : 'Não concluído';
     } else if (habit.tracking_type === 'amount') {
       const current = todayCheck?.amount || 0;
       return `${current}/${habit.amount_target} ${habit.title.toLowerCase()}`;
     } else if (habit.tracking_type === 'time') {
       const current = todayCheck?.time || 0;
-      return `${current}:00/${habit.time_target}:00`;
+      return `${current}min/${habit.time_target}min`;
     }
   };
 
@@ -134,18 +141,18 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
             variant="ghost"
             size="icon"
             className={`rounded-full w-8 h-8 border ${isCompleted ? 'bg-primary border-primary text-primary-foreground' : 'border-muted-foreground'}`}
-            onClick={() => toggleHabitCheck(habit.id, format(date, "yyyy-MM-dd"))}
+            onClick={() => toggleHabitCheck(habit.id, format(date, "yyyy-MM-dd"), 'task')}
           >
-            {isCompleted ? '✓' : ''}
+            {isCompleted && <Check className="h-4 w-4" />}
           </Button>
         );
       case 'time':
         return (
           <Button
-            variant="ghost"
+            variant={isCompleted ? "default" : "ghost"}
             size="icon"
-            onClick={() => toggleHabitCheck(habit.id, format(date, "yyyy-MM-dd"))}
-            className="rounded-full w-8 h-8 border border-muted-foreground hover:bg-accent"
+            onClick={() => toggleHabitCheck(habit.id, format(date, "yyyy-MM-dd"), 'time')}
+            className={`rounded-full w-8 h-8 border ${isCompleted ? 'bg-primary border-primary text-primary-foreground' : 'border-muted-foreground hover:bg-accent'}`}
           >
             <Play className="h-4 w-4" />
           </Button>
@@ -153,10 +160,10 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
       case 'amount':
         return (
           <Button
-            variant="ghost"
+            variant={isCompleted ? "default" : "ghost"}
             size="icon"
-            onClick={() => toggleHabitCheck(habit.id, format(date, "yyyy-MM-dd"))}
-            className="rounded-full w-8 h-8 border border-muted-foreground hover:bg-accent"
+            onClick={() => toggleHabitCheck(habit.id, format(date, "yyyy-MM-dd"), 'amount')}
+            className={`rounded-full w-8 h-8 border ${isCompleted ? 'bg-primary border-primary text-primary-foreground' : 'border-muted-foreground hover:bg-accent'}`}
           >
             <Plus className="h-4 w-4" />
           </Button>
@@ -165,7 +172,7 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
   };
 
   return (
-    <div className="space-y-2 overflow-y-auto max-h-[calc(100vh-280px)] w-full">
+    <div className="space-y-2">
       {habits.map(habit => (
         <div
           key={habit.id}
