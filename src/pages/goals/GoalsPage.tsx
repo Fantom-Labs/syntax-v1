@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import PageTemplate from "@/components/PageTemplate";
 import { GoalList } from "./GoalList";
 import { GoalInput } from "./GoalInput";
-import { Goal } from "@/types/goals";
+import { Goal, GoalPeriod } from "@/types/goals";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -27,17 +27,21 @@ export const GoalsPage = () => {
       return data.map(goal => ({
         id: goal.id,
         title: goal.title,
-        period: goal.period,
+        period: goal.period as GoalPeriod,
         completed: goal.completed || false,
       }));
     },
   });
 
   const addGoalMutation = useMutation({
-    mutationFn: async ({ title, period }: { title: string, period: Goal['period'] }) => {
+    mutationFn: async ({ title, period }: { title: string, period: GoalPeriod }) => {
       const { data, error } = await supabase
         .from('goals')
-        .insert([{ title, period }])
+        .insert([{ 
+          title, 
+          period,
+          user_id: (await supabase.auth.getUser()).data.user?.id
+        }])
         .select()
         .single();
 
@@ -89,7 +93,7 @@ export const GoalsPage = () => {
     },
   });
 
-  const addGoal = (title: string, period: Goal['period']) => {
+  const addGoal = (title: string, period: GoalPeriod) => {
     addGoalMutation.mutate({ title, period });
   };
 
