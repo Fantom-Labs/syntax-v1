@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,7 +28,6 @@ export const GoalInput = ({ onAddGoal }: GoalInputProps) => {
     }
     onAddGoal(title, period);
     setTitle("");
-    toast.success("Meta adicionada com sucesso!");
   };
 
   return (

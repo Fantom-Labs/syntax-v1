@@ -1,31 +1,116 @@
-import { useState } from "react";
+
+import { useEffect, useState } from "react";
 import PageTemplate from "@/components/PageTemplate";
 import { GoalList } from "./GoalList";
 import { GoalInput } from "./GoalInput";
 import { Goal } from "@/types/goals";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export const GoalsPage = () => {
-  const [goals, setGoals] = useState<Goal[]>([]);
+  const queryClient = useQueryClient();
+
+  const { data: goals = [], isLoading } = useQuery({
+    queryKey: ['goals'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('goals')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        toast.error("Erro ao carregar metas");
+        throw error;
+      }
+      
+      return data.map(goal => ({
+        id: goal.id,
+        title: goal.title,
+        period: goal.period,
+        completed: goal.completed || false,
+      }));
+    },
+  });
+
+  const addGoalMutation = useMutation({
+    mutationFn: async ({ title, period }: { title: string, period: Goal['period'] }) => {
+      const { data, error } = await supabase
+        .from('goals')
+        .insert([{ title, period }])
+        .select()
+        .single();
+
+      if (error) {
+        toast.error("Erro ao adicionar meta");
+        throw error;
+      }
+
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['goals'] });
+      toast.success("Meta adicionada com sucesso!");
+    },
+  });
+
+  const toggleGoalMutation = useMutation({
+    mutationFn: async ({ id, completed }: { id: string, completed: boolean }) => {
+      const { error } = await supabase
+        .from('goals')
+        .update({ completed })
+        .eq('id', id);
+
+      if (error) {
+        toast.error("Erro ao atualizar meta");
+        throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['goals'] });
+    },
+  });
+
+  const removeGoalMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('goals')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        toast.error("Erro ao remover meta");
+        throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['goals'] });
+      toast.success("Meta removida com sucesso!");
+    },
+  });
 
   const addGoal = (title: string, period: Goal['period']) => {
-    const newGoal: Goal = {
-      id: Date.now(),
-      title,
-      period,
-      completed: false,
-    };
-    setGoals([...goals, newGoal]);
+    addGoalMutation.mutate({ title, period });
   };
 
-  const toggleGoal = (id: number) => {
-    setGoals(goals.map(goal => 
-      goal.id === id ? { ...goal, completed: !goal.completed } : goal
-    ));
+  const toggleGoal = (id: string) => {
+    const goal = goals.find(g => g.id === id);
+    if (goal) {
+      toggleGoalMutation.mutate({ id, completed: !goal.completed });
+    }
   };
 
-  const removeGoal = (id: number) => {
-    setGoals(goals.filter(goal => goal.id !== id));
+  const removeGoal = (id: string) => {
+    removeGoalMutation.mutate(id);
   };
+
+  if (isLoading) {
+    return (
+      <PageTemplate title="Metas">
+        <div>Carregando...</div>
+      </PageTemplate>
+    );
+  }
 
   return (
     <PageTemplate title="Metas">

@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Goal } from "@/types/goals";
 import { Check, Trash2 } from "lucide-react";
@@ -5,8 +6,8 @@ import { Check, Trash2 } from "lucide-react";
 interface GoalListProps {
   title: string;
   goals: Goal[];
-  onToggleGoal: (id: number) => void;
-  onRemoveGoal: (id: number) => void;
+  onToggleGoal: (id: string) => void;
+  onRemoveGoal: (id: string) => void;
 }
 
 export const GoalList = ({ title, goals, onToggleGoal, onRemoveGoal }: GoalListProps) => {

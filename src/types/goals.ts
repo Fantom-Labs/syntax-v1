@@ -1,7 +1,8 @@
+
 export type GoalPeriod = 'short' | 'medium' | 'long';
 
 export interface Goal {
-  id: number;
+  id: string;
   title: string;
   period: GoalPeriod;
   completed: boolean;
