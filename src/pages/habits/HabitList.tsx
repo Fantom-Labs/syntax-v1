@@ -1,12 +1,13 @@
 
 import { Button } from "@/components/ui/button";
 import { Habit } from "@/types/habits";
-import { Trash2, Play, Plus, Check } from "lucide-react";
+import { Trash2, Play, Plus, Check, Pause } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useEffect, useState } from "react";
 
 interface HabitListProps {
   habits: Habit[];
@@ -19,6 +20,25 @@ type CheckStatus = "unchecked" | "completed" | "failed";
 export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
   const isMobile = useIsMobile();
   const { toast } = useToast();
+  const [runningTimers, setRunningTimers] = useState<{ [key: string]: number }>({});
+  const [elapsedTimes, setElapsedTimes] = useState<{ [key: string]: number }>({});
+
+  useEffect(() => {
+    const timers: { [key: string]: NodeJS.Timeout } = {};
+
+    Object.keys(runningTimers).forEach(habitId => {
+      timers[habitId] = setInterval(() => {
+        setElapsedTimes(prev => ({
+          ...prev,
+          [habitId]: (prev[habitId] || 0) + 1
+        }));
+      }, 60000); // Update every minute
+    });
+
+    return () => {
+      Object.values(timers).forEach(timer => clearInterval(timer));
+    };
+  }, [runningTimers]);
 
   const getCheckStatus = (habit: Habit, date: string): CheckStatus => {
     const check = habit.checks.find(c => c.timestamp.startsWith(date));
@@ -34,17 +54,44 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
     if (!habit) return;
 
     const currentStatus = getCheckStatus(habit, date);
-    const completed = currentStatus === "unchecked";
+    const todayCheck = habit.checks.find(c => c.timestamp.startsWith(date));
+    let completed = tracking_type === 'task' ? currentStatus === "unchecked" : true;
 
     let amount = undefined;
     let time = undefined;
 
-    if (completed) {
-      if (tracking_type === 'amount' && habit.amount_target) {
-        amount = habit.amount_target;
-      }
-      if (tracking_type === 'time' && habit.time_target) {
-        time = habit.time_target;
+    if (tracking_type === 'amount') {
+      amount = (todayCheck?.amount || 0) + 1;
+      completed = amount >= (habit.amount_target || 0);
+    }
+
+    if (tracking_type === 'time') {
+      if (runningTimers[habitId]) {
+        // Stop timer
+        time = (todayCheck?.time || 0) + elapsedTimes[habitId];
+        completed = time >= (habit.time_target || 0);
+        setRunningTimers(prev => {
+          const newTimers = { ...prev };
+          delete newTimers[habitId];
+          return newTimers;
+        });
+        setElapsedTimes(prev => {
+          const newTimes = { ...prev };
+          delete newTimes[habitId];
+          return newTimes;
+        });
+      } else {
+        // Start timer
+        time = todayCheck?.time || 0;
+        setRunningTimers(prev => ({
+          ...prev,
+          [habitId]: Date.now()
+        }));
+        setElapsedTimes(prev => ({
+          ...prev,
+          [habitId]: 0
+        }));
+        return; // Don't update the database when starting the timer
       }
     }
 
@@ -88,9 +135,14 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
       })
     );
 
+    const message = 
+      tracking_type === 'task' ? (completed ? "Hábito concluído!" : "Hábito desmarcado") :
+      tracking_type === 'amount' ? `${amount}/${habit.amount_target} concluídos` :
+      tracking_type === 'time' ? `${time}/${habit.time_target} minutos registrados` : "";
+
     toast({
-      title: completed ? "Hábito concluído!" : "Hábito desmarcado",
-      description: completed ? "Continue assim!" : "Tente novamente amanhã!",
+      title: message,
+      description: completed ? "Continue assim!" : "Continue tentando!",
     });
   };
 
@@ -118,6 +170,7 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
 
   const getProgressText = (habit: Habit) => {
     const todayCheck = habit.checks.find(c => c.timestamp.startsWith(format(date, "yyyy-MM-dd")));
+    const habitId = habit.id;
     
     if (habit.tracking_type === 'task') {
       return todayCheck?.completed ? 'Concluído' : 'Não concluído';
@@ -126,13 +179,17 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
       return `${current}/${habit.amount_target} ${habit.title.toLowerCase()}`;
     } else if (habit.tracking_type === 'time') {
       const current = todayCheck?.time || 0;
-      return `${current}min/${habit.time_target}min`;
+      const running = runningTimers[habitId];
+      const elapsed = running ? (current + (elapsedTimes[habitId] || 0)) : current;
+      return `${elapsed}min/${habit.time_target}min`;
     }
   };
 
   const renderHabitAction = (habit: Habit) => {
     const check = habit.checks.find(c => c.timestamp.startsWith(format(date, "yyyy-MM-dd")));
     const isCompleted = check?.completed;
+    const habitId = habit.id;
+    const isRunning = !!runningTimers[habitId];
 
     switch (habit.tracking_type) {
       case 'task':
@@ -149,12 +206,17 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
       case 'time':
         return (
           <Button
-            variant={isCompleted ? "default" : "ghost"}
+            variant={isCompleted ? "default" : isRunning ? "default" : "ghost"}
             size="icon"
             onClick={() => toggleHabitCheck(habit.id, format(date, "yyyy-MM-dd"), 'time')}
-            className={`rounded-full w-8 h-8 border ${isCompleted ? 'bg-primary border-primary text-primary-foreground' : 'border-muted-foreground hover:bg-accent'}`}
+            className={`rounded-full w-8 h-8 border 
+              ${isCompleted 
+                ? 'bg-primary border-primary text-primary-foreground' 
+                : isRunning 
+                  ? 'bg-green-500 border-green-500 text-white hover:bg-green-600' 
+                  : 'border-muted-foreground hover:bg-accent'}`}
           >
-            <Play className="h-4 w-4" />
+            {isRunning ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
           </Button>
         );
       case 'amount':
