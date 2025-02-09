@@ -169,25 +169,25 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
       {habits.map(habit => (
         <div
           key={habit.id}
-          className="flex items-center justify-between p-4 rounded-2xl bg-background transition-colors"
+          className="flex items-center justify-between p-3 rounded-xl bg-background transition-colors"
           style={{ backgroundColor: `${habit.color}15` }}
         >
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <div 
-              className="w-10 h-10 rounded-full flex items-center justify-center text-xl font-medium"
+              className="w-8 h-8 rounded-full flex items-center justify-center text-base font-medium"
               style={{ backgroundColor: habit.color }}
             >
               {habit.emoji || habit.title[0].toUpperCase()}
             </div>
-            <div className="flex flex-col">
-              <span className="font-medium">{habit.title}</span>
-              <span className="text-sm text-muted-foreground">
+            <div className="flex flex-col min-w-0">
+              <span className="font-medium truncate">{habit.title}</span>
+              <span className="text-xs text-muted-foreground truncate">
                 {getProgressText(habit)}
               </span>
             </div>
           </div>
           
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 ml-2">
             {renderHabitAction(habit)}
             <Button
               variant="ghost"
