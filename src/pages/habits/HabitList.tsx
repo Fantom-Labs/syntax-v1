@@ -1,13 +1,10 @@
 
-import { Button } from "@/components/ui/button";
 import { Habit } from "@/types/habits";
-import { Trash2, Play, Plus, Check, Pause } from "lucide-react";
 import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useEffect, useState } from "react";
+import { HabitItem } from "./components/HabitItem";
 
 interface HabitListProps {
   habits: Habit[];
@@ -15,10 +12,7 @@ interface HabitListProps {
   date: Date;
 }
 
-type CheckStatus = "unchecked" | "completed" | "failed";
-
 export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
-  const isMobile = useIsMobile();
   const { toast } = useToast();
   const [runningTimers, setRunningTimers] = useState<{ [key: string]: number }>({});
   const [elapsedTimes, setElapsedTimes] = useState<{ [key: string]: number }>({});
@@ -40,12 +34,6 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
     };
   }, [runningTimers]);
 
-  const getCheckStatus = (habit: Habit, date: string): CheckStatus => {
-    const check = habit.checks.find(c => c.timestamp.startsWith(date));
-    if (!check) return "unchecked";
-    return check.completed ? "completed" : "failed";
-  };
-
   const toggleHabitCheck = async (habitId: string, date: string, tracking_type: string) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
@@ -53,9 +41,8 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
     const habit = habits.find(h => h.id === habitId);
     if (!habit) return;
 
-    const currentStatus = getCheckStatus(habit, date);
     const todayCheck = habit.checks.find(c => c.timestamp.startsWith(date));
-    let completed = tracking_type === 'task' ? currentStatus === "unchecked" : true;
+    let completed = tracking_type === 'task' ? !todayCheck?.completed : true;
 
     let amount = undefined;
     let time = undefined;
@@ -168,106 +155,18 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
     });
   };
 
-  const getProgressText = (habit: Habit) => {
-    const todayCheck = habit.checks.find(c => c.timestamp.startsWith(format(date, "yyyy-MM-dd")));
-    const habitId = habit.id;
-    
-    if (habit.tracking_type === 'task') {
-      return todayCheck?.completed ? 'Concluído' : 'Não concluído';
-    } else if (habit.tracking_type === 'amount') {
-      const current = todayCheck?.amount || 0;
-      return `${current}/${habit.amount_target} ${habit.title.toLowerCase()}`;
-    } else if (habit.tracking_type === 'time') {
-      const current = todayCheck?.time || 0;
-      const running = runningTimers[habitId];
-      const elapsed = running ? (current + (elapsedTimes[habitId] || 0)) : current;
-      return `${elapsed}min/${habit.time_target}min`;
-    }
-  };
-
-  const renderHabitAction = (habit: Habit) => {
-    const check = habit.checks.find(c => c.timestamp.startsWith(format(date, "yyyy-MM-dd")));
-    const isCompleted = check?.completed;
-    const habitId = habit.id;
-    const isRunning = !!runningTimers[habitId];
-
-    switch (habit.tracking_type) {
-      case 'task':
-        return (
-          <Button
-            variant="ghost"
-            size="icon"
-            className={`rounded-full w-8 h-8 border ${isCompleted ? 'bg-primary border-primary text-primary-foreground' : 'border-muted-foreground'}`}
-            onClick={() => toggleHabitCheck(habit.id, format(date, "yyyy-MM-dd"), 'task')}
-          >
-            {isCompleted && <Check className="h-4 w-4" />}
-          </Button>
-        );
-      case 'time':
-        return (
-          <Button
-            variant={isCompleted ? "default" : isRunning ? "default" : "ghost"}
-            size="icon"
-            onClick={() => toggleHabitCheck(habit.id, format(date, "yyyy-MM-dd"), 'time')}
-            className={`rounded-full w-8 h-8 border 
-              ${isCompleted 
-                ? 'bg-primary border-primary text-primary-foreground' 
-                : isRunning 
-                  ? 'bg-green-500 border-green-500 text-white hover:bg-green-600' 
-                  : 'border-muted-foreground hover:bg-accent'}`}
-          >
-            {isRunning ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-          </Button>
-        );
-      case 'amount':
-        return (
-          <Button
-            variant={isCompleted ? "default" : "ghost"}
-            size="icon"
-            onClick={() => toggleHabitCheck(habit.id, format(date, "yyyy-MM-dd"), 'amount')}
-            className={`rounded-full w-8 h-8 border ${isCompleted ? 'bg-primary border-primary text-primary-foreground' : 'border-muted-foreground hover:bg-accent'}`}
-          >
-            <Plus className="h-4 w-4" />
-          </Button>
-        );
-    }
-  };
-
   return (
     <div className="space-y-2">
       {habits.map(habit => (
-        <div
+        <HabitItem
           key={habit.id}
-          className="flex items-center justify-between p-3 rounded-xl bg-background/50 backdrop-blur-sm shadow-sm"
-          style={{ backgroundColor: `${habit.color}10` }}
-        >
-          <div className="flex items-center gap-2 flex-1 min-w-0">
-            <div 
-              className="w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center text-base font-medium"
-              style={{ backgroundColor: habit.color }}
-            >
-              {habit.emoji || habit.title[0].toUpperCase()}
-            </div>
-            <div className="flex flex-col min-w-0 flex-1">
-              <span className="font-medium text-base truncate">{habit.title}</span>
-              <span className="text-sm text-muted-foreground truncate">
-                {getProgressText(habit)}
-              </span>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-1 ml-2 flex-shrink-0">
-            {renderHabitAction(habit)}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => removeHabit(habit.id)}
-              className="text-destructive hover:text-destructive/90 rounded-full w-8 h-8"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+          habit={habit}
+          date={date}
+          runningTimers={runningTimers}
+          elapsedTimes={elapsedTimes}
+          onToggleHabit={toggleHabitCheck}
+          onRemoveHabit={removeHabit}
+        />
       ))}
       
       {habits.length === 0 && (
