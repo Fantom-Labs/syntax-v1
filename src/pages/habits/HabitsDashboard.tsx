@@ -1,10 +1,5 @@
 
 import { useEffect, useState } from "react";
-import { Card } from "@/components/ui/card";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
-import { format, subDays } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import { HabitProgress } from "@/types/habits";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -19,9 +14,6 @@ export const HabitsDashboard = ({ userId }: HabitsDashboardProps) => {
     if (!userId) return;
 
     const fetchHabitProgress = async () => {
-      const today = new Date();
-      const startDate = subDays(today, 30);
-
       const { data: habits, error: habitsError } = await supabase
         .from("habits")
         .select("*")
@@ -32,113 +24,22 @@ export const HabitsDashboard = ({ userId }: HabitsDashboardProps) => {
         return;
       }
 
-      const habitProgress: HabitProgress[] = [];
+      const { data: history, error: historyError } = await supabase
+        .from("habit_history")
+        .select("*")
+        .eq("user_id", userId);
 
-      for (const habit of habits) {
-        const { data: history, error: historyError } = await supabase
-          .from("habit_history")
-          .select("*")
-          .eq("habit_id", habit.id)
-          .gte("date", startDate.toISOString())
-          .order("date", { ascending: true });
-
-        if (historyError) {
-          console.error("Error fetching habit history:", historyError);
-          continue;
-        }
-
-        const completedDays = history?.filter(h => h.completed).length || 0;
-        const totalDays = history?.length || 1;
-        const completionRate = (completedDays / totalDays) * 100;
-
-        habitProgress.push({
-          habitId: habit.id,
-          title: habit.title,
-          completionRate,
-          history: history || []
-        });
+      if (historyError) {
+        console.error("Error fetching habit history:", historyError);
+        return;
       }
 
+      const habitProgress: HabitProgress[] = [];
       setProgressData(habitProgress);
     };
 
     fetchHabitProgress();
   }, [userId]);
 
-  const chartConfig = {
-    value: {
-      theme: {
-        light: "#0ea5e9",
-        dark: "#38bdf8"
-      }
-    }
-  };
-
-  return (
-    <div className="space-y-6 mt-8">
-      <h2 className="text-2xl font-semibold">Progresso dos Hábitos</h2>
-      <div className="grid gap-6">
-        {progressData.map((habit) => (
-          <Card key={habit.habitId} className="p-6">
-            <div className="flex flex-col space-y-4">
-              <h3 className="text-lg font-medium">{habit.title}</h3>
-              <div className="h-[200px] w-full">
-                <ChartContainer config={chartConfig}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart 
-                      data={habit.history.map(h => ({
-                        date: format(new Date(h.date), "dd/MM", { locale: ptBR }),
-                        value: h.completed ? 100 : 0
-                      }))}
-                      margin={{ top: 20, right: 20, left: 0, bottom: 20 }}
-                    >
-                      <CartesianGrid 
-                        strokeDasharray="3 3" 
-                        vertical={false}
-                        stroke="#e5e7eb"
-                      />
-                      <XAxis 
-                        dataKey="date"
-                        axisLine={false}
-                        tickLine={false}
-                        tickMargin={10}
-                        stroke="#6b7280"
-                        fontSize={12}
-                      />
-                      <YAxis 
-                        domain={[0, 100]}
-                        tickFormatter={(value) => `${value}%`}
-                        axisLine={false}
-                        tickLine={false}
-                        tickMargin={10}
-                        stroke="#6b7280"
-                        fontSize={12}
-                        ticks={[0, 25, 50, 75, 100]}
-                      />
-                      <ChartTooltip
-                        content={({ active, payload }) => (
-                          <ChartTooltipContent
-                            active={active}
-                            payload={payload}
-                            formatter={(value) => `${value}% concluído`}
-                          />
-                        )}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="value"
-                        strokeWidth={2}
-                        dot={{ strokeWidth: 2, r: 4 }}
-                        activeDot={{ r: 6, strokeWidth: 2 }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </ChartContainer>
-              </div>
-            </div>
-          </Card>
-        ))}
-      </div>
-    </div>
-  );
+  return null;
 };
