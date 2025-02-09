@@ -10,7 +10,7 @@ type DateNavigationProps = {
 
 export const DateNavigation = ({ date, setDate }: DateNavigationProps) => {
   const today = new Date();
-  const dates = Array.from({ length: 5 }, (_, i) => addDays(today, i - 2));
+  const dates = Array.from({ length: 15 }, (_, i) => addDays(today, i - 7));
   
   return (
     <div className="space-y-4">
@@ -29,25 +29,27 @@ export const DateNavigation = ({ date, setDate }: DateNavigationProps) => {
         )}
       </div>
       
-      <div className="flex justify-between gap-2 w-full">
-        {dates.map((currentDate, index) => {
-          const isSelected = format(currentDate, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd');
-          const dayName = format(currentDate, 'EEE', { locale: ptBR });
-          const dayNumber = format(currentDate, 'd');
-          
-          return (
-            <button
-              key={index}
-              onClick={() => setDate(currentDate)}
-              className={`flex flex-col items-center p-2 rounded-xl transition-colors flex-1
-                ${isSelected ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'}
-              `}
-            >
-              <span className="text-sm font-medium">{dayName}</span>
-              <span className="text-lg font-bold">{dayNumber}</span>
-            </button>
-          );
-        })}
+      <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
+        <div className="flex gap-2 min-w-max">
+          {dates.map((currentDate, index) => {
+            const isSelected = format(currentDate, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd');
+            const dayName = format(currentDate, 'EEE', { locale: ptBR });
+            const dayNumber = format(currentDate, 'd');
+            
+            return (
+              <button
+                key={index}
+                onClick={() => setDate(currentDate)}
+                className={`flex flex-col items-center p-2 rounded-xl transition-colors w-20 flex-shrink-0
+                  ${isSelected ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'}
+                `}
+              >
+                <span className="text-sm font-medium">{dayName}</span>
+                <span className="text-lg font-bold">{dayNumber}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
