@@ -10,8 +10,8 @@ type DateNavigationProps = {
 
 export const DateNavigation = ({ date, setDate }: DateNavigationProps) => {
   const today = new Date();
-  // Generate 30 days (15 before and 14 after today)
-  const dates = Array.from({ length: 30 }, (_, i) => addDays(today, i - 15));
+  // Generate dates for the current month
+  const dates = Array.from({ length: 7 }, (_, i) => addDays(today, i - 3));
   
   return (
     <div className="space-y-4">
@@ -30,24 +30,28 @@ export const DateNavigation = ({ date, setDate }: DateNavigationProps) => {
         )}
       </div>
       
-      <div className="overflow-x-auto pb-2 -mx-4 px-4">
-        <div className="flex gap-2 w-max">
+      <div className="overflow-x-auto hide-scrollbar">
+        <div className="flex gap-6 w-full min-w-max px-1">
           {dates.map((currentDate, index) => {
             const isSelected = format(currentDate, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd');
-            const dayName = format(currentDate, 'EEE', { locale: ptBR });
+            const dayName = format(currentDate, 'EEE', { locale: ptBR }).toLowerCase();
             const dayNumber = format(currentDate, 'd');
             
             return (
-              <button
+              <div
                 key={index}
-                onClick={() => setDate(currentDate)}
-                className={`flex flex-col items-center p-2 rounded-xl transition-colors min-w-[70px]
-                  ${isSelected ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'}
-                `}
+                className="flex flex-col items-center"
               >
-                <span className="text-sm font-medium">{dayName}</span>
-                <span className="text-lg font-bold">{dayNumber}</span>
-              </button>
+                <span className="text-sm text-muted-foreground mb-2">{dayName}</span>
+                <button
+                  onClick={() => setDate(currentDate)}
+                  className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors
+                    ${isSelected ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'}
+                  `}
+                >
+                  <span className="text-sm font-medium">{dayNumber}</span>
+                </button>
+              </div>
             );
           })}
         </div>
