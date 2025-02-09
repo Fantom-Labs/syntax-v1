@@ -133,7 +133,7 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
           <Button
             variant="ghost"
             size="icon"
-            className={`rounded-full w-10 h-10 border ${isCompleted ? 'bg-primary border-primary text-primary-foreground' : 'border-muted-foreground'}`}
+            className={`rounded-full w-8 h-8 border ${isCompleted ? 'bg-primary border-primary text-primary-foreground' : 'border-muted-foreground'}`}
             onClick={() => toggleHabitCheck(habit.id, format(date, "yyyy-MM-dd"))}
           >
             {isCompleted ? '✓' : ''}
@@ -145,9 +145,9 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
             variant="ghost"
             size="icon"
             onClick={() => toggleHabitCheck(habit.id, format(date, "yyyy-MM-dd"))}
-            className="rounded-full w-10 h-10 border border-muted-foreground hover:bg-accent"
+            className="rounded-full w-8 h-8 border border-muted-foreground hover:bg-accent"
           >
-            <Play className="h-5 w-5" />
+            <Play className="h-4 w-4" />
           </Button>
         );
       case 'amount':
@@ -156,46 +156,46 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
             variant="ghost"
             size="icon"
             onClick={() => toggleHabitCheck(habit.id, format(date, "yyyy-MM-dd"))}
-            className="rounded-full w-10 h-10 border border-muted-foreground hover:bg-accent"
+            className="rounded-full w-8 h-8 border border-muted-foreground hover:bg-accent"
           >
-            <Plus className="h-5 w-5" />
+            <Plus className="h-4 w-4" />
           </Button>
         );
     }
   };
 
   return (
-    <div className="space-y-3 max-h-[calc(100vh-280px)] overflow-y-auto px-1">
+    <div className="space-y-2 overflow-y-auto max-h-[calc(100vh-280px)] w-full">
       {habits.map(habit => (
         <div
           key={habit.id}
-          className="flex items-center justify-between p-4 rounded-2xl bg-background/50 backdrop-blur-sm shadow-sm"
+          className="flex items-center justify-between p-3 rounded-xl bg-background/50 backdrop-blur-sm shadow-sm"
           style={{ backgroundColor: `${habit.color}10` }}
         >
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 flex-1 min-w-0">
             <div 
-              className="w-12 h-12 rounded-xl flex items-center justify-center text-base font-medium"
+              className="w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center text-base font-medium"
               style={{ backgroundColor: habit.color }}
             >
               {habit.emoji || habit.title[0].toUpperCase()}
             </div>
-            <div className="flex flex-col min-w-0">
-              <span className="font-medium text-lg">{habit.title}</span>
-              <span className="text-sm text-muted-foreground">
+            <div className="flex flex-col min-w-0 flex-1">
+              <span className="font-medium text-base truncate">{habit.title}</span>
+              <span className="text-sm text-muted-foreground truncate">
                 {getProgressText(habit)}
               </span>
             </div>
           </div>
           
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 ml-2 flex-shrink-0">
             {renderHabitAction(habit)}
             <Button
               variant="ghost"
               size="icon"
               onClick={() => removeHabit(habit.id)}
-              className="text-destructive hover:text-destructive/90 rounded-full w-10 h-10"
+              className="text-destructive hover:text-destructive/90 rounded-full w-8 h-8"
             >
-              <Trash2 className="h-5 w-5" />
+              <Trash2 className="h-4 w-4" />
             </Button>
           </div>
         </div>
