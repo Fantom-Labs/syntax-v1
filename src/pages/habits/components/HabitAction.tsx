@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Habit } from "@/types/habits";
-import { Check, Play, Plus, Pause } from "lucide-react";
+import { Check, Play, Plus, Pause, X } from "lucide-react";
 import { format } from "date-fns";
 import { getCheckStatus } from "../utils/habitUtils";
 
@@ -34,7 +34,7 @@ export const HabitAction = ({ habit, date, runningTimers, onToggleHabit }: Habit
           onClick={() => onToggleHabit(habit.id, format(date, "yyyy-MM-dd"), 'task')}
         >
           {checkStatus === "completed" && <Check className="h-4 w-4" />}
-          {checkStatus === "failed" && <Check className="h-4 w-4" />}
+          {checkStatus === "failed" && <X className="h-4 w-4" />}
         </Button>
       );
     case 'time':

@@ -5,14 +5,15 @@ import { format } from "date-fns";
 export type CheckStatus = "unchecked" | "completed" | "failed";
 
 export const getCheckStatus = (habit: Habit, date: string): CheckStatus => {
-  const check = habit.checks.find(c => c.timestamp.startsWith(date));
+  const check = habit.checks.find(c => c.timestamp === `${date}T00:00:00.000Z`);
   if (!check) return "unchecked";
   if (check.completed) return "completed";
   return "failed";
 };
 
 export const getProgressText = (habit: Habit, date: Date, elapsedTimes: { [key: string]: number }, runningTimers: { [key: string]: number }) => {
-  const todayCheck = habit.checks.find(c => c.timestamp.startsWith(format(date, "yyyy-MM-dd")));
+  const formattedDate = format(date, "yyyy-MM-dd");
+  const todayCheck = habit.checks.find(c => c.timestamp === `${formattedDate}T00:00:00.000Z`);
   const habitId = habit.id;
   
   if (habit.tracking_type === 'task') {
