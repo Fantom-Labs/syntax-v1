@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Search } from "lucide-react";
@@ -168,7 +169,7 @@ export const BooksPage = () => {
       <div className="space-y-8">
         <form onSubmit={handleSearch} className="flex gap-4">
           <div className="flex-1">
-            <Popover open={open}>
+            <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
                 <div className="flex-1">
                   <Input
@@ -177,7 +178,16 @@ export const BooksPage = () => {
                     value={searchQuery}
                     onChange={(e) => {
                       setSearchQuery(e.target.value);
-                      setOpen(e.target.value.length >= 2);
+                      if (e.target.value.length >= 2) {
+                        setOpen(true);
+                      } else {
+                        setOpen(false);
+                      }
+                    }}
+                    onClick={() => {
+                      if (searchQuery.length >= 2) {
+                        setOpen(true);
+                      }
                     }}
                     className="w-full"
                   />
