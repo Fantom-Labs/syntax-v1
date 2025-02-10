@@ -8,33 +8,28 @@ import { ptBR } from "date-fns/locale";
 export const EventCard = () => {
   const { data: events = [], isLoading } = useEventQueries();
 
-  // Get the next event (closest to current date)
-  const nextEvent = events.length > 0 
-    ? events.reduce((closest, current) => {
-        const closestDate = new Date(closest.date);
-        const currentDate = new Date(current.date);
-        const now = new Date();
-
-        // Only consider future events
-        if (currentDate < now) return closest;
-        if (closestDate < now) return current;
-
-        return currentDate < closestDate ? current : closest;
-      }, events[0])
-    : null;
+  // Get up to 3 upcoming events
+  const upcomingEvents = events
+    .filter(event => new Date(event.date) >= new Date())
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    .slice(0, 3);
 
   return (
     <Card className="p-4">
       <h3 className="font-semibold mb-2 flex items-center gap-2">
         <Calendar className="w-4 h-4" />
-        Próximo Evento
+        Próximos Eventos
       </h3>
       {isLoading ? (
         <p className="text-sm text-muted-foreground">Carregando eventos...</p>
-      ) : nextEvent ? (
-        <p className="text-sm">
-          {nextEvent.title} - {format(new Date(nextEvent.date), "PPP", { locale: ptBR })} às {nextEvent.time}
-        </p>
+      ) : upcomingEvents.length > 0 ? (
+        <div className="space-y-2">
+          {upcomingEvents.map((event) => (
+            <p key={event.id} className="text-sm">
+              {event.title} - {format(new Date(event.date), "PPP", { locale: ptBR })} às {event.time}
+            </p>
+          ))}
+        </div>
       ) : (
         <p className="text-sm text-muted-foreground">
           Nenhum evento agendado
