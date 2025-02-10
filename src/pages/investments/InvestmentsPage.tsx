@@ -8,6 +8,18 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Trash2 } from "lucide-react";
 
 export const InvestmentsPage = () => {
   const [selectedPortfolio, setSelectedPortfolio] = useState<string | null>(null);
@@ -76,6 +88,22 @@ export const InvestmentsPage = () => {
     toast.success("Portfolio created successfully");
   };
 
+  const deletePortfolio = async (portfolioId: string) => {
+    const { error } = await supabase
+      .from('portfolios')
+      .delete()
+      .eq('id', portfolioId);
+
+    if (error) {
+      toast.error("Error deleting portfolio");
+      return;
+    }
+
+    setSelectedPortfolio(null);
+    refetchPortfolios();
+    toast.success("Portfolio deleted successfully");
+  };
+
   return (
     <PageTemplate title="Investimentos">
       <div className="space-y-6">
@@ -95,10 +123,41 @@ export const InvestmentsPage = () => {
         </div>
 
         {selectedPortfolio && (
-          <PortfolioView
-            portfolio={portfolios.find((p) => p.id === selectedPortfolio)!}
-            onUpdate={() => refetchPortfolios()}
-          />
+          <>
+            <PortfolioView
+              portfolio={portfolios.find((p) => p.id === selectedPortfolio)!}
+              onUpdate={() => refetchPortfolios()}
+            />
+            
+            <div className="flex justify-end mt-8">
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive">
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Excluir Carteira
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Excluir Carteira</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Tem certeza que deseja excluir esta carteira? Esta ação não pode ser desfeita
+                      e todos os investimentos associados serão excluídos.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => deletePortfolio(selectedPortfolio)}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      Excluir
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+          </>
         )}
 
         {!selectedPortfolio && (
