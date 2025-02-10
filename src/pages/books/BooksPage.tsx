@@ -1,6 +1,7 @@
+
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Search } from "lucide-react";
+import { Search, Star, StarOff, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import PageTemplate from "@/components/PageTemplate";
 import { Input } from "@/components/ui/input";
@@ -16,7 +17,6 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface Book {
   id?: string;
@@ -54,6 +54,7 @@ export const BooksPage = () => {
           id,
           book_id,
           status,
+          rating,
           books (
             id,
             title,
@@ -155,10 +156,64 @@ export const BooksPage = () => {
     }
   };
 
+  const removeFromReadingList = async (readingListId: string) => {
+    try {
+      const { error } = await supabase
+        .from("reading_list")
+        .delete()
+        .eq("id", readingListId);
+
+      if (error) throw error;
+      
+      toast.success("Livro removido da lista!");
+      refetchReadingList();
+    } catch (error) {
+      console.error("Error removing book:", error);
+      toast.error("Erro ao remover livro da lista");
+    }
+  };
+
+  const updateRating = async (readingListId: string, rating: number | null) => {
+    try {
+      const { error } = await supabase
+        .from("reading_list")
+        .update({ rating })
+        .eq("id", readingListId);
+
+      if (error) throw error;
+      
+      toast.success("Avaliação atualizada!");
+      refetchReadingList();
+    } catch (error) {
+      console.error("Error updating rating:", error);
+      toast.error("Erro ao atualizar avaliação");
+    }
+  };
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
     searchBooks();
+  };
+
+  const renderStars = (rating: number | null, readingListId: string) => {
+    return (
+      <div className="flex gap-1">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <button
+            key={star}
+            onClick={() => updateRating(readingListId, star === rating ? null : star)}
+            className="text-yellow-500 hover:text-yellow-600 transition-colors"
+          >
+            {star <= (rating || 0) ? (
+              <Star className="w-4 h-4 fill-current" />
+            ) : (
+              <StarOff className="w-4 h-4" />
+            )}
+          </button>
+        ))}
+      </div>
+    );
   };
 
   return (
@@ -268,39 +323,6 @@ export const BooksPage = () => {
                               ? "Na lista"
                               : "Adicionar à lista"}
                           </Button>
-                          {readingList?.some(
-                            (item) => item.books.google_books_id === book.google_books_id
-                          ) && (
-                            <div className="flex items-center gap-2">
-                              <Checkbox
-                                checked={readingList.find(
-                                  (item) => item.books.google_books_id === book.google_books_id
-                                )?.status === "read"}
-                                onCheckedChange={async () => {
-                                  const item = readingList.find(
-                                    (item) => item.books.google_books_id === book.google_books_id
-                                  );
-                                  if (item) {
-                                    const { error } = await supabase
-                                      .from("reading_list")
-                                      .update({
-                                        status: item.status === "read" ? "to_read" : "read"
-                                      })
-                                      .eq("id", item.id);
-                                    
-                                    if (error) {
-                                      toast.error("Erro ao atualizar status do livro");
-                                      return;
-                                    }
-                                    
-                                    toast.success("Status do livro atualizado");
-                                    refetchReadingList();
-                                  }
-                                }}
-                              />
-                              <span className="text-sm text-muted-foreground">Lido</span>
-                            </div>
-                          )}
                         </div>
                       </div>
                     </div>
@@ -357,6 +379,21 @@ export const BooksPage = () => {
                             />
                             <span className="text-sm text-muted-foreground">Lido</span>
                           </div>
+                          {item.status === "read" && (
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm text-muted-foreground">Avaliação:</span>
+                              {renderStars(item.rating, item.id)}
+                            </div>
+                          )}
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            className="mt-2"
+                            onClick={() => removeFromReadingList(item.id)}
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Remover da lista
+                          </Button>
                         </div>
                       </div>
                     </CardContent>
@@ -370,3 +407,4 @@ export const BooksPage = () => {
     </PageTemplate>
   );
 };
+

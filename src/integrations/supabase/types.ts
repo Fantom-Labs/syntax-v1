@@ -322,6 +322,7 @@ export type Database = {
           book_id: string
           created_at: string
           id: string
+          rating: number | null
           status: string | null
           user_id: string
         }
@@ -329,6 +330,7 @@ export type Database = {
           book_id: string
           created_at?: string
           id?: string
+          rating?: number | null
           status?: string | null
           user_id: string
         }
@@ -336,6 +338,7 @@ export type Database = {
           book_id?: string
           created_at?: string
           id?: string
+          rating?: number | null
           status?: string | null
           user_id?: string
         }
