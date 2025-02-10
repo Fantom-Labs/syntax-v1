@@ -84,7 +84,7 @@ export const BookSearchForm = ({
       <Button
         type="button"
         variant="outline"
-        onClick={() => setLanguage(lang => lang === "pt" ? "en" : "pt")}
+        onClick={() => setLanguage(language === "pt" ? "en" : "pt")}
       >
         {language === "pt" ? "🇧🇷" : "🇺🇸"}
       </Button>
