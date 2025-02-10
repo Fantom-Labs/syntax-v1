@@ -7,23 +7,9 @@ const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
-    persistSession: true,
-    storageKey: 'supabase.auth.token',
-    storage: window.localStorage,
     autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
   },
 });
 
-// Initialize session from localStorage if available
-const persistedSession = localStorage.getItem('supabase.auth.token');
-if (persistedSession) {
-  try {
-    const { currentSession, error } = JSON.parse(persistedSession);
-    if (currentSession && !error) {
-      supabase.auth.setSession(currentSession);
-    }
-  } catch (error) {
-    console.error('Error restoring auth session:', error);
-    localStorage.removeItem('supabase.auth.token');
-  }
-}
