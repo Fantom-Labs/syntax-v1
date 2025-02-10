@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Search } from "lucide-react";
@@ -35,7 +34,6 @@ interface Book {
 export const BooksPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [language, setLanguage] = useState<"en" | "pt">("pt");
-  const [open, setOpen] = useState(false);
 
   const { data: session } = useQuery({
     queryKey: ["session"],
@@ -150,7 +148,6 @@ export const BooksPage = () => {
       if (readingListError) throw readingListError;
       
       toast.success("Livro adicionado à lista de leitura!");
-      setOpen(false);
       refetchReadingList();
     } catch (error) {
       console.error("Error adding book:", error);
@@ -168,37 +165,21 @@ export const BooksPage = () => {
     <PageTemplate title="Livros">
       <div className="space-y-8">
         <form onSubmit={handleSearch} className="flex gap-4">
-          <div className="flex-1">
-            <Popover open={open} onOpenChange={setOpen}>
-              <PopoverTrigger asChild>
-                <div className="flex-1">
-                  <Input
-                    type="text"
-                    placeholder="Buscar livros..."
-                    value={searchQuery}
-                    onChange={(e) => {
-                      setSearchQuery(e.target.value);
-                      if (e.target.value.length >= 2) {
-                        setOpen(true);
-                      } else {
-                        setOpen(false);
-                      }
-                    }}
-                    onClick={() => {
-                      if (searchQuery.length >= 2) {
-                        setOpen(true);
-                      }
-                    }}
-                    className="w-full"
-                  />
-                </div>
-              </PopoverTrigger>
-              <PopoverContent className="w-[400px] p-0" align="start">
+          <div className="flex-1 relative">
+            <Input
+              type="text"
+              placeholder="Buscar livros..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full"
+            />
+            {suggestions?.books && suggestions.books.length > 0 && searchQuery.length >= 2 && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-popover border rounded-md shadow-md z-10">
                 <Command>
                   <CommandList>
                     <CommandEmpty>Nenhum livro encontrado.</CommandEmpty>
                     <CommandGroup heading="Sugestões">
-                      {suggestions?.books?.map((book: Book) => (
+                      {suggestions.books.map((book: Book) => (
                         <CommandItem
                           key={book.google_books_id}
                           onSelect={() => {
@@ -225,8 +206,8 @@ export const BooksPage = () => {
                     </CommandGroup>
                   </CommandList>
                 </Command>
-              </PopoverContent>
-            </Popover>
+              </div>
+            )}
           </div>
           <Button type="submit" className="gap-2">
             <Search className="w-4 h-4" />
