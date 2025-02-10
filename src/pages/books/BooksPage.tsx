@@ -355,7 +355,17 @@ export const BooksPage = () => {
                           </div>
                         )}
                         <div className="flex-1 space-y-2">
-                          <h3 className="font-semibold line-clamp-2">{book.title}</h3>
+                          <div className="flex items-start justify-between">
+                            <h3 className="font-semibold line-clamp-2">{book.title}</h3>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              onClick={() => removeFromReadingList(item.id)}
+                              className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                           <p className="text-sm text-muted-foreground">{book.author}</p>
                           <div className="flex items-center gap-2">
                             <Checkbox
@@ -385,15 +395,6 @@ export const BooksPage = () => {
                               {renderStars(item.rating, item.id)}
                             </div>
                           )}
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            className="mt-2"
-                            onClick={() => removeFromReadingList(item.id)}
-                          >
-                            <Trash2 className="w-4 h-4 mr-2" />
-                            Remover da lista
-                          </Button>
                         </div>
                       </div>
                     </CardContent>
