@@ -42,7 +42,7 @@ export const BookSearchForm = ({
           className="w-full"
         />
         {suggestions?.books && suggestions.books.length > 0 && searchQuery.length >= 2 && (
-          <div className="absolute top-full left-0 right-0 mt-1 bg-popover border rounded-md shadow-md z-10">
+          <div className="absolute top-full left-0 w-screen md:w-full mt-1 bg-popover border rounded-md shadow-md z-10 -translate-x-4 md:translate-x-0 px-4 md:px-0">
             <Command>
               <CommandList>
                 <CommandEmpty>Nenhum livro encontrado.</CommandEmpty>
