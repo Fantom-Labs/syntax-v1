@@ -381,6 +381,7 @@ export type Database = {
       }
       tasks: {
         Row: {
+          archived: boolean | null
           completed: boolean | null
           created_at: string
           id: string
@@ -388,6 +389,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          archived?: boolean | null
           completed?: boolean | null
           created_at?: string
           id?: string
@@ -395,6 +397,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          archived?: boolean | null
           completed?: boolean | null
           created_at?: string
           id?: string

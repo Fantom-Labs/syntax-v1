@@ -1,3 +1,4 @@
+
 import { useToast } from "@/hooks/use-toast";
 import PageTemplate from "@/components/PageTemplate";
 import { TaskInput } from "@/components/tasks/TaskInput";
@@ -5,14 +6,18 @@ import { TaskList } from "@/components/tasks/TaskList";
 import { Task } from "@/types/tasks";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { Archive } from "lucide-react";
+import { useState } from "react";
 
 export const TasksPage = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [showArchived, setShowArchived] = useState(false);
 
   // Fetch tasks
   const { data: tasks = [], isLoading } = useQuery({
-    queryKey: ['tasks'],
+    queryKey: ['tasks', { archived: showArchived }],
     queryFn: async () => {
       const { data: user } = await supabase.auth.getUser();
       if (!user.user) throw new Error('User not authenticated');
@@ -21,6 +26,7 @@ export const TasksPage = () => {
         .from('tasks')
         .select('*')
         .eq('user_id', user.user.id)
+        .eq('archived', showArchived)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -36,6 +42,7 @@ export const TasksPage = () => {
         id: task.id,
         title: task.title,
         completed: task.completed || false,
+        archived: task.archived || false,
         user_id: task.user_id
       }));
     },
@@ -51,7 +58,8 @@ export const TasksPage = () => {
         .from('tasks')
         .insert([{ 
           title,
-          user_id: user.user.id
+          user_id: user.user.id,
+          archived: false
         }])
         .select()
         .single();
@@ -80,7 +88,7 @@ export const TasksPage = () => {
     mutationFn: async ({ id, completed }: { id: string; completed: boolean }) => {
       const { error } = await supabase
         .from('tasks')
-        .update({ completed })
+        .update({ completed, archived: completed })
         .eq('id', id);
 
       if (error) throw error;
@@ -143,12 +151,24 @@ export const TasksPage = () => {
   return (
     <PageTemplate title="Tarefas">
       <div className="space-y-4">
-        <TaskInput onAddTask={handleAddTask} />
+        <div className="flex justify-between items-center">
+          <Button
+            variant="outline"
+            onClick={() => setShowArchived(!showArchived)}
+            className="flex items-center gap-2"
+          >
+            <Archive className="h-4 w-4" />
+            {showArchived ? "Voltar às tarefas" : "Ver arquivadas"}
+          </Button>
+        </div>
+
+        {!showArchived && <TaskInput onAddTask={handleAddTask} />}
+        
         <TaskList 
           tasks={tasks}
           onToggleTask={toggleTask}
-          onDeleteTask={deleteTask}
         />
+
         {isLoading && (
           <p className="text-center text-muted-foreground">
             Carregando tarefas...

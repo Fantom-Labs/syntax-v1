@@ -1,14 +1,14 @@
+
 import { Button } from "@/components/ui/button";
 import { Task } from "@/types/tasks";
-import { Trash2 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface TaskListProps {
   tasks: Task[];
   onToggleTask: (id: string) => void;
-  onDeleteTask: (id: string) => void;
 }
 
-export const TaskList = ({ tasks, onToggleTask, onDeleteTask }: TaskListProps) => {
+export const TaskList = ({ tasks, onToggleTask }: TaskListProps) => {
   return (
     <div className="space-y-2">
       {tasks.map(task => (
@@ -16,25 +16,14 @@ export const TaskList = ({ tasks, onToggleTask, onDeleteTask }: TaskListProps) =
           key={task.id}
           className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
         >
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={task.completed}
-              onChange={() => onToggleTask(task.id)}
-              className="w-4 h-4 rounded border-gray-300"
-            />
-            <span className={task.completed ? "line-through text-muted-foreground" : ""}>
-              {task.title}
-            </span>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onDeleteTask(task.id)}
-            className="text-destructive hover:text-destructive/90"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          <span className={task.completed ? "line-through text-muted-foreground" : ""}>
+            {task.title}
+          </span>
+          <Checkbox
+            checked={task.completed}
+            onCheckedChange={() => onToggleTask(task.id)}
+            className="h-5 w-5"
+          />
         </div>
       ))}
       {tasks.length === 0 && (
