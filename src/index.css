@@ -86,17 +86,8 @@
     transform: translateY(2px);
     filter: url('#curve');
   }
-}
-
-@layer components {
   .nav-button {
-    @apply flex items-center gap-2 px-6 py-3 rounded-full bg-secondary transition-colors duration-200;
-  }
-
-  @media (hover: hover) {
-    .nav-button:hover {
-      @apply bg-secondary/80;
-    }
+    @apply flex items-center gap-2 px-6 py-3 rounded-full bg-secondary hover:bg-secondary/80 transition-colors duration-200;
   }
 }
 
