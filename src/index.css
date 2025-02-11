@@ -87,7 +87,7 @@
     filter: url('#curve');
   }
   .nav-button {
-    @apply flex items-center gap-2 px-6 py-3 rounded-full bg-secondary transition-colors duration-200;
+    @apply flex items-center gap-2 px-6 py-3 rounded-full bg-secondary hover:bg-secondary/80 transition-colors duration-200;
   }
 }
 
@@ -98,17 +98,5 @@
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
-  }
-}
-
-@media (hover: hover) {
-  .nav-button:hover {
-    @apply bg-secondary/80;
-  }
-  .logo:hover {
-    filter: drop-shadow(0 0 2em #646cffaa);
-  }
-  .logo.react:hover {
-    filter: drop-shadow(0 0 2em #61dafbaa);
   }
 }
