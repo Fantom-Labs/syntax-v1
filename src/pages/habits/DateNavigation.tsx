@@ -9,7 +9,7 @@ type DateNavigationProps = {
 };
 
 export const DateNavigation = ({ date, setDate }: DateNavigationProps) => {
-  const today = new Date(2025, 1, 9); // February 9, 2025
+  const today = new Date(); // Now using the actual current date
   const dates = Array.from({ length: 5 }, (_, i) => addDays(today, i - 2));
   
   return (
@@ -22,7 +22,7 @@ export const DateNavigation = ({ date, setDate }: DateNavigationProps) => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setDate(new Date(2025, 1, 9))}
+            onClick={() => setDate(new Date())}
           >
             Hoje
           </Button>
