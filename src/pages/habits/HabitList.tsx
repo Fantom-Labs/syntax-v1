@@ -1,3 +1,4 @@
+
 import { Habit } from "@/types/habits";
 import { format } from "date-fns";
 import { useEffect, useState } from "react";
@@ -215,9 +216,27 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
       const newHabits = arrayMove(habits, oldIndex, newIndex);
       setHabits(newHabits);
 
-      // Opcional: Salvar a nova ordem no Supabase
-      // Isso exigiria adicionar uma coluna 'order' na tabela habits
-      // e atualizar todos os hábitos afetados
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Atualiza a ordem de todos os hábitos afetados
+      const updates = newHabits.map((habit, index) => ({
+        id: habit.id,
+        order: index
+      }));
+
+      const { error } = await supabase
+        .from('habits')
+        .upsert(updates, { onConflict: 'id' });
+
+      if (error) {
+        toast({
+          title: "Erro ao salvar ordem",
+          description: "Não foi possível salvar a nova ordem dos hábitos",
+          variant: "destructive"
+        });
+        return;
+      }
     }
   };
 

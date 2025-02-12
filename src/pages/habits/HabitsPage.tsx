@@ -38,7 +38,8 @@ export const HabitsPage = () => {
         const { data: habits, error } = await supabase
           .from("habits")
           .select("*")
-          .eq("user_id", user.id);
+          .eq("user_id", user.id)
+          .order('order', { ascending: true }); // Order by the new order column
 
         if (error) {
           console.error("Error fetching habits:", error);
@@ -71,6 +72,7 @@ export const HabitsPage = () => {
             .map(h => ({
               timestamp: h.date,
               completed: h.completed,
+              failed: h.failed,
               amount: h.amount,
               time: h.time
             })) || []

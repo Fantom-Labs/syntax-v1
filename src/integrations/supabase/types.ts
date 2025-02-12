@@ -140,6 +140,7 @@ export type Database = {
           created_at: string
           emoji: string | null
           id: string
+          order: number | null
           repeat_days: string[] | null
           time_target: number | null
           title: string
@@ -154,6 +155,7 @@ export type Database = {
           created_at?: string
           emoji?: string | null
           id?: string
+          order?: number | null
           repeat_days?: string[] | null
           time_target?: number | null
           title: string
@@ -168,6 +170,7 @@ export type Database = {
           created_at?: string
           emoji?: string | null
           id?: string
+          order?: number | null
           repeat_days?: string[] | null
           time_target?: number | null
           title?: string
