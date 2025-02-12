@@ -1,10 +1,22 @@
-
 import { Habit } from "@/types/habits";
 import { format } from "date-fns";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { HabitItem } from "./components/HabitItem";
+import {
+  DndContext,
+  DragEndEvent,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 
 interface HabitListProps {
   habits: Habit[];
@@ -16,6 +28,20 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
   const { toast } = useToast();
   const [runningTimers, setRunningTimers] = useState<{ [key: string]: number }>({});
   const [elapsedTimes, setElapsedTimes] = useState<{ [key: string]: number }>({});
+
+  const sensors = useSensors(
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 200,
+        tolerance: 8,
+      },
+    })
+  );
 
   useEffect(() => {
     const timers: { [key: string]: NodeJS.Timeout } = {};
@@ -46,7 +72,6 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
     let failed;
 
     if (tracking_type === 'task') {
-      // Ciclo: null -> completed -> failed -> null
       if (!todayCheck || (!todayCheck.completed && !todayCheck.failed)) {
         completed = true;
         failed = false;
@@ -176,25 +201,49 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
     });
   };
 
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (!over || active.id === over.id) {
+      return;
+    }
+
+    const oldIndex = habits.findIndex((habit) => habit.id === active.id);
+    const newIndex = habits.findIndex((habit) => habit.id === over.id);
+    
+    if (oldIndex !== -1 && newIndex !== -1) {
+      const newHabits = arrayMove(habits, oldIndex, newIndex);
+      setHabits(newHabits);
+
+      // Opcional: Salvar a nova ordem no Supabase
+      // Isso exigiria adicionar uma coluna 'order' na tabela habits
+      // e atualizar todos os hábitos afetados
+    }
+  };
+
   return (
-    <div className="space-y-2">
-      {habits.map(habit => (
-        <HabitItem
-          key={habit.id}
-          habit={habit}
-          date={date}
-          runningTimers={runningTimers}
-          elapsedTimes={elapsedTimes}
-          onToggleHabit={toggleHabitCheck}
-          onRemoveHabit={removeHabit}
-        />
-      ))}
-      
-      {habits.length === 0 && (
-        <p className="text-center text-muted-foreground py-4">
-          Nenhum hábito cadastrado
-        </p>
-      )}
-    </div>
+    <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+      <SortableContext items={habits.map(h => h.id)} strategy={verticalListSortingStrategy}>
+        <div className="space-y-2">
+          {habits.map(habit => (
+            <HabitItem
+              key={habit.id}
+              habit={habit}
+              date={date}
+              runningTimers={runningTimers}
+              elapsedTimes={elapsedTimes}
+              onToggleHabit={toggleHabitCheck}
+              onRemoveHabit={removeHabit}
+            />
+          ))}
+          
+          {habits.length === 0 && (
+            <p className="text-center text-muted-foreground py-4">
+              Nenhum hábito cadastrado
+            </p>
+          )}
+        </div>
+      </SortableContext>
+    </DndContext>
   );
 };

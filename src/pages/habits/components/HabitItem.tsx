@@ -1,9 +1,11 @@
 
 import { Button } from "@/components/ui/button";
 import { Habit } from "@/types/habits";
-import { Trash2 } from "lucide-react";
+import { Trash2, GripVertical } from "lucide-react";
 import { getProgressText } from "../utils/habitUtils";
 import { HabitAction } from "./HabitAction";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 interface HabitItemProps {
   habit: Habit;
@@ -22,18 +24,43 @@ export const HabitItem = ({
   onToggleHabit,
   onRemoveHabit
 }: HabitItemProps) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: habit.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
   return (
     <div
+      ref={setNodeRef}
+      style={style}
       className="flex items-center justify-between p-3 rounded-xl bg-background/50 backdrop-blur-sm shadow-sm"
-      style={{ backgroundColor: `${habit.color}10` }}
+      {...attributes}
     >
       <div className="flex items-center gap-2 flex-1 min-w-0">
+        <button
+          className="touch-none p-1 hover:bg-accent rounded-lg cursor-grab active:cursor-grabbing"
+          {...listeners}
+        >
+          <GripVertical className="h-5 w-5 text-muted-foreground" />
+        </button>
+        
         <div 
           className="w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center text-base font-medium"
           style={{ backgroundColor: habit.color }}
         >
           {habit.emoji || habit.title[0].toUpperCase()}
         </div>
+        
         <div className="flex flex-col min-w-0 flex-1">
           <span className="font-medium text-base truncate">{habit.title}</span>
           <span className="text-sm text-muted-foreground truncate">
