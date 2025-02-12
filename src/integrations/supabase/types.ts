@@ -102,6 +102,7 @@ export type Database = {
           completed: boolean | null
           created_at: string
           date: string
+          failed: boolean | null
           habit_id: string
           id: string
           time: number | null
@@ -112,6 +113,7 @@ export type Database = {
           completed?: boolean | null
           created_at?: string
           date: string
+          failed?: boolean | null
           habit_id: string
           id?: string
           time?: number | null
@@ -122,6 +124,7 @@ export type Database = {
           completed?: boolean | null
           created_at?: string
           date?: string
+          failed?: boolean | null
           habit_id?: string
           id?: string
           time?: number | null
