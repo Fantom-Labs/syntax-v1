@@ -16,18 +16,24 @@ export const EventCard = () => {
 
   return (
     <Card className="p-4">
-      <h3 className="font-semibold mb-2 flex items-center gap-2">
+      <h3 className="font-semibold mb-4 flex items-center gap-2">
         <Calendar className="w-4 h-4" />
         Próximos Eventos
       </h3>
       {isLoading ? (
         <p className="text-sm text-muted-foreground">Carregando eventos...</p>
       ) : upcomingEvents.length > 0 ? (
-        <div className="space-y-2">
+        <div className="space-y-3">
           {upcomingEvents.map((event) => (
-            <p key={event.id} className="text-sm">
-              {event.title} - {format(new Date(event.date), "PPP", { locale: ptBR })} às {event.time}
-            </p>
+            <Card key={event.id} className="p-3 bg-muted/50">
+              <h4 className="font-medium mb-1">{event.title}</h4>
+              <p className="text-sm text-muted-foreground">
+                {format(new Date(event.date), "PPP", { locale: ptBR })} às {event.time}
+              </p>
+              {event.description && (
+                <p className="text-sm mt-2 text-muted-foreground">{event.description}</p>
+              )}
+            </Card>
           ))}
         </div>
       ) : (
