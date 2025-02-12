@@ -8,7 +8,8 @@ export const getCheckStatus = (habit: Habit, date: string): CheckStatus => {
   const check = habit.checks.find(c => c.timestamp === `${date}T00:00:00.000Z`);
   if (!check) return "unchecked";
   if (check.completed) return "completed";
-  return "failed";
+  if (check.failed) return "failed";
+  return "unchecked";
 };
 
 export const getProgressText = (habit: Habit, date: Date, elapsedTimes: { [key: string]: number }, runningTimers: { [key: string]: number }) => {

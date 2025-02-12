@@ -5,6 +5,7 @@ export type TrackingType = 'task' | 'amount' | 'time';
 export interface HabitCheck {
   timestamp: string;
   completed: boolean;
+  failed?: boolean;
   amount?: number;
   time?: number;
 }
@@ -28,6 +29,7 @@ export interface HabitHistory {
   habit_id: string;
   date: string;
   completed: boolean;
+  failed?: boolean;
   amount?: number;
   time?: number;
   created_at: string;

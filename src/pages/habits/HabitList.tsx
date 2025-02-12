@@ -42,7 +42,25 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
     if (!habit) return;
 
     const todayCheck = habit.checks.find(c => c.timestamp.startsWith(date));
-    let completed = tracking_type === 'task' ? !todayCheck?.completed : true;
+    let completed;
+    let failed;
+
+    if (tracking_type === 'task') {
+      // Ciclo: null -> completed -> failed -> null
+      if (!todayCheck || (!todayCheck.completed && !todayCheck.failed)) {
+        completed = true;
+        failed = false;
+      } else if (todayCheck.completed) {
+        completed = false;
+        failed = true;
+      } else {
+        completed = false;
+        failed = false;
+      }
+    } else {
+      completed = true;
+      failed = false;
+    }
 
     let amount = undefined;
     let time = undefined;
@@ -90,6 +108,7 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
         user_id: user.id,
         date,
         completed,
+        failed,
         amount,
         time
       });
@@ -110,6 +129,7 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
           newChecks.push({
             timestamp: `${date}T00:00:00.000Z`,
             completed,
+            failed,
             amount,
             time
           });
@@ -124,7 +144,7 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
     );
 
     const message = 
-      tracking_type === 'task' ? (completed ? "Hábito concluído!" : "Hábito desmarcado") :
+      tracking_type === 'task' ? (completed ? "Hábito concluído!" : failed ? "Hábito não concluído" : "Hábito neutro") :
       tracking_type === 'amount' ? `${amount}/${habit.amount_target} concluídos` :
       tracking_type === 'time' ? `${time}/${habit.time_target} minutos registrados` : "";
 
