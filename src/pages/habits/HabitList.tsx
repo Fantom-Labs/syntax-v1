@@ -219,9 +219,19 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Atualiza a ordem de todos os hábitos afetados
+      // Atualiza a ordem mantendo todos os campos necessários
       const updates = newHabits.map((habit, index) => ({
         id: habit.id,
+        title: habit.title,
+        type: habit.type,
+        tracking_type: habit.tracking_type,
+        emoji: habit.emoji,
+        color: habit.color,
+        amount_target: habit.amount_target,
+        time_target: habit.time_target,
+        repeat_days: habit.repeat_days,
+        checks_per_day: habit.checksPerDay,
+        user_id: user.id,
         order: index
       }));
 
