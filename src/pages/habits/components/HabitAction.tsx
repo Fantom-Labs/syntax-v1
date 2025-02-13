@@ -13,11 +13,13 @@ interface HabitActionProps {
 }
 
 export const HabitAction = ({ habit, date, runningTimers, onToggleHabit }: HabitActionProps) => {
-  const check = habit.checks.find(c => c.timestamp === `${format(date, "yyyy-MM-dd")}T00:00:00.000Z`);
+  const formattedDate = format(date, "yyyy-MM-dd");
+  const check = habit.checks.find(c => c.timestamp === `${formattedDate}T00:00:00.000Z`);
   const isCompleted = check?.completed;
   const habitId = habit.id;
   const isRunning = !!runningTimers[habitId];
-  const checkStatus = getCheckStatus(habit, format(date, "yyyy-MM-dd"));
+  const checkStatus = getCheckStatus(habit, formattedDate);
+  const isToday = format(new Date(), "yyyy-MM-dd") === formattedDate;
 
   switch (habit.tracking_type) {
     case 'task':
@@ -25,13 +27,14 @@ export const HabitAction = ({ habit, date, runningTimers, onToggleHabit }: Habit
         <Button
           variant="ghost"
           size="icon"
+          disabled={!isToday}
           className={`rounded-full w-8 h-8 border transition-colors duration-200 
             ${checkStatus === "completed" 
               ? 'bg-green-500 border-green-500 text-white hover:bg-green-600'
               : checkStatus === "failed"
                 ? 'bg-red-500 border-red-500 text-white hover:bg-red-600'
                 : 'border-muted-foreground hover:bg-accent'}`}
-          onClick={() => onToggleHabit(habit.id, format(date, "yyyy-MM-dd"), 'task')}
+          onClick={() => onToggleHabit(habit.id, formattedDate, 'task')}
         >
           {checkStatus === "completed" && <Check className="h-4 w-4" />}
           {checkStatus === "failed" && <X className="h-4 w-4" />}
@@ -42,7 +45,8 @@ export const HabitAction = ({ habit, date, runningTimers, onToggleHabit }: Habit
         <Button
           variant={isCompleted ? "default" : isRunning ? "default" : "ghost"}
           size="icon"
-          onClick={() => onToggleHabit(habit.id, format(date, "yyyy-MM-dd"), 'time')}
+          disabled={!isToday}
+          onClick={() => onToggleHabit(habit.id, formattedDate, 'time')}
           className={`rounded-full w-8 h-8 border 
             ${isCompleted 
               ? 'bg-primary border-primary text-primary-foreground' 
@@ -59,7 +63,8 @@ export const HabitAction = ({ habit, date, runningTimers, onToggleHabit }: Habit
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => onToggleHabit(habit.id, format(date, "yyyy-MM-dd"), 'amount', false)}
+            disabled={!isToday}
+            onClick={() => onToggleHabit(habit.id, formattedDate, 'amount', false)}
             className={`rounded-full w-8 h-8 border border-muted-foreground hover:bg-accent`}
           >
             <Minus className="h-4 w-4" />
@@ -67,7 +72,8 @@ export const HabitAction = ({ habit, date, runningTimers, onToggleHabit }: Habit
           <Button
             variant={isCompleted ? "default" : "ghost"}
             size="icon"
-            onClick={() => onToggleHabit(habit.id, format(date, "yyyy-MM-dd"), 'amount', true)}
+            disabled={!isToday}
+            onClick={() => onToggleHabit(habit.id, formattedDate, 'amount', true)}
             className={`rounded-full w-8 h-8 border ${isCompleted ? 'bg-primary border-primary text-primary-foreground' : 'border-muted-foreground hover:bg-accent'}`}
           >
             <Plus className="h-4 w-4" />
