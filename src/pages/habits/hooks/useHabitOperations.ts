@@ -7,7 +7,9 @@ import { format } from "date-fns";
 export const useHabitOperations = (
   habits: Habit[],
   setHabits: React.Dispatch<React.SetStateAction<Habit[]>>,
+  runningTimers: { [key: string]: number },
   setRunningTimers: React.Dispatch<React.SetStateAction<{ [key: string]: number }>>,
+  elapsedTimes: { [key: string]: number },
   setElapsedTimes: React.Dispatch<React.SetStateAction<{ [key: string]: number }>>,
   setIsDeleteMode: React.Dispatch<React.SetStateAction<boolean>>
 ) => {

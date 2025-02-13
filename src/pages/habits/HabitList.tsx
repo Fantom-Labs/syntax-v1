@@ -26,7 +26,15 @@ interface HabitListProps {
 export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
   const [isDeleteMode, setIsDeleteMode] = useState(false);
   const { runningTimers, setRunningTimers, elapsedTimes, setElapsedTimes } = useHabitTimers();
-  const { toggleHabitCheck, removeHabit } = useHabitOperations(habits, setHabits, setRunningTimers, setElapsedTimes, setIsDeleteMode);
+  const { toggleHabitCheck, removeHabit } = useHabitOperations(
+    habits, 
+    setHabits, 
+    runningTimers,
+    setRunningTimers, 
+    elapsedTimes,
+    setElapsedTimes, 
+    setIsDeleteMode
+  );
   const { handleDragEnd } = useHabitDragAndDrop(habits, setHabits);
 
   const sensors = useSensors(
