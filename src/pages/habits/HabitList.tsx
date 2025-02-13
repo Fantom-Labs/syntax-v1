@@ -1,4 +1,3 @@
-
 import { Habit } from "@/types/habits";
 import { format } from "date-fns";
 import { useEffect, useState } from "react";
@@ -29,6 +28,7 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
   const { toast } = useToast();
   const [runningTimers, setRunningTimers] = useState<{ [key: string]: number }>({});
   const [elapsedTimes, setElapsedTimes] = useState<{ [key: string]: number }>({});
+  const [isDeleteMode, setIsDeleteMode] = useState(false);
 
   const sensors = useSensors(
     useSensor(MouseSensor, {
@@ -196,6 +196,7 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
     }
 
     setHabits(currentHabits => currentHabits.filter(habit => habit.id !== habitId));
+    setIsDeleteMode(false);
     toast({
       title: "Sucesso",
       description: "Hábito removido com sucesso!"
@@ -251,28 +252,40 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
   };
 
   return (
-    <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-      <SortableContext items={habits.map(h => h.id)} strategy={verticalListSortingStrategy}>
-        <div className="space-y-2">
-          {habits.map(habit => (
-            <HabitItem
-              key={habit.id}
-              habit={habit}
-              date={date}
-              runningTimers={runningTimers}
-              elapsedTimes={elapsedTimes}
-              onToggleHabit={toggleHabitCheck}
-              onRemoveHabit={removeHabit}
-            />
-          ))}
-          
-          {habits.length === 0 && (
-            <p className="text-center text-muted-foreground py-4">
-              Nenhum hábito cadastrado
-            </p>
-          )}
-        </div>
-      </SortableContext>
-    </DndContext>
+    <>
+      <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+        <SortableContext items={habits.map(h => h.id)} strategy={verticalListSortingStrategy}>
+          <div className="space-y-2">
+            {habits.map(habit => (
+              <HabitItem
+                key={habit.id}
+                habit={habit}
+                date={date}
+                runningTimers={runningTimers}
+                elapsedTimes={elapsedTimes}
+                onToggleHabit={toggleHabitCheck}
+                onRemoveHabit={removeHabit}
+                isDeleteMode={isDeleteMode}
+              />
+            ))}
+            
+            {habits.length === 0 && (
+              <p className="text-center text-muted-foreground py-4">
+                Nenhum hábito cadastrado
+              </p>
+            )}
+          </div>
+        </SortableContext>
+      </DndContext>
+
+      {habits.length > 0 && (
+        <button
+          onClick={() => setIsDeleteMode(!isDeleteMode)}
+          className="mt-6 text-destructive hover:text-destructive/90 underline underline-offset-4 text-sm mx-auto block"
+        >
+          {isDeleteMode ? "Cancelar" : "Excluir hábito"}
+        </button>
+      )}
+    </>
   );
 };

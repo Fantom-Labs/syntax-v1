@@ -14,6 +14,7 @@ interface HabitItemProps {
   elapsedTimes: { [key: string]: number };
   onToggleHabit: (habitId: string, date: string, tracking_type: string) => void;
   onRemoveHabit: (habitId: string) => void;
+  isDeleteMode: boolean;
 }
 
 export const HabitItem = ({
@@ -22,7 +23,8 @@ export const HabitItem = ({
   runningTimers,
   elapsedTimes,
   onToggleHabit,
-  onRemoveHabit
+  onRemoveHabit,
+  isDeleteMode
 }: HabitItemProps) => {
   const {
     attributes,
@@ -43,7 +45,9 @@ export const HabitItem = ({
     <div
       ref={setNodeRef}
       style={style}
-      className="flex items-center justify-between p-3 rounded-xl bg-background/50 backdrop-blur-sm shadow-sm"
+      className={`flex items-center justify-between p-3 rounded-xl bg-background/50 backdrop-blur-sm shadow-sm ${
+        isDeleteMode ? 'animate-[wiggle_0.3s_ease-in-out_infinite]' : ''
+      }`}
       {...attributes}
     >
       <div className="flex items-center gap-2 flex-1 min-w-0">
@@ -76,14 +80,16 @@ export const HabitItem = ({
           runningTimers={runningTimers}
           onToggleHabit={onToggleHabit}
         />
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => onRemoveHabit(habit.id)}
-          className="text-destructive hover:text-destructive/90 rounded-full w-8 h-8"
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
+        {isDeleteMode && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onRemoveHabit(habit.id)}
+            className="text-destructive hover:text-destructive/90 rounded-full w-8 h-8"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        )}
       </div>
     </div>
   );
