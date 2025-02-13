@@ -81,6 +81,7 @@ export const useHabitOperations = (
       }
     }
 
+    // Salva o estado do hábito no banco de dados
     const { error } = await supabase
       .from("habit_history")
       .upsert({
@@ -102,6 +103,7 @@ export const useHabitOperations = (
       return;
     }
 
+    // Atualiza o estado local
     setHabits(currentHabits => 
       currentHabits.map(h => {
         if (h.id === habitId) {
