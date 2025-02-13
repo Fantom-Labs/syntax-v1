@@ -1,8 +1,8 @@
 
 import { Button } from "@/components/ui/button";
 import { Habit } from "@/types/habits";
-import { Trash2, GripVertical } from "lucide-react";
-import { getProgressText } from "../utils/habitUtils";
+import { Trash2, GripVertical, Fire } from "lucide-react";
+import { getProgressText, getConsecutiveDays } from "../utils/habitUtils";
 import { HabitAction } from "./HabitAction";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -41,6 +41,9 @@ export const HabitItem = ({
     opacity: isDragging ? 0.5 : 1,
   };
 
+  const consecutiveDays = getConsecutiveDays(habit);
+  const showStreak = consecutiveDays >= 5;
+
   return (
     <div
       ref={setNodeRef}
@@ -66,7 +69,15 @@ export const HabitItem = ({
         </div>
         
         <div className="flex flex-col min-w-0 flex-1">
-          <span className="font-medium text-base truncate">{habit.title}</span>
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-base truncate">{habit.title}</span>
+            {showStreak && (
+              <div className="flex items-center gap-1 text-amber-500">
+                <Fire className="h-4 w-4" />
+                <span className="text-sm font-medium">{consecutiveDays}</span>
+              </div>
+            )}
+          </div>
           <span className="text-sm text-muted-foreground truncate">
             {getProgressText(habit, date, elapsedTimes, runningTimers)}
           </span>
