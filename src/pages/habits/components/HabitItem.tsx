@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Habit } from "@/types/habits";
-import { Trash2, GripVertical, Fire } from "lucide-react";
+import { Trash2, GripVertical, Flame } from "lucide-react";
 import { getProgressText, getConsecutiveDays } from "../utils/habitUtils";
 import { HabitAction } from "./HabitAction";
 import { useSortable } from "@dnd-kit/sortable";
@@ -73,7 +73,7 @@ export const HabitItem = ({
             <span className="font-medium text-base truncate">{habit.title}</span>
             {showStreak && (
               <div className="flex items-center gap-1 text-amber-500">
-                <Fire className="h-4 w-4" />
+                <Flame className="h-4 w-4" />
                 <span className="text-sm font-medium">{consecutiveDays}</span>
               </div>
             )}
