@@ -10,6 +10,8 @@ import { CSS } from "@dnd-kit/utilities";
 interface HabitItemProps {
   habit: Habit;
   date: Date;
+  runningTimers: { [key: string]: number };
+  elapsedTimes: { [key: string]: number };
   onToggleHabit: (habitId: string, date: string, tracking_type: string) => void;
   onRemoveHabit: (habitId: string) => void;
   isDeleteMode: boolean;
@@ -18,6 +20,8 @@ interface HabitItemProps {
 export const HabitItem = ({
   habit,
   date,
+  runningTimers,
+  elapsedTimes,
   onToggleHabit,
   onRemoveHabit,
   isDeleteMode
@@ -75,7 +79,7 @@ export const HabitItem = ({
             )}
           </div>
           <span className="text-sm text-muted-foreground truncate">
-            {getProgressText(habit, date)}
+            {getProgressText(habit, date, elapsedTimes, runningTimers)}
           </span>
         </div>
       </div>
@@ -84,6 +88,7 @@ export const HabitItem = ({
         <HabitAction
           habit={habit}
           date={date}
+          runningTimers={runningTimers}
           onToggleHabit={onToggleHabit}
         />
         {isDeleteMode && (
