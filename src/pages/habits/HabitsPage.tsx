@@ -7,9 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Habit, HabitType, TrackingType } from "@/types/habits";
+import { Habit, HabitType } from "@/types/habits";
 import { HabitList } from "./HabitList";
 import { DateNavigation } from "./DateNavigation";
 import { HabitsDashboard } from "./HabitsDashboard";
@@ -21,11 +20,8 @@ export const HabitsPage = () => {
   const [isAddingHabit, setIsAddingHabit] = useState(false);
   const [newHabitTitle, setNewHabitTitle] = useState("");
   const [habitType, setHabitType] = useState<HabitType>("build");
-  const [trackingType, setTrackingType] = useState<TrackingType>("task");
   const [emoji, setEmoji] = useState("");
   const [color, setColor] = useState("#7BFF8B");
-  const [amountTarget, setAmountTarget] = useState(1);
-  const [timeTarget, setTimeTarget] = useState(30);
   const [userId, setUserId] = useState<string | undefined>();
   const { toast } = useToast();
 
@@ -39,7 +35,7 @@ export const HabitsPage = () => {
           .from("habits")
           .select("*")
           .eq("user_id", user.id)
-          .order('order', { ascending: true }); // Order by the new order column
+          .order('order', { ascending: true });
 
         if (error) {
           console.error("Error fetching habits:", error);
@@ -60,11 +56,9 @@ export const HabitsPage = () => {
           id: habit.id,
           title: habit.title,
           type: habit.type as HabitType,
-          tracking_type: habit.tracking_type as TrackingType,
+          tracking_type: 'task',
           emoji: habit.emoji,
           color: habit.color,
-          amount_target: habit.amount_target,
-          time_target: habit.time_target,
           repeat_days: habit.repeat_days,
           checksPerDay: habit.checks_per_day || 1,
           checks: history
@@ -72,9 +66,7 @@ export const HabitsPage = () => {
             .map(h => ({
               timestamp: h.date,
               completed: h.completed,
-              failed: h.failed,
-              amount: h.amount,
-              time: h.time
+              failed: h.failed
             })) || []
         })));
       }
@@ -105,11 +97,9 @@ export const HabitsPage = () => {
     const habitData = {
       title: newHabitTitle,
       type: habitType,
-      tracking_type: trackingType,
+      tracking_type: 'task',
       emoji: emoji || undefined,
       color: color || undefined,
-      amount_target: trackingType === 'amount' ? amountTarget : undefined,
-      time_target: trackingType === 'time' ? timeTarget : undefined,
       user_id: userId
     };
 
@@ -132,11 +122,9 @@ export const HabitsPage = () => {
       id: habit.id,
       title: habit.title,
       type: habit.type as HabitType,
-      tracking_type: habit.tracking_type as TrackingType,
+      tracking_type: 'task',
       emoji: habit.emoji,
       color: habit.color,
-      amount_target: habit.amount_target,
-      time_target: habit.time_target,
       repeat_days: habit.repeat_days,
       checksPerDay: habit.checks_per_day || 1,
       checks: []
@@ -154,11 +142,8 @@ export const HabitsPage = () => {
   const resetForm = () => {
     setNewHabitTitle("");
     setHabitType("build");
-    setTrackingType("task");
     setEmoji("");
     setColor("#7BFF8B");
-    setAmountTarget(1);
-    setTimeTarget(30);
   };
 
   if (!userId) {
@@ -222,46 +207,6 @@ export const HabitsPage = () => {
                       placeholder="Ex: Beber água"
                     />
                   </div>
-
-                  <div className="space-y-2">
-                    <Label>Tipo de Acompanhamento</Label>
-                    <Select value={trackingType} onValueChange={(value) => setTrackingType(value as TrackingType)}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="task">Tarefa (Sim/Não)</SelectItem>
-                        <SelectItem value="amount">Quantidade (repetições)</SelectItem>
-                        <SelectItem value="time">Tempo (minutos)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {trackingType === 'amount' && (
-                    <div className="space-y-2">
-                      <Label htmlFor="amount">Meta de Repetições</Label>
-                      <Input
-                        id="amount"
-                        type="number"
-                        min="1"
-                        value={amountTarget}
-                        onChange={(e) => setAmountTarget(Number(e.target.value))}
-                      />
-                    </div>
-                  )}
-
-                  {trackingType === 'time' && (
-                    <div className="space-y-2">
-                      <Label htmlFor="time">Meta de Tempo (minutos)</Label>
-                      <Input
-                        id="time"
-                        type="number"
-                        min="1"
-                        value={timeTarget}
-                        onChange={(e) => setTimeTarget(Number(e.target.value))}
-                      />
-                    </div>
-                  )}
 
                   <div className="space-y-2">
                     <Label htmlFor="emoji">Emoji (opcional)</Label>

@@ -35,8 +35,6 @@ export const useHabitDragAndDrop = (
         tracking_type: habit.tracking_type,
         emoji: habit.emoji,
         color: habit.color,
-        amount_target: habit.amount_target,
-        time_target: habit.time_target,
         repeat_days: habit.repeat_days,
         checks_per_day: habit.checksPerDay,
         user_id: user.id,
