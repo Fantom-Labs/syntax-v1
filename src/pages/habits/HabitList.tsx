@@ -13,7 +13,6 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { useHabitTimers } from "./hooks/useHabitTimers";
 import { useHabitOperations } from "./hooks/useHabitOperations";
 import { useHabitDragAndDrop } from "./hooks/useHabitDragAndDrop";
 
@@ -25,16 +24,7 @@ interface HabitListProps {
 
 export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
   const [isDeleteMode, setIsDeleteMode] = useState(false);
-  const { runningTimers, setRunningTimers, elapsedTimes, setElapsedTimes } = useHabitTimers();
-  const { toggleHabitCheck, removeHabit } = useHabitOperations(
-    habits, 
-    setHabits, 
-    runningTimers,
-    setRunningTimers, 
-    elapsedTimes,
-    setElapsedTimes, 
-    setIsDeleteMode
-  );
+  const { toggleHabitCheck, removeHabit } = useHabitOperations(habits, setHabits, setIsDeleteMode);
   const { handleDragEnd } = useHabitDragAndDrop(habits, setHabits);
 
   const sensors = useSensors(
@@ -61,8 +51,6 @@ export const HabitList = ({ habits, setHabits, date }: HabitListProps) => {
                 key={habit.id}
                 habit={habit}
                 date={date}
-                runningTimers={runningTimers}
-                elapsedTimes={elapsedTimes}
                 onToggleHabit={toggleHabitCheck}
                 onRemoveHabit={removeHabit}
                 isDeleteMode={isDeleteMode}
