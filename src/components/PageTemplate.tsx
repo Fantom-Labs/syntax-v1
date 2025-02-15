@@ -10,7 +10,7 @@ interface PageTemplateProps {
 
 const PageTemplate = ({ title, children }: PageTemplateProps) => {
   return (
-    <div className="min-h-screen px-2 py-4 md:p-12 relative">
+    <div className="min-h-screen px-3 py-4 md:p-12 relative max-w-full">
       <Header />
       <header className="mb-8">
         <div className="flex justify-between items-center mb-4">
@@ -21,7 +21,7 @@ const PageTemplate = ({ title, children }: PageTemplateProps) => {
         </div>
         <h1 className="text-3xl font-medium name-underline">{title}</h1>
       </header>
-      <main className="w-full">{children}</main>
+      <main className="w-full max-w-full overflow-hidden">{children}</main>
     </div>
   );
 };

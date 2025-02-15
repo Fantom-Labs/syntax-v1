@@ -163,8 +163,8 @@ export const HabitsPage = () => {
 
   return (
     <PageTemplate title="Hábitos">
-      <div className="grid gap-6 md:grid-cols-[1fr]">
-        <div className="space-y-6">
+      <div className="grid gap-6">
+        <div className="space-y-6 max-w-full">
           <DateNavigation date={date} setDate={setDate} />
           <HabitList habits={habits} setHabits={setHabits} date={date} />
           
@@ -175,7 +175,7 @@ export const HabitsPage = () => {
                   <Plus className="h-4 w-4" />
                 </Button>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="max-w-[95vw] w-full sm:max-w-[425px]">
                 <DialogHeader>
                   <DialogTitle>Adicionar Novo Hábito</DialogTitle>
                 </DialogHeader>
