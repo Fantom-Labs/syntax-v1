@@ -12,7 +12,7 @@ type DateNavigationProps = {
 export const DateNavigation = ({ date, setDate }: DateNavigationProps) => {
   const today = new Date();
   const minDate = subWeeks(today, 6); // 6 semanas atrás
-  const dates = Array.from({ length: 5 }, (_, i) => addDays(date, i - 2));
+  const dates = Array.from({ length: 3 }, (_, i) => addDays(date, i - 1)); // Reduzido para 3 datas no mobile
   
   const handlePrevDay = () => {
     const newDate = subDays(date, 1);
@@ -45,7 +45,7 @@ export const DateNavigation = ({ date, setDate }: DateNavigationProps) => {
         )}
       </div>
       
-      <div className="flex items-center gap-2 w-full">
+      <div className="flex items-center gap-1 md:gap-2 w-full">
         <Button
           variant="ghost"
           size="icon"
@@ -56,7 +56,7 @@ export const DateNavigation = ({ date, setDate }: DateNavigationProps) => {
           <ChevronLeft className="h-4 w-4" />
         </Button>
 
-        <div className="flex justify-between gap-2 w-full">
+        <div className="flex justify-between gap-1 md:gap-2 w-full">
           {dates.map((currentDate, index) => {
             const isSelected = format(currentDate, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd');
             const dayName = format(currentDate, 'EEE', { locale: ptBR });
@@ -68,13 +68,13 @@ export const DateNavigation = ({ date, setDate }: DateNavigationProps) => {
                 key={index}
                 onClick={() => !isDisabled && setDate(currentDate)}
                 disabled={isDisabled}
-                className={`flex flex-col items-center p-2 rounded-xl transition-colors flex-1
+                className={`flex flex-col items-center p-1.5 md:p-2 rounded-xl transition-colors flex-1
                   ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}
                   ${isSelected ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'}
                 `}
               >
-                <span className="text-sm font-medium">{dayName}</span>
-                <span className="text-lg font-bold">{dayNumber}</span>
+                <span className="text-xs md:text-sm font-medium">{dayName}</span>
+                <span className="text-base md:text-lg font-bold">{dayNumber}</span>
               </button>
             );
           })}
