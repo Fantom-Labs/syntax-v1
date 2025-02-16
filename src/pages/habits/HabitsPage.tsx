@@ -42,10 +42,16 @@ export const HabitsPage = () => {
           return;
         }
 
+        // Busca o histórico dos últimos 42 dias (6 semanas)
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - 42);
+        const formattedStartDate = startDate.toISOString().split('T')[0];
+
         const { data: history, error: historyError } = await supabase
           .from("habit_history")
           .select("*")
-          .eq("user_id", user.id);
+          .eq("user_id", user.id)
+          .gte('date', formattedStartDate);
 
         if (historyError) {
           console.error("Error fetching habit history:", historyError);
@@ -64,7 +70,7 @@ export const HabitsPage = () => {
           checks: history
             ?.filter(h => h.habit_id === habit.id)
             .map(h => ({
-              timestamp: h.date,
+              timestamp: `${h.date}T00:00:00.000Z`,
               completed: h.completed,
               failed: h.failed
             })) || []
