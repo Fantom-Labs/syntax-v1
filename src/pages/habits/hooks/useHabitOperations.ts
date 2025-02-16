@@ -28,29 +28,50 @@ export const useHabitOperations = (
     } else if (todayCheck.completed) {
       completed = false;
       failed = true;
-    } else {
+    } else if (todayCheck.failed) {
       completed = false;
       failed = false;
     }
 
-    // Salva o estado do hábito no banco de dados
-    const { error } = await supabase
-      .from("habit_history")
-      .upsert({
-        habit_id: habitId,
-        user_id: user.id,
-        date,
-        completed,
-        failed
-      });
+    // Primeiro criamos o objeto com os campos atualizados
+    const updateData = {
+      habit_id: habitId,
+      user_id: user.id,
+      date,
+      completed,
+      failed
+    };
 
-    if (error) {
-      toast({
-        title: "Erro",
-        description: "Erro ao atualizar hábito",
-        variant: "destructive"
-      });
-      return;
+    // Se estiver voltando para o estado neutro, deletamos o registro
+    if (!completed && !failed) {
+      const { error } = await supabase
+        .from("habit_history")
+        .delete()
+        .eq('habit_id', habitId)
+        .eq('date', date);
+
+      if (error) {
+        toast({
+          title: "Erro",
+          description: "Erro ao atualizar hábito",
+          variant: "destructive"
+        });
+        return;
+      }
+    } else {
+      // Caso contrário, atualizamos ou inserimos o registro
+      const { error } = await supabase
+        .from("habit_history")
+        .upsert(updateData);
+
+      if (error) {
+        toast({
+          title: "Erro",
+          description: "Erro ao atualizar hábito",
+          variant: "destructive"
+        });
+        return;
+      }
     }
 
     // Atualiza o estado local
@@ -58,11 +79,13 @@ export const useHabitOperations = (
       currentHabits.map(h => {
         if (h.id === habitId) {
           let newChecks = h.checks.filter(check => !check.timestamp.startsWith(date));
-          newChecks.push({
-            timestamp: `${date}T00:00:00.000Z`,
-            completed,
-            failed
-          });
+          if (completed || failed) {
+            newChecks.push({
+              timestamp: `${date}T00:00:00.000Z`,
+              completed,
+              failed
+            });
+          }
           
           return {
             ...h,
