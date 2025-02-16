@@ -53,12 +53,14 @@ export const HabitsPage = () => {
           .eq("user_id", user.id)
           .gte('date', formattedStartDate);
 
+        console.log("Histórico carregado:", history); // Debug
+
         if (historyError) {
           console.error("Error fetching habit history:", historyError);
           return;
         }
 
-        setHabits(habits.map(habit => ({
+        const habitsWithChecks = habits.map(habit => ({
           id: habit.id,
           title: habit.title,
           type: habit.type as HabitType,
@@ -72,9 +74,13 @@ export const HabitsPage = () => {
             .map(h => ({
               timestamp: `${h.date}T00:00:00.000Z`,
               completed: h.completed,
-              failed: h.failed
+              failed: h.failed || false  // Garantir que failed seja sempre um booleano
             })) || []
-        })));
+        }));
+
+        console.log("Hábitos processados:", habitsWithChecks); // Debug
+
+        setHabits(habitsWithChecks);
       }
     };
 
