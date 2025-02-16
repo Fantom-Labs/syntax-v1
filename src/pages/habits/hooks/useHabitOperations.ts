@@ -26,7 +26,7 @@ export const useHabitOperations = (
       // Se não houver check, marca como completado
       completed = true;
       failed = false;
-    } else if (todayCheck.completed) {
+    } else if (todayCheck.completed && !todayCheck.failed) {
       // Se estiver completado, marca como falhou
       completed = false;
       failed = true;
