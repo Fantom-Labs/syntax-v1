@@ -22,25 +22,25 @@ export const useHabitOperations = (
     let failed = false;
 
     // Ciclo de estados: neutro -> completado -> falhou -> neutro
-    if (!todayCheck || (!todayCheck.completed && !todayCheck.failed)) {
+    if (!todayCheck) {
+      // Se não houver check, marca como completado
       completed = true;
       failed = false;
     } else if (todayCheck.completed) {
+      // Se estiver completado, marca como falhou
       completed = false;
       failed = true;
     } else if (todayCheck.failed) {
+      // Se estiver falhou, volta para neutro
       completed = false;
+      failed = false;
+    } else {
+      // Se estiver neutro, marca como completado
+      completed = true;
       failed = false;
     }
 
-    // Primeiro criamos o objeto com os campos atualizados
-    const updateData = {
-      habit_id: habitId,
-      user_id: user.id,
-      date,
-      completed,
-      failed
-    };
+    console.log('Estado atual:', { todayCheck, completed, failed }); // Debug
 
     // Se estiver voltando para o estado neutro, deletamos o registro
     if (!completed && !failed) {
@@ -51,6 +51,7 @@ export const useHabitOperations = (
         .eq('date', date);
 
       if (error) {
+        console.error('Erro ao deletar:', error); // Debug
         toast({
           title: "Erro",
           description: "Erro ao atualizar hábito",
@@ -60,11 +61,22 @@ export const useHabitOperations = (
       }
     } else {
       // Caso contrário, atualizamos ou inserimos o registro
+      const updateData = {
+        habit_id: habitId,
+        user_id: user.id,
+        date,
+        completed,
+        failed
+      };
+
+      console.log('Salvando dados:', updateData); // Debug
+
       const { error } = await supabase
         .from("habit_history")
         .upsert(updateData);
 
       if (error) {
+        console.error('Erro ao salvar:', error); // Debug
         toast({
           title: "Erro",
           description: "Erro ao atualizar hábito",
@@ -97,6 +109,7 @@ export const useHabitOperations = (
     );
 
     const message = completed ? "Hábito concluído!" : failed ? "Hábito não concluído" : "Hábito neutro";
+    console.log('Estado final:', message); // Debug
 
     toast({
       title: message,
