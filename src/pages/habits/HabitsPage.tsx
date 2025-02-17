@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Habit, HabitType } from "@/types/habits";
+import { Habit, HabitType, TrackingType } from "@/types/habits";
 import { HabitList } from "./HabitList";
 import { DateNavigation } from "./DateNavigation";
 import { HabitsDashboard } from "./HabitsDashboard";
@@ -60,11 +60,11 @@ export const HabitsPage = () => {
           return;
         }
 
-        const habitsWithChecks = habits.map(habit => ({
+        const habitsWithChecks: Habit[] = habits.map(habit => ({
           id: habit.id,
           title: habit.title,
           type: habit.type as HabitType,
-          tracking_type: 'task',
+          tracking_type: "task" as TrackingType,  // Especificando explicitamente como "task"
           emoji: habit.emoji,
           color: habit.color,
           repeat_days: habit.repeat_days,
@@ -74,7 +74,7 @@ export const HabitsPage = () => {
             .map(h => ({
               timestamp: `${h.date}T00:00:00.000Z`,
               completed: h.completed,
-              failed: h.failed || false  // Garantir que failed seja sempre um booleano
+              failed: h.failed || false
             })) || []
         }));
 
