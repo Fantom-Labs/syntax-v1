@@ -37,9 +37,9 @@ export const useHabitOperations = (
       .select("*")
       .eq("habit_id", habitId)
       .eq("date", date)
-      .single();
+      .maybeSingle(); // Alterado de .single() para .maybeSingle()
 
-    if (checkError && checkError.code !== 'PGRST116') { // PGRST116 é o código para "não encontrado"
+    if (checkError) {
       console.error("Erro ao buscar histórico:", checkError);
       toast({
         title: "Erro",
