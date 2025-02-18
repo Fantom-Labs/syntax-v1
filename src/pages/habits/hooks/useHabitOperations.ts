@@ -10,7 +10,7 @@ export const useHabitOperations = (
 ) => {
   const { toast } = useToast();
 
-  const toggleHabitCheck = async (habitId: string, date: string, tracking_type: string) => {
+  const toggleHabitCheck = async (habitId: string, date: string) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       toast({
@@ -22,98 +22,79 @@ export const useHabitOperations = (
     }
 
     try {
-      // Busca o estado atual do hábito
-      const { data: existingCheck } = await supabase
+      const { data: habit } = await supabase
         .from("habit_history")
-        .select("completed, failed")
+        .select("*")
         .eq("habit_id", habitId)
         .eq("date", date)
         .maybeSingle();
 
-      // Define o próximo estado no loop infinito: neutro -> concluído -> não concluído -> neutro
-      let nextState;
+      // Estado atual e próximo estado
+      let newState;
 
-      if (!existingCheck) {
-        // Se não existe registro (neutro) -> concluído
-        nextState = { completed: true, failed: false };
-      } else if (existingCheck.completed) {
-        // Se está concluído -> não concluído
-        nextState = { completed: false, failed: true };
-      } else if (existingCheck.failed) {
-        // Se está não concluído -> neutro (deleta o registro)
-        const { error } = await supabase
+      if (!habit) {
+        // Sem registro -> Concluído
+        newState = { completed: true, failed: false };
+      } else if (habit.completed) {
+        // Concluído -> Não concluído
+        newState = { completed: false, failed: true };
+      } else {
+        // Não concluído -> Sem registro (neutro)
+        const { error: deleteError } = await supabase
           .from("habit_history")
           .delete()
           .eq("habit_id", habitId)
           .eq("date", date);
 
-        if (error) throw error;
+        if (deleteError) throw deleteError;
 
-        // Atualiza estado local removendo o check
-        setHabits(currentHabits => 
-          currentHabits.map(h => {
-            if (h.id === habitId) {
-              return {
-                ...h,
-                checks: h.checks.filter(c => !c.timestamp.startsWith(date))
-              };
-            }
-            return h;
-          })
-        );
-
-        toast({
-          title: "Estado removido",
-          description: "Status atualizado com sucesso"
-        });
+        // Atualiza estado local
+        setHabits(prev => prev.map(h => {
+          if (h.id === habitId) {
+            return {
+              ...h,
+              checks: h.checks.filter(check => !check.timestamp.startsWith(date))
+            };
+          }
+          return h;
+        }));
 
         return;
       }
 
-      if (nextState) {
-        // Insere ou atualiza o registro com o novo estado
-        const { error } = await supabase
-          .from("habit_history")
-          .upsert({
-            habit_id: habitId,
-            user_id: user.id,
-            date,
-            completed: nextState.completed,
-            failed: nextState.failed
-          });
-
-        if (error) throw error;
-
-        // Atualiza o estado local
-        setHabits(currentHabits => 
-          currentHabits.map(h => {
-            if (h.id === habitId) {
-              return {
-                ...h,
-                checks: [
-                  ...h.checks.filter(c => !c.timestamp.startsWith(date)),
-                  {
-                    timestamp: `${date}T00:00:00.000Z`,
-                    completed: nextState.completed,
-                    failed: nextState.failed
-                  }
-                ]
-              };
-            }
-            return h;
-          })
-        );
-
-        toast({
-          title: nextState.completed ? "Hábito concluído!" : "Hábito não concluído",
-          description: "Status atualizado com sucesso"
+      // Se chegou aqui, precisa criar ou atualizar o registro
+      const { error: upsertError } = await supabase
+        .from("habit_history")
+        .upsert({
+          habit_id: habitId,
+          user_id: user.id,
+          date,
+          completed: newState.completed,
+          failed: newState.failed
         });
-      }
+
+      if (upsertError) throw upsertError;
+
+      // Atualiza estado local
+      setHabits(prev => prev.map(h => {
+        if (h.id === habitId) {
+          const newChecks = [
+            ...h.checks.filter(check => !check.timestamp.startsWith(date)),
+            {
+              timestamp: `${date}T00:00:00.000Z`,
+              completed: newState.completed,
+              failed: newState.failed
+            }
+          ];
+          return { ...h, checks: newChecks };
+        }
+        return h;
+      }));
     } catch (error) {
-      console.error("Erro na operação:", error);
+      console.error("Erro ao atualizar hábito:", error);
       toast({
         title: "Erro",
-        description: "Erro ao atualizar o hábito",
+        description: "Não foi possível atualizar o hábito",
         variant: "destructive"
       });
     }
@@ -128,18 +109,18 @@ export const useHabitOperations = (
 
       if (error) throw error;
 
-      setHabits(currentHabits => currentHabits.filter(habit => habit.id !== habitId));
+      setHabits(prev => prev.filter(habit => habit.id !== habitId));
       setIsDeleteMode(false);
       
       toast({
         title: "Sucesso",
-        description: "Hábito removido com sucesso!"
+        description: "Hábito removido com sucesso"
       });
     } catch (error) {
       console.error("Erro ao remover hábito:", error);
       toast({
         title: "Erro",
-        description: "Erro ao remover hábito",
+        description: "Não foi possível remover o hábito",
         variant: "destructive"
       });
     }
