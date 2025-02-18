@@ -8,7 +8,7 @@ import { getCheckStatus } from "../utils/habitUtils";
 interface HabitActionProps {
   habit: Habit;
   date: Date;
-  onToggleHabit: (habitId: string, date: string, tracking_type: string) => void;
+  onToggleHabit: (habitId: string, date: string) => void;
 }
 
 export const HabitAction = ({ habit, date, onToggleHabit }: HabitActionProps) => {
@@ -25,7 +25,7 @@ export const HabitAction = ({ habit, date, onToggleHabit }: HabitActionProps) =>
           : checkStatus === "failed"
             ? 'bg-red-500 border-red-500 text-white hover:bg-red-600'
             : 'border-muted-foreground hover:bg-accent'}`}
-      onClick={() => onToggleHabit(habit.id, formattedDate, 'task')}
+      onClick={() => onToggleHabit(habit.id, formattedDate)}
     >
       {checkStatus === "completed" && <Check className="h-4 w-4" />}
       {checkStatus === "failed" && <X className="h-4 w-4" />}
