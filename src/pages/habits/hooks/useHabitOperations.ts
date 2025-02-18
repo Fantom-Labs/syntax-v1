@@ -21,66 +21,38 @@ export const useHabitOperations = (
       return;
     }
 
-    const habit = habits.find(h => h.id === habitId);
-    if (!habit) {
-      toast({
-        title: "Erro",
-        description: "Hábito não encontrado",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    // Encontra o check atual para o dia
-    const { data: existingCheck, error: checkError } = await supabase
-      .from("habit_history")
-      .select("*")
-      .eq("habit_id", habitId)
-      .eq("date", date)
-      .maybeSingle(); // Alterado de .single() para .maybeSingle()
-
-    if (checkError) {
-      console.error("Erro ao buscar histórico:", checkError);
-      toast({
-        title: "Erro",
-        description: "Erro ao verificar estado do hábito",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    // Define o próximo estado com base no estado atual
-    let nextState;
-    if (!existingCheck) {
-      // Se não existir check, marca como concluído
-      nextState = { completed: true, failed: false };
-    } else if (existingCheck.completed && !existingCheck.failed) {
-      // Se estiver concluído, marca como não concluído
-      nextState = { completed: false, failed: true };
-    } else if (existingCheck.failed) {
-      // Se estiver não concluído, remove o registro (estado neutro)
-      nextState = null;
-    } else {
-      // Estado indefinido, marca como concluído
-      nextState = { completed: true, failed: false };
-    }
-
-    console.log('Estado atual:', existingCheck);
-    console.log('Próximo estado:', nextState);
-
     try {
+      // Busca o estado atual do hábito para a data específica
+      const { data: existingCheck } = await supabase
+        .from("habit_history")
+        .select("*")
+        .eq("habit_id", habitId)
+        .eq("date", date)
+        .maybeSingle();
+
+      // Determina o próximo estado baseado no estado atual
+      let nextState;
+
+      if (!existingCheck) {
+        // Se não existe registro, marca como concluído
+        nextState = { completed: true, failed: false };
+      } else if (existingCheck.completed) {
+        // Se está concluído, marca como falhou
+        nextState = { completed: false, failed: true };
+      } else {
+        // Se está marcado como falha ou outro estado, remove o registro
+        nextState = null;
+      }
+
+      // Aplica a mudança no banco de dados
       if (nextState === null) {
-        // Remove o registro para voltar ao estado neutro
-        const { error } = await supabase
+        await supabase
           .from("habit_history")
           .delete()
           .eq("habit_id", habitId)
           .eq("date", date);
-
-        if (error) throw error;
       } else {
-        // Insere ou atualiza o registro com o novo estado
-        const { error } = await supabase
+        await supabase
           .from("habit_history")
           .upsert({
             habit_id: habitId,
@@ -89,8 +61,6 @@ export const useHabitOperations = (
             completed: nextState.completed,
             failed: nextState.failed
           });
-
-        if (error) throw error;
       }
 
       // Atualiza o estado local
@@ -111,14 +81,14 @@ export const useHabitOperations = (
         })
       );
 
-      // Mensagem de sucesso apropriada
-      const message = nextState === null ? "Estado neutro" :
+      // Feedback para o usuário
+      const message = nextState === null ? "Estado removido" :
                      nextState.completed ? "Hábito concluído!" :
                      "Hábito não concluído";
       
       toast({
         title: message,
-        description: "Status atualizado com sucesso!"
+        description: "Status atualizado com sucesso"
       });
 
     } catch (error) {
@@ -132,26 +102,29 @@ export const useHabitOperations = (
   };
 
   const removeHabit = async (habitId: string) => {
-    const { error } = await supabase
-      .from("habits")
-      .delete()
-      .eq("id", habitId);
+    try {
+      const { error } = await supabase
+        .from("habits")
+        .delete()
+        .eq("id", habitId);
 
-    if (error) {
+      if (error) throw error;
+
+      setHabits(currentHabits => currentHabits.filter(habit => habit.id !== habitId));
+      setIsDeleteMode(false);
+      
+      toast({
+        title: "Sucesso",
+        description: "Hábito removido com sucesso!"
+      });
+    } catch (error) {
+      console.error("Erro ao remover hábito:", error);
       toast({
         title: "Erro",
         description: "Erro ao remover hábito",
         variant: "destructive"
       });
-      return;
     }
-
-    setHabits(currentHabits => currentHabits.filter(habit => habit.id !== habitId));
-    setIsDeleteMode(false);
-    toast({
-      title: "Sucesso",
-      description: "Hábito removido com sucesso!"
-    });
   };
 
   return {
