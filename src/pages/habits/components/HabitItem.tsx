@@ -45,7 +45,7 @@ export const HabitItem = ({
       ref={setNodeRef}
       style={style}
       className={`flex items-center justify-between p-2 md:p-3 rounded-xl bg-background/50 backdrop-blur-sm shadow-sm w-full max-w-full overflow-hidden ${
-        isDeleteMode ? 'animate-[wiggle_0.3s_ease-in-out_infinite]' : ''
+        isDeleteMode ? 'md:animate-none sm:animate-[wiggle_0.3s_ease-in-out_infinite]' : ''
       }`}
       {...attributes}
     >
