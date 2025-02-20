@@ -22,74 +22,82 @@ export const useHabitOperations = (
     }
 
     try {
-      const { data: existingHabit } = await supabase
+      // Busca o registro atual
+      const { data: currentCheck } = await supabase
         .from("habit_history")
         .select("*")
         .eq("habit_id", habitId)
         .eq("date", date)
         .maybeSingle();
 
-      console.log('Estado atual:', existingHabit);
+      // Lógica de alternância simplificada
+      if (!currentCheck) {
+        // Sem registro -> Criar como completo
+        await supabase.from("habit_history").insert({
+          habit_id: habitId,
+          user_id: user.id,
+          date,
+          completed: true,
+          failed: false
+        });
 
-      // Define o próximo estado baseado no estado atual
-      let nextState = null;
-      
-      if (!existingHabit) {
-        // Se não existe registro -> marca como completo
-        nextState = { completed: true, failed: false };
-      } else if (existingHabit.completed) {
-        // Se está completo -> marca como falhou
-        nextState = { completed: false, failed: true };
-      } else if (existingHabit.failed) {
-        // Se falhou -> remove o registro (estado neutro)
-        const { error: deleteError } = await supabase
+        // Atualiza estado local
+        setHabits(prev => prev.map(h => {
+          if (h.id === habitId) {
+            return {
+              ...h,
+              checks: [
+                ...h.checks,
+                {
+                  timestamp: `${date}T00:00:00.000Z`,
+                  completed: true,
+                  failed: false
+                }
+              ]
+            };
+          }
+          return h;
+        }));
+      } 
+      else if (currentCheck.completed) {
+        // Completo -> Marcar como falha
+        await supabase
+          .from("habit_history")
+          .update({ completed: false, failed: true })
+          .eq("habit_id", habitId)
+          .eq("date", date);
+
+        // Atualiza estado local
+        setHabits(prev => prev.map(h => {
+          if (h.id === habitId) {
+            return {
+              ...h,
+              checks: h.checks.map(check => {
+                if (check.timestamp.startsWith(date)) {
+                  return { ...check, completed: false, failed: true };
+                }
+                return check;
+              })
+            };
+          }
+          return h;
+        }));
+      }
+      else {
+        // Falha ou outro estado -> Remover registro
+        await supabase
           .from("habit_history")
           .delete()
           .eq("habit_id", habitId)
           .eq("date", date);
 
-        if (deleteError) throw deleteError;
-
-        // Atualiza estado local removendo o check
+        // Atualiza estado local
         setHabits(prev => prev.map(h => {
           if (h.id === habitId) {
             return {
               ...h,
               checks: h.checks.filter(check => !check.timestamp.startsWith(date))
             };
-          }
-          return h;
-        }));
-
-        console.log('Registro removido - estado neutro');
-        return;
-      }
-
-      // Se temos um próximo estado, atualiza ou insere
-      if (nextState !== null) {
-        console.log('Próximo estado:', nextState);
-        const { error: upsertError } = await supabase
-          .from("habit_history")
-          .upsert({
-            habit_id: habitId,
-            user_id: user.id,
-            date,
-            ...nextState
-          });
-
-        if (upsertError) throw upsertError;
-
-        // Atualiza estado local
-        setHabits(prev => prev.map(h => {
-          if (h.id === habitId) {
-            const newChecks = [
-              ...h.checks.filter(check => !check.timestamp.startsWith(date)),
-              {
-                timestamp: `${date}T00:00:00.000Z`,
-                ...nextState
-              }
-            ];
-            return { ...h, checks: newChecks };
           }
           return h;
         }));
@@ -107,13 +115,13 @@ export const useHabitOperations = (
 
   const removeHabit = async (habitId: string) => {
     try {
-      const { error } = await supabase
-        .from("habits")
-        .delete()
-        .eq("id", habitId);
+      // Remove o hábito
+      await supabase.from("habits").delete().eq("id", habitId);
+      
+      // Remove todos os registros históricos do hábito
+      await supabase.from("habit_history").delete().eq("habit_id", habitId);
 
-      if (error) throw error;
-
+      // Atualiza estado local
       setHabits(prev => prev.filter(habit => habit.id !== habitId));
       setIsDeleteMode(false);
       
