@@ -10,7 +10,7 @@ import { CSS } from "@dnd-kit/utilities";
 interface HabitItemProps {
   habit: Habit;
   date: Date;
-  onToggleHabit: (habitId: string, date: string, tracking_type: string) => void;
+  onToggleHabit: (habitId: string, date: string) => void;
   onRemoveHabit: (habitId: string) => void;
   isDeleteMode: boolean;
 }
