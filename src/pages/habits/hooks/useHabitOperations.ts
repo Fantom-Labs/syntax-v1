@@ -22,24 +22,26 @@ export const useHabitOperations = (
     }
 
     try {
-      const { data: habit } = await supabase
+      const { data: existingHabit } = await supabase
         .from("habit_history")
         .select("*")
         .eq("habit_id", habitId)
         .eq("date", date)
         .maybeSingle();
 
-      // Estado atual e próximo estado
-      let newState;
+      console.log('Estado atual:', existingHabit);
 
-      if (!habit) {
-        // Sem registro -> Concluído
-        newState = { completed: true, failed: false };
-      } else if (habit.completed) {
-        // Concluído -> Não concluído
-        newState = { completed: false, failed: true };
-      } else {
-        // Não concluído -> Sem registro (neutro)
+      // Define o próximo estado baseado no estado atual
+      let nextState = null;
+      
+      if (!existingHabit) {
+        // Se não existe registro -> marca como completo
+        nextState = { completed: true, failed: false };
+      } else if (existingHabit.completed) {
+        // Se está completo -> marca como falhou
+        nextState = { completed: false, failed: true };
+      } else if (existingHabit.failed) {
+        // Se falhou -> remove o registro (estado neutro)
         const { error: deleteError } = await supabase
           .from("habit_history")
           .delete()
@@ -48,7 +50,7 @@ export const useHabitOperations = (
 
         if (deleteError) throw deleteError;
 
-        // Atualiza estado local
+        // Atualiza estado local removendo o check
         setHabits(prev => prev.map(h => {
           if (h.id === habitId) {
             return {
@@ -59,37 +61,40 @@ export const useHabitOperations = (
           return h;
         }));
 
+        console.log('Registro removido - estado neutro');
         return;
       }
 
-      // Se chegou aqui, precisa criar ou atualizar o registro
-      const { error: upsertError } = await supabase
-        .from("habit_history")
-        .upsert({
-          habit_id: habitId,
-          user_id: user.id,
-          date,
-          completed: newState.completed,
-          failed: newState.failed
-        });
+      // Se temos um próximo estado, atualiza ou insere
+      if (nextState !== null) {
+        console.log('Próximo estado:', nextState);
+        const { error: upsertError } = await supabase
+          .from("habit_history")
+          .upsert({
+            habit_id: habitId,
+            user_id: user.id,
+            date,
+            ...nextState
+          });
 
-      if (upsertError) throw upsertError;
+        if (upsertError) throw upsertError;
 
-      // Atualiza estado local
-      setHabits(prev => prev.map(h => {
-        if (h.id === habitId) {
-          const newChecks = [
-            ...h.checks.filter(check => !check.timestamp.startsWith(date)),
-            {
-              timestamp: `${date}T00:00:00.000Z`,
-              completed: newState.completed,
-              failed: newState.failed
-            }
-          ];
-          return { ...h, checks: newChecks };
-        }
-        return h;
-      }));
+        // Atualiza estado local
+        setHabits(prev => prev.map(h => {
+          if (h.id === habitId) {
+            const newChecks = [
+              ...h.checks.filter(check => !check.timestamp.startsWith(date)),
+              {
+                timestamp: `${date}T00:00:00.000Z`,
+                ...nextState
+              }
+            ];
+            return { ...h, checks: newChecks };
+          }
+          return h;
+        }));
+      }
+
     } catch (error) {
       console.error("Erro ao atualizar hábito:", error);
       toast({
