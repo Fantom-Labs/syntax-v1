@@ -44,11 +44,10 @@ export const useHabitOperations = (
         // Atualiza estado local
         setHabits(prev => prev.map(h => {
           if (h.id === habitId) {
-            const existingChecks = h.checks.filter(check => !check.timestamp.startsWith(date));
             return {
               ...h,
               checks: [
-                ...existingChecks,
+                ...h.checks,
                 {
                   timestamp: `${date}T00:00:00.000Z`,
                   completed: true,
