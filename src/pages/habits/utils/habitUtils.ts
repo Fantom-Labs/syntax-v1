@@ -15,9 +15,16 @@ export const getCheckStatus = (habit: Habit, date: string): CheckStatus => {
 export const getProgressText = (habit: Habit, date: Date) => {
   const formattedDate = format(date, "yyyy-MM-dd");
   const status = getCheckStatus(habit, formattedDate);
-  if (status === "completed") return "Concluído";
-  if (status === "failed") return "Não concluído";
-  return "Pendente";
+  
+  switch (status) {
+    case "completed":
+      return "Concluído";
+    case "failed":
+      return "Não concluído";
+    case "unchecked":
+    default:
+      return "Pendente";
+  }
 };
 
 export const getConsecutiveDays = (habit: Habit): number => {
