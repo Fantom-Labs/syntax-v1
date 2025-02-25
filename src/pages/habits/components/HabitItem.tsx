@@ -51,7 +51,7 @@ export const HabitItem = ({
         
         <div className="flex flex-col min-w-0 flex-1 overflow-hidden">
           <div className="flex items-center gap-1 md:gap-2 overflow-hidden">
-            <span className="font-medium text-sm truncate md:text-lg">{habit.title}</span>
+            <span className="font-medium truncate md:text-lg text-base">{habit.title}</span>
             {showStreak && <div className="flex items-center gap-0.5 md:gap-1 text-amber-500 flex-shrink-0">
                 <Flame className="h-3.5 w-3.5 md:h-4 md:w-4" />
                 <span className="text-xs md:text-sm font-medium">{consecutiveDays}</span>
