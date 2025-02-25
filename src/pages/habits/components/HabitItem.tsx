@@ -38,7 +38,7 @@ export const HabitItem = ({
   };
 
   const consecutiveDays = getConsecutiveDays(habit);
-  const showStreak = consecutiveDays >= 5;
+  const showStreak = consecutiveDays >= 3; // Mudado de 5 para 3 dias
 
   return (
     <div
