@@ -140,6 +140,8 @@ export type Database = {
           created_at: string
           emoji: string | null
           id: string
+          notification_enabled: boolean | null
+          notification_time: string | null
           order: number | null
           repeat_days: string[] | null
           time_target: number | null
@@ -155,6 +157,8 @@ export type Database = {
           created_at?: string
           emoji?: string | null
           id?: string
+          notification_enabled?: boolean | null
+          notification_time?: string | null
           order?: number | null
           repeat_days?: string[] | null
           time_target?: number | null
@@ -170,6 +174,8 @@ export type Database = {
           created_at?: string
           emoji?: string | null
           id?: string
+          notification_enabled?: boolean | null
+          notification_time?: string | null
           order?: number | null
           repeat_days?: string[] | null
           time_target?: number | null

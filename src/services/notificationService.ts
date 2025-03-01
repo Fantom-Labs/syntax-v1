@@ -1,5 +1,7 @@
 
 // Verifica se as notificações são suportadas pelo navegador
+import { Habit } from "@/types/habits";
+
 export const isNotificationSupported = (): boolean => {
   return 'Notification' in window;
 };

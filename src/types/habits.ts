@@ -1,5 +1,4 @@
 
-
 export type HabitType = 'build' | 'quit';
 export type TrackingType = 'task';
 
@@ -39,4 +38,3 @@ export interface HabitProgress {
   completionRate: number;
   history: HabitHistory[];
 }
-

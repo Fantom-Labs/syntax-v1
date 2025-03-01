@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Habit, HabitType, TrackingType } from "@/types/habits";
 import { supabase } from "@/integrations/supabase/client";
