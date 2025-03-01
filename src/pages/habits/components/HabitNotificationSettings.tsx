@@ -8,7 +8,8 @@ import {
   DialogContent, 
   DialogHeader, 
   DialogTitle, 
-  DialogTrigger 
+  DialogTrigger,
+  DialogDescription
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -113,10 +114,13 @@ export const HabitNotificationSettings = ({ habit, onUpdate }: HabitNotification
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Notificações para {habit.title}</DialogTitle>
+          <DialogDescription>
+            Configure as notificações diárias para este hábito.
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div className="flex items-center justify-between">
-            <Label htmlFor="notification-toggle-edit">Ativar notificações diárias</Label>
+            <Label htmlFor="notification-toggle-edit" className="text-base">Ativar notificações diárias</Label>
             <Switch 
               id="notification-toggle-edit"
               checked={notificationEnabled}
@@ -125,25 +129,26 @@ export const HabitNotificationSettings = ({ habit, onUpdate }: HabitNotification
           </div>
           
           {notificationEnabled && (
-            <div className="space-y-2">
-              <Label htmlFor="notification-time-edit">Horário da notificação</Label>
+            <div className="space-y-2 mt-4">
+              <Label htmlFor="notification-time-edit" className="text-base">Horário da notificação</Label>
               <Input
                 id="notification-time-edit"
                 type="time"
                 value={notificationTime}
                 onChange={(e) => setNotificationTime(e.target.value)}
+                className="w-full"
               />
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground mt-2">
                 Você receberá uma notificação diária no horário escolhido.
               </p>
             </div>
           )}
 
-          <div className="flex justify-end space-x-2 pt-4">
+          <div className="flex justify-end space-x-2 pt-4 mt-4">
             <Button variant="outline" onClick={() => setIsOpen(false)}>
               Cancelar
             </Button>
-            <Button onClick={saveNotificationSettings}>
+            <Button onClick={saveNotificationSettings} type="button">
               Salvar
             </Button>
           </div>
