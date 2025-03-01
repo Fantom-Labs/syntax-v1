@@ -1,21 +1,13 @@
 
-
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Habit, HabitType } from "@/types/habits";
 import { supabase } from "@/integrations/supabase/client";
-import { Switch } from "@/components/ui/switch";
-import { 
-  requestNotificationPermission, 
-  isNotificationSupported,
-  isNotificationPermissionGranted 
-} from "@/services/notificationService";
+import { HabitFormFields } from "./HabitFormFields";
+import { HabitNotificationField } from "./HabitNotificationField";
 
 interface AddHabitDialogProps {
   userId: string;
@@ -39,21 +31,6 @@ export const AddHabitDialog = ({ userId, onHabitAdded }: AddHabitDialogProps) =>
     setColor("#7BFF8B");
     setNotificationEnabled(false);
     setNotificationTime("08:00");
-  };
-
-  const handleNotificationToggle = async (checked: boolean) => {
-    if (checked && !isNotificationPermissionGranted()) {
-      const granted = await requestNotificationPermission();
-      if (!granted) {
-        toast({
-          title: "Permissão necessária",
-          description: "Permissão para notificações é necessária para ativar esta função.",
-          variant: "destructive"
-        });
-        return;
-      }
-    }
-    setNotificationEnabled(checked);
   };
 
   const addHabit = async () => {
@@ -127,80 +104,23 @@ export const AddHabitDialog = ({ userId, onHabitAdded }: AddHabitDialogProps) =>
           <DialogTitle>Adicionar Novo Hábito</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 mt-4">
-          <div className="space-y-2">
-            <Label>Tipo de Hábito</Label>
-            <RadioGroup
-              value={habitType}
-              onValueChange={(value) => setHabitType(value as HabitType)}
-              className="flex gap-4"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="build" id="build" />
-                <Label htmlFor="build">Construir</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="quit" id="quit" />
-                <Label htmlFor="quit">Abandonar</Label>
-              </div>
-            </RadioGroup>
-          </div>
+          <HabitFormFields 
+            habitTitle={newHabitTitle}
+            onTitleChange={setNewHabitTitle}
+            habitType={habitType}
+            onTypeChange={setHabitType}
+            emoji={emoji}
+            onEmojiChange={setEmoji}
+            color={color}
+            onColorChange={setColor}
+          />
 
-          <div className="space-y-2">
-            <Label htmlFor="title">Título do Hábito</Label>
-            <Input
-              id="title"
-              value={newHabitTitle}
-              onChange={(e) => setNewHabitTitle(e.target.value)}
-              placeholder="Ex: Beber água"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="emoji">Emoji (opcional)</Label>
-            <Input
-              id="emoji"
-              value={emoji}
-              onChange={(e) => setEmoji(e.target.value)}
-              placeholder="Ex: 💧"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="color">Cor</Label>
-            <Input
-              id="color"
-              type="color"
-              value={color}
-              onChange={(e) => setColor(e.target.value)}
-              className="h-10 w-full"
-            />
-          </div>
-
-          {isNotificationSupported() && (
-            <>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="notification-toggle">Notificações diárias</Label>
-                <Switch 
-                  id="notification-toggle"
-                  checked={notificationEnabled}
-                  onCheckedChange={handleNotificationToggle}
-                />
-              </div>
-              
-              {notificationEnabled && (
-                <div className="space-y-2">
-                  <Label htmlFor="notification-time">Horário da notificação</Label>
-                  <Input
-                    id="notification-time"
-                    type="time"
-                    value={notificationTime}
-                    onChange={(e) => setNotificationTime(e.target.value)}
-                    className="h-10 w-full"
-                  />
-                </div>
-              )}
-            </>
-          )}
+          <HabitNotificationField
+            notificationEnabled={notificationEnabled}
+            notificationTime={notificationTime}
+            onNotificationEnabledChange={setNotificationEnabled}
+            onNotificationTimeChange={setNotificationTime}
+          />
 
           <Button onClick={addHabit} className="w-full">
             Adicionar Hábito
@@ -210,4 +130,3 @@ export const AddHabitDialog = ({ userId, onHabitAdded }: AddHabitDialogProps) =>
     </Dialog>
   );
 };
-
