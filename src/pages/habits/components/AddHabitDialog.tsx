@@ -1,4 +1,5 @@
 
+
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -9,6 +10,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Habit, HabitType } from "@/types/habits";
 import { supabase } from "@/integrations/supabase/client";
+import { Switch } from "@/components/ui/switch";
+import { 
+  requestNotificationPermission, 
+  isNotificationSupported,
+  isNotificationPermissionGranted 
+} from "@/services/notificationService";
 
 interface AddHabitDialogProps {
   userId: string;
@@ -21,6 +28,8 @@ export const AddHabitDialog = ({ userId, onHabitAdded }: AddHabitDialogProps) =>
   const [habitType, setHabitType] = useState<HabitType>("build");
   const [emoji, setEmoji] = useState("");
   const [color, setColor] = useState("#7BFF8B");
+  const [notificationEnabled, setNotificationEnabled] = useState(false);
+  const [notificationTime, setNotificationTime] = useState("08:00");
   const { toast } = useToast();
 
   const resetForm = () => {
@@ -28,6 +37,23 @@ export const AddHabitDialog = ({ userId, onHabitAdded }: AddHabitDialogProps) =>
     setHabitType("build");
     setEmoji("");
     setColor("#7BFF8B");
+    setNotificationEnabled(false);
+    setNotificationTime("08:00");
+  };
+
+  const handleNotificationToggle = async (checked: boolean) => {
+    if (checked && !isNotificationPermissionGranted()) {
+      const granted = await requestNotificationPermission();
+      if (!granted) {
+        toast({
+          title: "Permissão necessária",
+          description: "Permissão para notificações é necessária para ativar esta função.",
+          variant: "destructive"
+        });
+        return;
+      }
+    }
+    setNotificationEnabled(checked);
   };
 
   const addHabit = async () => {
@@ -46,7 +72,9 @@ export const AddHabitDialog = ({ userId, onHabitAdded }: AddHabitDialogProps) =>
       tracking_type: 'task',
       emoji: emoji || undefined,
       color: color || undefined,
-      user_id: userId
+      user_id: userId,
+      notification_enabled: notificationEnabled,
+      notification_time: notificationEnabled ? notificationTime : null
     };
 
     const { data: habit, error } = await supabase
@@ -73,7 +101,9 @@ export const AddHabitDialog = ({ userId, onHabitAdded }: AddHabitDialogProps) =>
       color: habit.color,
       repeat_days: habit.repeat_days,
       checksPerDay: habit.checks_per_day || 1,
-      checks: []
+      checks: [],
+      notification_enabled: habit.notification_enabled,
+      notification_time: habit.notification_time
     };
 
     onHabitAdded(newHabit);
@@ -146,6 +176,32 @@ export const AddHabitDialog = ({ userId, onHabitAdded }: AddHabitDialogProps) =>
             />
           </div>
 
+          {isNotificationSupported() && (
+            <>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="notification-toggle">Notificações diárias</Label>
+                <Switch 
+                  id="notification-toggle"
+                  checked={notificationEnabled}
+                  onCheckedChange={handleNotificationToggle}
+                />
+              </div>
+              
+              {notificationEnabled && (
+                <div className="space-y-2">
+                  <Label htmlFor="notification-time">Horário da notificação</Label>
+                  <Input
+                    id="notification-time"
+                    type="time"
+                    value={notificationTime}
+                    onChange={(e) => setNotificationTime(e.target.value)}
+                    className="h-10 w-full"
+                  />
+                </div>
+              )}
+            </>
+          )}
+
           <Button onClick={addHabit} className="w-full">
             Adicionar Hábito
           </Button>
@@ -154,3 +210,4 @@ export const AddHabitDialog = ({ userId, onHabitAdded }: AddHabitDialogProps) =>
     </Dialog>
   );
 };
+

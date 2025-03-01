@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Habit, HabitType, TrackingType } from "@/types/habits";
 import { supabase } from "@/integrations/supabase/client";
@@ -60,7 +59,9 @@ export const useLoadHabits = () => {
             color: habit.color,
             repeat_days: habit.repeat_days,
             checksPerDay: habit.checks_per_day || 1,
-            checks: habitChecks
+            checks: habitChecks,
+            notification_enabled: habit.notification_enabled,
+            notification_time: habit.notification_time
           });
         });
 

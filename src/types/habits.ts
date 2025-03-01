@@ -1,4 +1,5 @@
 
+
 export type HabitType = 'build' | 'quit';
 export type TrackingType = 'task';
 
@@ -18,6 +19,8 @@ export interface Habit {
   repeat_days?: string[];
   checksPerDay: number;
   checks: HabitCheck[];
+  notification_enabled?: boolean;
+  notification_time?: string;
 }
 
 export interface HabitHistory {
@@ -36,3 +39,4 @@ export interface HabitProgress {
   completionRate: number;
   history: HabitHistory[];
 }
+

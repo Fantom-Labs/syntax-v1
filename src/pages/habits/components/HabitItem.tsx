@@ -5,6 +5,8 @@ import { getProgressText, getConsecutiveDays } from "../utils/habitUtils";
 import { HabitAction } from "./HabitAction";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { HabitNotificationSettings } from "./HabitNotificationSettings";
+
 interface HabitItemProps {
   habit: Habit;
   date: Date;
@@ -12,6 +14,7 @@ interface HabitItemProps {
   onRemoveHabit: (habitId: string) => void;
   isDeleteMode: boolean;
 }
+
 export const HabitItem = ({
   habit,
   date,
@@ -29,13 +32,15 @@ export const HabitItem = ({
   } = useSortable({
     id: habit.id
   });
+
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1
   };
+
   const consecutiveDays = getConsecutiveDays(habit);
-  const showStreak = consecutiveDays >= 3; // Mudado de 5 para 3 dias
+  const showStreak = consecutiveDays >= 3;
 
   return <div ref={setNodeRef} style={style} className={`flex items-center justify-between p-2 md:p-3 rounded-xl bg-background/50 backdrop-blur-sm shadow-sm w-full max-w-full overflow-hidden ${isDeleteMode ? 'md:animate-none sm:animate-[wiggle_0.3s_ease-in-out_infinite]' : ''}`} {...attributes}>
       <div className="flex items-center gap-1.5 md:gap-2 flex-1 min-w-0 overflow-hidden">
@@ -65,6 +70,13 @@ export const HabitItem = ({
       
       <div className="flex items-center gap-1 ml-1.5 md:ml-2 flex-shrink-0">
         <HabitAction habit={habit} date={date} onToggleHabit={onToggleHabit} />
+        <HabitNotificationSettings
+          habit={habit}
+          onUpdate={(updatedHabit) => {
+            // Este é um callback que será chamado quando as notificações forem atualizadas
+            // Não é necessário fazer nada aqui, pois o estado será atualizado pelo backend
+          }}
+        />
         {isDeleteMode && <Button variant="ghost" size="icon" onClick={() => onRemoveHabit(habit.id)} className="text-destructive hover:text-destructive/90 rounded-full w-7 h-7 md:w-8 md:h-8">
             <Trash2 className="h-3.5 w-3.5 md:h-4 md:w-4" />
           </Button>}

@@ -1,4 +1,5 @@
 
+
 import { useState } from "react";
 import PageTemplate from "@/components/PageTemplate";
 import { Habit } from "@/types/habits";
@@ -7,10 +8,14 @@ import { DateNavigation } from "./DateNavigation";
 import { HabitsDashboard } from "./HabitsDashboard";
 import { AddHabitDialog } from "./components/AddHabitDialog";
 import { useLoadHabits } from "./hooks/useLoadHabits";
+import { useNotifications } from "@/hooks/useNotifications";
+import { Button } from "@/components/ui/button";
+import { Bell } from "lucide-react";
 
 export const HabitsPage = () => {
   const [date, setDate] = useState<Date>(new Date());
   const { habits, setHabits, userId } = useLoadHabits();
+  const { isSupported, permissionGranted, requestPermission } = useNotifications(habits);
 
   const handleHabitAdded = (newHabit: Habit) => {
     setHabits([...habits, newHabit]);
@@ -35,7 +40,22 @@ export const HabitsPage = () => {
     <PageTemplate title="Hábitos">
       <div className="grid gap-6">
         <div className="space-y-6 max-w-full">
-          <DateNavigation date={date} setDate={setDate} />
+          <div className="flex items-center justify-between">
+            <DateNavigation date={date} setDate={setDate} />
+            
+            {isSupported && !permissionGranted && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={requestPermission}
+                className="flex items-center gap-2"
+              >
+                <Bell className="h-4 w-4" />
+                Ativar notificações
+              </Button>
+            )}
+          </div>
+          
           <HabitList habits={habits} setHabits={setHabits} date={date} />
           
           <div className="flex justify-center mt-4">
@@ -48,3 +68,4 @@ export const HabitsPage = () => {
     </PageTemplate>
   );
 };
+
