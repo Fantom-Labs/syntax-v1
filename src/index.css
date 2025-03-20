@@ -29,11 +29,14 @@
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 98%;
+
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
     --ring: 262 83% 58%;
 
-    --radius: 1rem;
+    --radius: 1.25rem;
   }
 
   .dark {
@@ -61,6 +64,9 @@
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 98%;
+
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
     --ring: 262 83% 58%;
@@ -86,8 +92,22 @@
     transform: translateY(2px);
     filter: url('#curve');
   }
-  .nav-button {
-    @apply flex items-center gap-2 px-6 py-3 rounded-full bg-secondary hover:bg-secondary/80 transition-colors duration-200;
+  
+  /* Duolingo-inspired styles */
+  .duolingo-card {
+    @apply rounded-2xl border-2 border-border bg-card shadow-md transition-all duration-200 hover:shadow-lg;
+  }
+  
+  .duolingo-button {
+    @apply flex items-center justify-center gap-2 px-6 py-3 font-bold rounded-xl bg-primary text-primary-foreground shadow-md transition-all duration-200 hover:brightness-110 active:scale-95;
+  }
+
+  .duolingo-nav-button {
+    @apply inline-flex items-center gap-3 px-5 py-4 rounded-xl bg-card hover:bg-accent/20 transition-all duration-200 border-2 border-border/70 shadow-sm hover:shadow-md active:scale-95 h-full font-medium;
+  }
+  
+  .duolingo-success {
+    @apply bg-[#58cc02] text-white border-b-4 border-[#46a302] hover:bg-[#61e002] active:border-b-0 active:border-t-4;
   }
 }
 

@@ -24,7 +24,7 @@ const NavButton = ({
   return (
     <Link 
       to={to} 
-      className="inline-flex items-center gap-3 px-6 py-4 rounded-xl bg-card hover:bg-accent/10 transition-all duration-300 border border-border/50 shadow-sm hover:shadow-md active:scale-[0.98] h-full"
+      className="duolingo-nav-button"
       draggable 
       onDragStart={e => onDragStart?.(e, index!)} 
       onDragOver={e => {
@@ -34,7 +34,7 @@ const NavButton = ({
       onDrop={e => onDrop?.(e, index!)}
     >
       <Icon className="w-5 h-5 text-primary" />
-      <span className="text-base font-medium">{label}</span>
+      <span className="text-base">{label}</span>
     </Link>
   );
 };
