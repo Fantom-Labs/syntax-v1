@@ -89,7 +89,7 @@
     @apply absolute -bottom-1 left-0 w-full;
     height: 6px;
     /* Updated gradient to match the image: green to purple */
-    background: linear-gradient( 90deg, #9b87f5 25%, #f6ff71 47%, #B259FF 70%);
+    background: linear-gradient( 90deg, #7BFF8B 25%, #F6FF71 47%, #B259FF 70%);
     border-radius: 999px;
     transform: translateY(2px);
     filter: url('#curve');
