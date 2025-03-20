@@ -1,8 +1,1 @@
-
 project_id = "votqbgkcwhjdekjjitcb"
-
-[functions.assistant-chat]
-verify_jwt = false
-
-[api]
-enabled_apis = ["rest", "graphql", "realtime", "storage", "edge-functions"]

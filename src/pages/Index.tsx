@@ -4,7 +4,6 @@ import { DashboardNavigation } from "@/components/dashboard/DashboardNavigation"
 import { EventCard } from "@/components/dashboard/EventCard";
 import { TaskCard } from "@/components/dashboard/TaskCard";
 import { useDashboardData } from "@/hooks/useDashboardData";
-import { HomeAssistant } from "@/components/assistant/HomeAssistant";
 
 const Index = () => {
   const { displayName } = useDashboardData();
@@ -25,8 +24,6 @@ const Index = () => {
           <EventCard />
           <TaskCard />
         </div>
-        
-        <HomeAssistant />
       </main>
     </div>
   );
