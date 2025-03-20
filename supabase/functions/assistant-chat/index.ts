@@ -16,11 +16,15 @@ serve(async (req) => {
   }
 
   try {
+    // Check if OpenAI API key is available
     if (!OPENAI_API_KEY) {
-      throw new Error('OPENAI_API_KEY is not set');
+      console.error('No OpenAI API key found');
+      throw new Error('OPENAI_API_KEY is not set in Supabase environment');
     }
 
     const { message, userId, chatHistory } = await req.json();
+    
+    console.log('Request received:', { userId, messageLength: message.length });
     
     // Create system message that describes the app's capabilities
     const systemMessage = `
@@ -58,6 +62,8 @@ Remember to maintain a friendly, helpful tone like a personal assistant would. Y
       { role: "user", content: message }
     ];
 
+    console.log('Sending request to OpenAI with message history length:', messages.length);
+
     // Call OpenAI API
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -72,11 +78,14 @@ Remember to maintain a friendly, helpful tone like a personal assistant would. Y
       }),
     });
 
-    const data = await response.json();
-    
     if (!response.ok) {
-      throw new Error(data.error?.message || 'OpenAI API request failed');
+      const error = await response.json();
+      console.error('OpenAI API error:', error);
+      throw new Error(error.error?.message || `OpenAI API returned ${response.status}: ${response.statusText}`);
     }
+
+    const data = await response.json();
+    console.log('OpenAI response received successfully');
 
     return new Response(JSON.stringify({
       content: data.choices[0].message.content,
@@ -86,7 +95,11 @@ Remember to maintain a friendly, helpful tone like a personal assistant would. Y
     });
   } catch (error) {
     console.error('Error in assistant-chat function:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ 
+      error: error.message || 'Unknown error occurred',
+      content: "I'm having trouble connecting right now. Please try again in a moment or contact support if this persists.",
+      role: "assistant"
+    }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

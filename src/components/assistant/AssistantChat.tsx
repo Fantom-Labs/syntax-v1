@@ -24,6 +24,7 @@ export const AssistantChat = ({ onClose }: AssistantChatProps) => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [hasError, setHasError] = useState(false);
   const { processCommands } = useProcessAssistantCommands();
   const scrollRef = useRef<HTMLDivElement>(null);
   
@@ -68,8 +69,14 @@ export const AssistantChat = ({ onClose }: AssistantChatProps) => {
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
+    setHasError(false);
     
     try {
+      // Check if user is authenticated
+      if (!userId) {
+        throw new Error('You need to be logged in to use the assistant');
+      }
+      
       // Format chat history for the API
       const chatHistory = messages.map(msg => ({
         role: msg.role,
@@ -81,7 +88,11 @@ export const AssistantChat = ({ onClose }: AssistantChatProps) => {
         body: { message: input, userId, chatHistory }
       });
       
-      if (error) throw new Error(error.message);
+      if (error) throw new Error(error.message || 'Failed to send a request to the Edge Function');
+      
+      if (data.error) {
+        throw new Error(data.error || 'The assistant encountered an error');
+      }
       
       const assistantMessage = {
         content: data.content,
@@ -98,6 +109,15 @@ export const AssistantChat = ({ onClose }: AssistantChatProps) => {
       
     } catch (error) {
       console.error('Error sending message:', error);
+      setHasError(true);
+      
+      // Add error message to chat
+      setMessages(prev => [...prev, {
+        content: "I'm sorry, I'm having trouble connecting right now. Please try again in a moment.",
+        role: 'assistant',
+        timestamp: new Date()
+      }]);
+      
       toast.error('Failed to get a response from the assistant');
     } finally {
       setIsLoading(false);
@@ -153,6 +173,11 @@ export const AssistantChat = ({ onClose }: AssistantChatProps) => {
               </div>
             </div>
           ))}
+          {hasError && (
+            <div className="text-center py-2 px-4 bg-destructive/10 text-destructive text-sm rounded-md">
+              There was a problem connecting to the assistant. Please check your network connection or try again later.
+            </div>
+          )}
           <div ref={scrollRef} />
         </div>
       </ScrollArea>
