@@ -1,12 +1,24 @@
 
 import { useState } from "react";
-import { List, Calendar, Activity, BookOpen, Target, ShoppingCart, DollarSign, Notebook, User } from "lucide-react";
+import { 
+  ListTodo, 
+  Calendar, 
+  Activity, 
+  BookOpen, 
+  Target, 
+  ShoppingCart, 
+  DollarSign, 
+  Notebook, 
+  User,
+  Clock
+} from "lucide-react";
 import { NavButtons } from "./NavButtons";
 import { toast } from "sonner";
 
 export const DashboardNavigation = () => {
   const [buttons, setButtons] = useState([
-    { label: "Tarefas", path: "/tarefas", icon: List },
+    { label: "Tarefas", path: "/tarefas", icon: ListTodo },
+    { label: "Rotina", path: "/rotina", icon: Clock },
     { label: "Agenda", path: "/agenda", icon: Calendar },
     { label: "Notas", path: "/notas", icon: Notebook },
     { label: "Hábitos", path: "/habitos", icon: Activity },

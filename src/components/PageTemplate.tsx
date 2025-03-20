@@ -10,11 +10,14 @@ interface PageTemplateProps {
 
 const PageTemplate = ({ title, children }: PageTemplateProps) => {
   return (
-    <div className="min-h-screen px-3 py-4 md:p-12 relative max-w-full">
+    <div className="min-h-screen px-4 py-6 md:p-12 relative max-w-full">
       <Header />
       <header className="mb-8">
         <div className="flex justify-between items-center mb-4">
-          <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground">
+          <Link 
+            to="/" 
+            className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors px-3 py-1 rounded-lg hover:bg-secondary"
+          >
             <ArrowLeft className="w-4 h-4" />
             <span>Voltar</span>
           </Link>

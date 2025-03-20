@@ -14,6 +14,7 @@ import { GoalsPage } from "@/pages/goals/GoalsPage";
 import { ShoppingPage } from "@/pages/shopping/ShoppingPage";
 import { InvestmentsPage } from "@/pages/investments/InvestmentsPage";
 import { PhysicalPage } from "@/pages/physical/PhysicalPage";
+import { RoutinePage } from "@/pages/routine/RoutinePage";
 import { AuthPage } from "@/pages/auth/AuthPage";
 
 // Create a new QueryClient instance outside of the component
@@ -36,6 +37,7 @@ function App() {
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/tarefas" element={<TasksPage />} />
+              <Route path="/rotina" element={<RoutinePage />} />
               <Route path="/agenda" element={<AgendaPage />} />
               <Route path="/habitos" element={<HabitsPage />} />
               <Route path="/notas" element={<NotesPage />} />
